@@ -1829,6 +1829,182 @@ module.exports = {
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Calculator.vue?vue&type=script&lang=js&":
+/*!*********************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/Calculator.vue?vue&type=script&lang=js& ***!
+  \*********************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  name: "Calculator",
+  data: function data() {
+    return {
+      active: true
+    };
+  },
+  methods: {
+    calculator: function calculator() {
+      var _this = this;
+
+      var calc = document.querySelector('.calculator');
+      var keys = document.querySelector('.keys');
+      var display = document.querySelector('.display');
+      keys.addEventListener('click', function (e) {
+        if (e.target.matches('button')) {
+          var key = e.target;
+          var action = key.dataset.action;
+          var keyContent = key.textContent;
+          var displayedNum = display.textContent;
+          var previousKeyType = calc.dataset.previousKeyType;
+          Array.from(key.parentNode.children).forEach(function (k) {
+            return k.classList.remove('is-depressed');
+          });
+
+          if (!action) {
+            if (displayedNum === '0' || previousKeyType === 'operator') {
+              display.textContent = keyContent;
+            } else {
+              display.textContent = displayedNum + keyContent;
+            }
+
+            calc.dataset.previousKeyType = keyContent;
+          }
+
+          if (action === 'add' || action === 'subtract' || action === 'multiply' || action === 'divide') {
+            key.classList.add('is-depressed');
+            calc.dataset.firstValue = displayedNum;
+            calc.dataset.operator = action;
+            calc.dataset.previousKeyType = 'operator';
+          }
+
+          if (action === 'decimal') {
+            display.textContent = displayedNum + '.';
+          }
+
+          if (action === 'clear') {
+            display.textContent = '';
+          }
+
+          if (action === 'calculate') {
+            var firstValue = calc.dataset.firstValue;
+            var operator = calc.dataset.operator;
+            display.textContent = _this.calculate(firstValue, operator, displayedNum);
+          }
+        }
+      }, false);
+      /* numpad */
+
+      document.addEventListener('keydown', keyboardType);
+
+      function keyboardType(e) {
+        var key = Number(e.key);
+        var keyContent = e.key;
+        var displayedNum = display.textContent;
+        var previousKeyType = calc.dataset.previousKeyType;
+
+        if (isNaN(key) || key === null) {
+          if (keyContent === '+' || keyContent === '-' || keyContent === '*' || keyContent === '/' || keyContent === '.') {
+            switch (keyContent) {
+              case "+":
+                calc.dataset.operator = 'add';
+                break;
+
+              case "-":
+                calc.dataset.operator = 'subtract';
+                break;
+
+              case "*":
+                calc.dataset.operator = 'multiply';
+                break;
+
+              case "/":
+                calc.dataset.operator = 'divide';
+                break;
+            }
+
+            calc.dataset.firstValue = displayedNum;
+            calc.dataset.previousKeyType = 'operator';
+          }
+
+          if (keyContent === 'Enter') {
+            e.preventDefault();
+            var firstValue = calc.dataset.firstValue;
+            var operator = calc.dataset.operator;
+            display.textContent = this.calculate(firstValue, operator, displayedNum);
+          }
+
+          if (keyContent === 'Backspace' || keyContent === 'Delete') {
+            display.textContent = '';
+          }
+        } else {
+          if (keyContent >= 0 && keyContent <= 9) {
+            // 0-9 only
+            if (displayedNum === '0' || previousKeyType === 'operator') {
+              display.textContent = keyContent;
+            } else {
+              display.textContent = displayedNum + keyContent;
+            }
+
+            calc.dataset.previousKeyType = keyContent;
+          }
+        }
+      }
+    },
+    calculate: function calculate(n1, operator, n2) {
+      var result = '';
+
+      if (operator === 'add') {
+        result = parseFloat(n1) + parseFloat(n2);
+      } else if (operator === 'subtract') {
+        result = parseFloat(n1) - parseFloat(n2);
+      } else if (operator === 'multiply') {
+        result = parseFloat(n1) * parseFloat(n2);
+      } else if (operator === 'divide') {
+        result = parseFloat(n1) / parseFloat(n2);
+      }
+
+      return result;
+    }
+  },
+  mounted: function mounted() {
+    this.calculator();
+  }
+});
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/ConfirmButton.vue?vue&type=script&lang=js&":
 /*!************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/ConfirmButton.vue?vue&type=script&lang=js& ***!
@@ -2231,6 +2407,25 @@ __webpack_require__.r(__webpack_exports__);
     return {};
   }
 });
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Calculator.vue?vue&type=style&index=0&id=625bc6ad&scoped=true&lang=css&":
+/*!****************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader??ref--6-1!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--6-2!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/Calculator.vue?vue&type=style&index=0&id=625bc6ad&scoped=true&lang=css& ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, "fieldset.calculator[data-v-625bc6ad] {\n  background-color: #f7fafc;\n  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);\n  text-align: right;\n}\n.btn[data-v-625bc6ad] {\n  padding: 0.75rem;\n  border-radius: 0.25rem;\n  background-color: #4299e1;\n}\n.btn.is-depressed[data-v-625bc6ad] {\n  background-color: #dd6b20;\n  box-shadow: inset 0 0 10px black;\n}\n.btn-number[data-v-625bc6ad] {\n  width: 6rem;\n  margin-top: 0.25rem;\n  margin-bottom: 0.25rem;\n  margin-left: 0.25rem;\n  margin-right: 0.25rem;\n}\n.btn-operator[data-v-625bc6ad] {\n  font-weight: 700;\n  color: #fff;\n  font-size: 1.5rem;\n  line-height: 1.375;\n  background-color: #4a5568;\n  margin: 0.25rem;\n  width: 2.5rem;\n  font-family: Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace;\n}\n.btn-equals[data-v-625bc6ad] {\n  width: 6rem;\n  margin: 0.25rem;\n  background-color: #f7fafc;\n  color: #000;\n}\n.display[data-v-625bc6ad] {\n  width: 100%;\n  margin-bottom: 1rem;\n  padding: 0.5rem;\n  height: 1rem;\n  font-size: 1.5rem;\n  border-width: 2px;\n  border-color: #cbd5e0;\n  text-align: right;\n  font-family: Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace;\n  color: #000;\n  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5);\n}\n", ""]);
+
+// exports
+
 
 /***/ }),
 
@@ -20681,6 +20876,36 @@ process.umask = function() { return 0; };
 
 /***/ }),
 
+/***/ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Calculator.vue?vue&type=style&index=0&id=625bc6ad&scoped=true&lang=css&":
+/*!********************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader!./node_modules/css-loader??ref--6-1!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--6-2!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/Calculator.vue?vue&type=style&index=0&id=625bc6ad&scoped=true&lang=css& ***!
+  \********************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+
+var content = __webpack_require__(/*! !../../../node_modules/css-loader??ref--6-1!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/src??ref--6-2!../../../node_modules/vue-loader/lib??vue-loader-options!./Calculator.vue?vue&type=style&index=0&id=625bc6ad&scoped=true&lang=css& */ "./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Calculator.vue?vue&type=style&index=0&id=625bc6ad&scoped=true&lang=css&");
+
+if(typeof content === 'string') content = [[module.i, content, '']];
+
+var transform;
+var insertInto;
+
+
+
+var options = {"hmr":true}
+
+options.transform = transform
+options.insertInto = undefined;
+
+var update = __webpack_require__(/*! ../../../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
+
+if(content.locals) module.exports = content.locals;
+
+if(false) {}
+
+/***/ }),
+
 /***/ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/DropDown.vue?vue&type=style&index=0&lang=css&":
 /*!******************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/style-loader!./node_modules/css-loader??ref--6-1!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--6-2!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/DropDown.vue?vue&type=style&index=0&lang=css& ***!
@@ -21412,6 +21637,137 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
                          (this && this.clearImmediate);
 
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../webpack/buildin/global.js */ "./node_modules/webpack/buildin/global.js")))
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Calculator.vue?vue&type=template&id=625bc6ad&scoped=true&":
+/*!*************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/Calculator.vue?vue&type=template&id=625bc6ad&scoped=true& ***!
+  \*************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", [
+    _c(
+      "div",
+      {
+        directives: [
+          {
+            name: "show",
+            rawName: "v-show",
+            value: _vm.active,
+            expression: "active"
+          }
+        ],
+        staticClass: "container flex flex-column"
+      },
+      [_vm._m(0)]
+    )
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("fieldset", { staticClass: "calculator" }, [
+      _c("div", { staticClass: "display" }),
+      _vm._v(" "),
+      _c("div", { staticClass: "keys" }, [
+        _c("button", { staticClass: "btn-number btn" }, [_vm._v("7")]),
+        _vm._v(" "),
+        _c("button", { staticClass: "btn-number btn" }, [_vm._v("8")]),
+        _vm._v(" "),
+        _c("button", { staticClass: "btn-number btn" }, [_vm._v("9")]),
+        _vm._v(" "),
+        _c(
+          "button",
+          {
+            staticClass: "btn-operator btn",
+            attrs: { "data-action": "divide" }
+          },
+          [_vm._v("÷")]
+        ),
+        _vm._v(" "),
+        _c("button", { staticClass: "btn-number btn" }, [_vm._v("4")]),
+        _vm._v(" "),
+        _c("button", { staticClass: "btn-number btn" }, [_vm._v("5")]),
+        _vm._v(" "),
+        _c("button", { staticClass: "btn-number btn" }, [_vm._v("6")]),
+        _vm._v(" "),
+        _c(
+          "button",
+          {
+            staticClass: "btn-operator btn",
+            attrs: { "data-action": "multiply" }
+          },
+          [_vm._v("×")]
+        ),
+        _vm._v(" "),
+        _c("button", { staticClass: "btn-number btn" }, [_vm._v("1")]),
+        _vm._v(" "),
+        _c("button", { staticClass: "btn-number btn" }, [_vm._v("2")]),
+        _vm._v(" "),
+        _c("button", { staticClass: "btn-number btn" }, [_vm._v("3")]),
+        _vm._v(" "),
+        _c(
+          "button",
+          {
+            staticClass: "btn-operator btn",
+            attrs: { "data-action": "subtract" }
+          },
+          [_vm._v("-")]
+        ),
+        _vm._v(" "),
+        _c("button", { staticClass: "btn-number btn" }, [_vm._v("0")]),
+        _vm._v(" "),
+        _c(
+          "button",
+          {
+            staticClass: "btn-decimal btn-number btn",
+            attrs: { "data-action": "decimal" }
+          },
+          [_vm._v(".")]
+        ),
+        _vm._v(" "),
+        _c(
+          "button",
+          {
+            staticClass: "btn-equals btn",
+            attrs: { "data-action": "calculate" }
+          },
+          [_vm._v("=")]
+        ),
+        _vm._v(" "),
+        _c(
+          "button",
+          { staticClass: "btn-operator btn", attrs: { "data-action": "add" } },
+          [_vm._v("+")]
+        ),
+        _vm._v(" "),
+        _c(
+          "button",
+          {
+            staticClass: "btn-operator btn-clr btn",
+            attrs: { "data-action": "clear" }
+          },
+          [_vm._v("C")]
+        )
+      ])
+    ])
+  }
+]
+render._withStripped = true
+
+
 
 /***/ }),
 
@@ -34032,8 +34388,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_ConfirmDialog__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./components/ConfirmDialog */ "./resources/js/components/ConfirmDialog.vue");
 /* harmony import */ var _components_FlashMessage__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./components/FlashMessage */ "./resources/js/components/FlashMessage.vue");
 /* harmony import */ var _components_TriggerForm__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./components/TriggerForm */ "./resources/js/components/TriggerForm.vue");
-/* harmony import */ var _plugins_modal_ModalPlugin__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./plugins/modal/ModalPlugin */ "./resources/js/plugins/modal/ModalPlugin.js");
+/* harmony import */ var _components_Calculator__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./components/Calculator */ "./resources/js/components/Calculator.vue");
+/* harmony import */ var _plugins_modal_ModalPlugin__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./plugins/modal/ModalPlugin */ "./resources/js/plugins/modal/ModalPlugin.js");
 __webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js");
+
 
 
 
@@ -34046,9 +34404,7 @@ __webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js");
 
 window.Vue = vue__WEBPACK_IMPORTED_MODULE_0___default.a;
 window.Bus = new vue__WEBPACK_IMPORTED_MODULE_0___default.a();
-vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(_plugins_modal_ModalPlugin__WEBPACK_IMPORTED_MODULE_8__["default"]); // const files = require.context('./', true, /\.vue$/i)
-// files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
-
+vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(_plugins_modal_ModalPlugin__WEBPACK_IMPORTED_MODULE_9__["default"]);
 vue__WEBPACK_IMPORTED_MODULE_0___default.a.component('scroll-link', _components_ScrollLink__WEBPACK_IMPORTED_MODULE_1__["default"]);
 vue__WEBPACK_IMPORTED_MODULE_0___default.a.component('dropdown', _components_DropDown__WEBPACK_IMPORTED_MODULE_2__["default"]);
 vue__WEBPACK_IMPORTED_MODULE_0___default.a.component('visible', _components_Visible__WEBPACK_IMPORTED_MODULE_3__["default"]);
@@ -34056,6 +34412,7 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.component('confirm-dialog', _componen
 vue__WEBPACK_IMPORTED_MODULE_0___default.a.component('confirm-button', _components_ConfirmButton__WEBPACK_IMPORTED_MODULE_4__["default"]);
 vue__WEBPACK_IMPORTED_MODULE_0___default.a.component('flash-message', _components_FlashMessage__WEBPACK_IMPORTED_MODULE_6__["default"]);
 vue__WEBPACK_IMPORTED_MODULE_0___default.a.component('trigger-form', _components_TriggerForm__WEBPACK_IMPORTED_MODULE_7__["default"]);
+vue__WEBPACK_IMPORTED_MODULE_0___default.a.component('calculator', _components_Calculator__WEBPACK_IMPORTED_MODULE_8__["default"]);
 var app = new vue__WEBPACK_IMPORTED_MODULE_0___default.a({
   el: '#app',
   methods: {
@@ -34120,6 +34477,93 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 //     cluster: process.env.MIX_PUSHER_APP_CLUSTER,
 //     encrypted: true
 // });
+
+/***/ }),
+
+/***/ "./resources/js/components/Calculator.vue":
+/*!************************************************!*\
+  !*** ./resources/js/components/Calculator.vue ***!
+  \************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _Calculator_vue_vue_type_template_id_625bc6ad_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Calculator.vue?vue&type=template&id=625bc6ad&scoped=true& */ "./resources/js/components/Calculator.vue?vue&type=template&id=625bc6ad&scoped=true&");
+/* harmony import */ var _Calculator_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Calculator.vue?vue&type=script&lang=js& */ "./resources/js/components/Calculator.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _Calculator_vue_vue_type_style_index_0_id_625bc6ad_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Calculator.vue?vue&type=style&index=0&id=625bc6ad&scoped=true&lang=css& */ "./resources/js/components/Calculator.vue?vue&type=style&index=0&id=625bc6ad&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
+  _Calculator_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _Calculator_vue_vue_type_template_id_625bc6ad_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _Calculator_vue_vue_type_template_id_625bc6ad_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  "625bc6ad",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/Calculator.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/Calculator.vue?vue&type=script&lang=js&":
+/*!*************************************************************************!*\
+  !*** ./resources/js/components/Calculator.vue?vue&type=script&lang=js& ***!
+  \*************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Calculator_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib??ref--4-0!../../../node_modules/vue-loader/lib??vue-loader-options!./Calculator.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Calculator.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Calculator_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/Calculator.vue?vue&type=style&index=0&id=625bc6ad&scoped=true&lang=css&":
+/*!*********************************************************************************************************!*\
+  !*** ./resources/js/components/Calculator.vue?vue&type=style&index=0&id=625bc6ad&scoped=true&lang=css& ***!
+  \*********************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Calculator_vue_vue_type_style_index_0_id_625bc6ad_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/style-loader!../../../node_modules/css-loader??ref--6-1!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/src??ref--6-2!../../../node_modules/vue-loader/lib??vue-loader-options!./Calculator.vue?vue&type=style&index=0&id=625bc6ad&scoped=true&lang=css& */ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Calculator.vue?vue&type=style&index=0&id=625bc6ad&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Calculator_vue_vue_type_style_index_0_id_625bc6ad_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Calculator_vue_vue_type_style_index_0_id_625bc6ad_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__);
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Calculator_vue_vue_type_style_index_0_id_625bc6ad_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Calculator_vue_vue_type_style_index_0_id_625bc6ad_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Calculator_vue_vue_type_style_index_0_id_625bc6ad_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0___default.a); 
+
+/***/ }),
+
+/***/ "./resources/js/components/Calculator.vue?vue&type=template&id=625bc6ad&scoped=true&":
+/*!*******************************************************************************************!*\
+  !*** ./resources/js/components/Calculator.vue?vue&type=template&id=625bc6ad&scoped=true& ***!
+  \*******************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Calculator_vue_vue_type_template_id_625bc6ad_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib??vue-loader-options!./Calculator.vue?vue&type=template&id=625bc6ad&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Calculator.vue?vue&type=template&id=625bc6ad&scoped=true&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Calculator_vue_vue_type_template_id_625bc6ad_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Calculator_vue_vue_type_template_id_625bc6ad_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
 
 /***/ }),
 
@@ -34834,8 +35278,8 @@ var Plugin = {
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! /Users/colin/Projects/php/phpspec/untitled/resources/js/app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! /Users/colin/Projects/php/phpspec/untitled/resources/sass/app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! C:\Users\cmichaels\Projects\laravel-vue-starter\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! C:\Users\cmichaels\Projects\laravel-vue-starter\resources\sass\app.scss */"./resources/sass/app.scss");
 
 
 /***/ })

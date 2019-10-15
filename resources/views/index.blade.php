@@ -6,6 +6,8 @@
         <h1 class="text-2xl font-bold">Hello World</h1>
         <scroll-link id="top" href="#categories">Go To Categories</scroll-link>
 
+        <calculator></calculator>
+
         @include('vue-examples/modal', ['heading' => 'test', 'content' => 'yeah buddy'])
         @include('vue-examples/dropdown', ['heading' => 'test', 'content' => 'yeah buddy'])
 
