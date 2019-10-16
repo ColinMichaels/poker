@@ -2422,7 +2422,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "fieldset.calculator[data-v-625bc6ad] {\n  background-color: #f7fafc;\n  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);\n  text-align: right;\n}\n.btn[data-v-625bc6ad] {\n  padding: 0.75rem;\n  border-radius: 0.25rem;\n  background-color: #4299e1;\n}\n.btn.is-depressed[data-v-625bc6ad] {\n  background-color: #dd6b20;\n  box-shadow: inset 0 0 10px black;\n}\n.btn-number[data-v-625bc6ad] {\n  width: 6rem;\n  margin-top: 0.25rem;\n  margin-bottom: 0.25rem;\n  margin-left: 0.25rem;\n  margin-right: 0.25rem;\n}\n.btn-operator[data-v-625bc6ad] {\n  font-weight: 700;\n  color: #fff;\n  font-size: 1.5rem;\n  line-height: 1.375;\n  background-color: #4a5568;\n  margin: 0.25rem;\n  width: 2.5rem;\n  font-family: Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace;\n}\n.btn-equals[data-v-625bc6ad] {\n  width: 6rem;\n  margin: 0.25rem;\n  background-color: #f7fafc;\n  color: #000;\n}\n.display[data-v-625bc6ad] {\n  width: 100%;\n  margin-bottom: 1rem;\n  padding: 0.5rem;\n  height: 1rem;\n  font-size: 1.5rem;\n  border-width: 2px;\n  border-color: #cbd5e0;\n  text-align: right;\n  font-family: Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace;\n  color: #000;\n  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5);\n}\n", ""]);
+exports.push([module.i, "fieldset.calculator[data-v-625bc6ad] {\n  background-color: #f7fafc;\n  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);\n  text-align: right;\n}\n.btn[data-v-625bc6ad] {\n  padding: 0.75rem;\n  border-radius: 0.25rem;\n  background-color: #4299e1;\n}\n.btn.is-depressed[data-v-625bc6ad] {\n  background-color: #dd6b20;\n  box-shadow: inset 0 0 10px black;\n}\n.btn-number[data-v-625bc6ad] {\n  width: 25%;\n  margin-top: 0.25rem;\n  margin-bottom: 0.25rem;\n  margin-left: 0.25rem;\n  margin-right: 0.25rem;\n}\n.btn-operator[data-v-625bc6ad] {\n  font-weight: 700;\n  color: #fff;\n  font-size: 1.5rem;\n  line-height: 1.375;\n  background-color: #4a5568;\n  margin: 0.25rem;\n  width: 2.5rem;\n  font-family: Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace;\n}\n.btn-equals[data-v-625bc6ad] {\n  width: 25%;\n  margin: 0.25rem;\n  background-color: #a0aec0;\n  color: #000;\n}\n.display[data-v-625bc6ad] {\n  width: 100%;\n  margin-bottom: 1rem;\n  padding: 0.5rem;\n  height: 2rem;\n  font-size: 1.5rem;\n  border-width: 2px;\n  border-color: #cbd5e0;\n  text-align: right;\n  font-family: Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace;\n  color: #000;\n  min-height: 60px;\n  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5);\n}\n", ""]);
 
 // exports
 
@@ -21667,7 +21667,7 @@ var render = function() {
             expression: "active"
           }
         ],
-        staticClass: "container flex flex-column"
+        staticClass: "flex flex-column p-4"
       },
       [_vm._m(0)]
     )
@@ -21678,91 +21678,98 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("fieldset", { staticClass: "calculator" }, [
-      _c("div", { staticClass: "display" }),
-      _vm._v(" "),
-      _c("div", { staticClass: "keys" }, [
-        _c("button", { staticClass: "btn-number btn" }, [_vm._v("7")]),
+    return _c(
+      "fieldset",
+      { staticClass: "calculator flex flex-column flex-wrap" },
+      [
+        _c("div", { staticClass: "display" }),
         _vm._v(" "),
-        _c("button", { staticClass: "btn-number btn" }, [_vm._v("8")]),
-        _vm._v(" "),
-        _c("button", { staticClass: "btn-number btn" }, [_vm._v("9")]),
-        _vm._v(" "),
-        _c(
-          "button",
-          {
-            staticClass: "btn-operator btn",
-            attrs: { "data-action": "divide" }
-          },
-          [_vm._v("÷")]
-        ),
-        _vm._v(" "),
-        _c("button", { staticClass: "btn-number btn" }, [_vm._v("4")]),
-        _vm._v(" "),
-        _c("button", { staticClass: "btn-number btn" }, [_vm._v("5")]),
-        _vm._v(" "),
-        _c("button", { staticClass: "btn-number btn" }, [_vm._v("6")]),
-        _vm._v(" "),
-        _c(
-          "button",
-          {
-            staticClass: "btn-operator btn",
-            attrs: { "data-action": "multiply" }
-          },
-          [_vm._v("×")]
-        ),
-        _vm._v(" "),
-        _c("button", { staticClass: "btn-number btn" }, [_vm._v("1")]),
-        _vm._v(" "),
-        _c("button", { staticClass: "btn-number btn" }, [_vm._v("2")]),
-        _vm._v(" "),
-        _c("button", { staticClass: "btn-number btn" }, [_vm._v("3")]),
-        _vm._v(" "),
-        _c(
-          "button",
-          {
-            staticClass: "btn-operator btn",
-            attrs: { "data-action": "subtract" }
-          },
-          [_vm._v("-")]
-        ),
-        _vm._v(" "),
-        _c("button", { staticClass: "btn-number btn" }, [_vm._v("0")]),
-        _vm._v(" "),
-        _c(
-          "button",
-          {
-            staticClass: "btn-decimal btn-number btn",
-            attrs: { "data-action": "decimal" }
-          },
-          [_vm._v(".")]
-        ),
-        _vm._v(" "),
-        _c(
-          "button",
-          {
-            staticClass: "btn-equals btn",
-            attrs: { "data-action": "calculate" }
-          },
-          [_vm._v("=")]
-        ),
-        _vm._v(" "),
-        _c(
-          "button",
-          { staticClass: "btn-operator btn", attrs: { "data-action": "add" } },
-          [_vm._v("+")]
-        ),
-        _vm._v(" "),
-        _c(
-          "button",
-          {
-            staticClass: "btn-operator btn-clr btn",
-            attrs: { "data-action": "clear" }
-          },
-          [_vm._v("C")]
-        )
-      ])
-    ])
+        _c("div", { staticClass: "keys flex flex-wrap" }, [
+          _c("button", { staticClass: "btn-number btn" }, [_vm._v("7")]),
+          _vm._v(" "),
+          _c("button", { staticClass: "btn-number btn" }, [_vm._v("8")]),
+          _vm._v(" "),
+          _c("button", { staticClass: "btn-number btn" }, [_vm._v("9")]),
+          _vm._v(" "),
+          _c(
+            "button",
+            {
+              staticClass: "btn-operator btn",
+              attrs: { "data-action": "divide" }
+            },
+            [_vm._v("÷")]
+          ),
+          _vm._v(" "),
+          _c("button", { staticClass: "btn-number btn" }, [_vm._v("4")]),
+          _vm._v(" "),
+          _c("button", { staticClass: "btn-number btn" }, [_vm._v("5")]),
+          _vm._v(" "),
+          _c("button", { staticClass: "btn-number btn" }, [_vm._v("6")]),
+          _vm._v(" "),
+          _c(
+            "button",
+            {
+              staticClass: "btn-operator btn",
+              attrs: { "data-action": "multiply" }
+            },
+            [_vm._v("×")]
+          ),
+          _vm._v(" "),
+          _c("button", { staticClass: "btn-number btn" }, [_vm._v("1")]),
+          _vm._v(" "),
+          _c("button", { staticClass: "btn-number btn" }, [_vm._v("2")]),
+          _vm._v(" "),
+          _c("button", { staticClass: "btn-number btn" }, [_vm._v("3")]),
+          _vm._v(" "),
+          _c(
+            "button",
+            {
+              staticClass: "btn-operator btn",
+              attrs: { "data-action": "subtract" }
+            },
+            [_vm._v("-")]
+          ),
+          _vm._v(" "),
+          _c("button", { staticClass: "btn-number btn" }, [_vm._v("0")]),
+          _vm._v(" "),
+          _c(
+            "button",
+            {
+              staticClass: "btn-decimal btn-number btn",
+              attrs: { "data-action": "decimal" }
+            },
+            [_vm._v(".")]
+          ),
+          _vm._v(" "),
+          _c(
+            "button",
+            {
+              staticClass: "btn-equals btn",
+              attrs: { "data-action": "calculate" }
+            },
+            [_vm._v("=")]
+          ),
+          _vm._v(" "),
+          _c(
+            "button",
+            {
+              staticClass: "btn-operator btn",
+              attrs: { "data-action": "add" }
+            },
+            [_vm._v("+")]
+          ),
+          _vm._v(" "),
+          _c(
+            "button",
+            {
+              staticClass: "btn-operator btn-clr btn",
+              attrs: { "data-action": "clear" }
+            },
+            [_vm._v("C")]
+          )
+        ])
+      ]
+    )
   }
 ]
 render._withStripped = true
