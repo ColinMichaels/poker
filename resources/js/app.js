@@ -10,6 +10,7 @@ import ConfirmDialog from "./components/ConfirmDialog";
 import FlashMessage from "./components/FlashMessage";
 import TriggerForm from "./components/TriggerForm";
 import Calculator from "./components/Calculator";
+import SidebarMenu from "./components/SidebarMenu";
 
 import Modal from "./plugins/modal/ModalPlugin";
 
@@ -25,6 +26,7 @@ Vue.component('confirm-button', ConfirmButton);
 Vue.component('flash-message', FlashMessage);
 Vue.component('trigger-form', TriggerForm);
 Vue.component('calculator', Calculator);
+Vue.component('sidebar-menu', SidebarMenu);
 
 
 const app = new Vue({

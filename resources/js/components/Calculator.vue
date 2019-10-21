@@ -3,7 +3,7 @@
         <div class="flex flex-column p-4" v-show="active">
             <fieldset class="calculator flex flex-column flex-wrap">
                 <div class="display"></div>
-                <div class="keys flex flex-wrap">
+                <div class="keys flex flex-wrap justify-between px-2">
                     <button class="btn-number btn">7</button>
                     <button class="btn-number btn">8</button>
                     <button class="btn-number btn">9</button>
@@ -186,15 +186,16 @@
     }
 
     .btn-operator {
-        @apply font-bold text-white text-2xl leading-snug bg-gray-700 m-1 w-10 font-mono;
+        @apply font-bold  text-white text-2xl leading-snug bg-gray-700 m-1 font-mono;
+        width:19%;
     }
 
     .btn-equals {
-        @apply w-3/12 m-1 bg-gray-500 text-black;
+        @apply w-1/4 m-1 bg-gray-500 text-black;
     }
 
     .display {
-        @apply w-full mb-4 p-2 h-8 text-2xl border-2 border-gray-400 text-right font-mono text-black;
+        @apply w-full bg-gray-800 mb-4 p-2 h-8 text-2xl border-2 border-gray-400 text-right font-mono text-gray-100;
         min-height: 60px;
         box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5);
     }
