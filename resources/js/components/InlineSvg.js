@@ -1,7 +1,7 @@
 class Svg {
     constructor(name) {
         let div = document.createElement('div');
-        div.innerHTML = require('../../../public/images/icons/' + name); // be careful with dynamic webpack requires.
+        div.innerHTML = require('../../../public/cards/icons/' + name); // be careful with dynamic webpack requires.
 
         let fragment = document.createDocumentFragment();
         fragment.appendChild(div);

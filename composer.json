@@ -19,7 +19,9 @@
         "laravel-frontend-presets/tailwindcss": "^2.0",
         "mockery/mockery": "^1.0",
         "nunomaduro/collision": "^3.0",
-        "phpunit/phpunit": "^8.0"
+        "phpunit/phpunit": "^8.0",
+        "phpspec/phpspec" : "~4.2.0",
+        "fetzi/phpspec-watcher": "^1.0"
     },
     "config": {
         "optimize-autoloader": true,
@@ -42,7 +44,8 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\": "tests/"
+            "Tests\\": "tests/",
+            "Poker\\": "app/Poker"
         }
     },
     "minimum-stability": "dev",

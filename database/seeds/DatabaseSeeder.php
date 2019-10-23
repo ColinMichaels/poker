@@ -11,7 +11,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        $this->call(MenuItemSeeder::class)
-            ->call(MenuSeeder::class);
+        $this
+            ->call(AdminUserSeeder::class);
+//            ->call(MenuItemSeeder::class)
+//            ->call(MenuSeeder::class);
     }
 }

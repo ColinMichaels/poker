@@ -1,0 +1,6 @@
+suites:
+  poker_suite:
+    namespace: Poker
+    src_path:  app
+    spec_path: app
+    spec_prefix: spec

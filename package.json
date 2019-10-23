@@ -25,6 +25,7 @@
         "vue-template-compiler": "^2.6.4"
     },
     "dependencies": {
+        "howler": "^2.1.2",
         "in-viewport": "^3.6.0",
         "smoothscroll-polyfill": "^0.4.4"
     }
