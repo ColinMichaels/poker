@@ -9,6 +9,11 @@ use Prophecy\Argument;
 
 class GameSpec extends ObjectBehavior {
 
+    const BET_MAX = 1000;
+    const BET_MIN = 1;
+    const NUM_CARDS_PER = 5;
+    const MAX_PLAYERS = 8;
+
 	function it_is_initializable() {
 
 		$this->shouldHaveType( Game::class );
@@ -49,17 +54,20 @@ class GameSpec extends ObjectBehavior {
 
 	function it_should_deal_5_cards_to_each_players_hand() {
 
-		$this->create(2)->players[0]->hand->shouldHaveCount(5);
+		$game = $this->create(2)->deal();
+		$game->players[0]->hand->getCards()->shouldHaveCount(5);
 	}
 
 	function it_should_deal_5_cards_to_player2_hand() {
 
-		$this->create(2)->players[1]->hand->shouldHaveCount(5);
+        $game = $this->create(2)->deal();
+        $game->players[1]->hand->getCards()->shouldHaveCount(5);
 	}
 
 	function it_should_have_42_cards_remaining_after_the_deal(){
 
-		$this->create(2)->deck->cards->shouldHaveCount(42);
+        $game = $this->create(2)->deal();
+		$game->deck->cards->shouldHaveCount(42);
 
 	}
 
@@ -89,6 +97,25 @@ class GameSpec extends ObjectBehavior {
 		$game->pot->shouldEqual(array_sum($bets));
 
 	}
+
+	function it_should_allow_game_options_to_be_set_by_passing_an_array_of_options(){
+
+	    $options = [
+            'bet_max'       => self::BET_MAX,
+            'bet_min'       => self::BET_MIN,
+            'max_players'   => self::MAX_PLAYERS,
+            'num_cards_per' => self::NUM_CARDS_PER
+        ];
+
+	    $this->beConstructedWith($options);
+
+	    $this->getOptions()->shouldReturn([
+            'bet_max'  => self::BET_MAX,
+            'bet_min'       => self::BET_MIN,
+            'max_players'   => self::MAX_PLAYERS,
+            'num_cards_per' => self::NUM_CARDS_PER
+        ]);
+    }
 
 
 }

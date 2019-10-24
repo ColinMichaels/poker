@@ -2,6 +2,10 @@
 
 namespace Poker;
 
+/**
+ * Borrowed from and inspired by --> https://github.com/aaronm2112/Poker-Hand-Evaluation/tree/master/libs
+ */
+
 class EvaluateHand
 {
 
