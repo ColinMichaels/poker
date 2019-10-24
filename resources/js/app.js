@@ -2,6 +2,8 @@ require('./bootstrap');
 
 import Vue from 'vue';
 
+import PokerChip from "./components/Poker/Chip";
+import PokerCard from "./components/Poker/Card";
 import ScrollLink from './components/ScrollLink';
 import DropDown from './components/DropDown';
 import Visible from "./components/Visible";
@@ -12,12 +14,15 @@ import TriggerForm from "./components/TriggerForm";
 import Calculator from "./components/Calculator";
 import SidebarMenu from "./components/SidebarMenu";
 
+
 import Modal from "./plugins/modal/ModalPlugin";
 
 window.Vue = Vue;
 window.Bus = new Vue();
 Vue.use(Modal);
 
+Vue.component('chip', PokerChip);
+Vue.component('card', PokerCard);
 Vue.component('scroll-link', ScrollLink);
 Vue.component('dropdown', DropDown);
 Vue.component('visible', Visible);
@@ -27,6 +32,7 @@ Vue.component('flash-message', FlashMessage);
 Vue.component('trigger-form', TriggerForm);
 Vue.component('calculator', Calculator);
 Vue.component('sidebar-menu', SidebarMenu);
+
 
 
 const app = new Vue({

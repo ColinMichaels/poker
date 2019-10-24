@@ -1,39 +1,52 @@
 @extends('layouts.app')
 
 @section('content')
-
     <div class="full mx-auto flex flex-row">
-        <div class="sidebar-menu h-screen w-1/4 bg-gray-400 h-full p-4">
+        <div class="sidebar-menu h-screen w-1/6 bg-gray-900 h-full p-4">
             <sidebar-menu></sidebar-menu>
         </div>
-        <div class="main-content flex flex-col mx-auto w-3/4 bg-red-400 p-4">
-                <h1 class="text-2xl font-bold">Hello World</h1>
-                <scroll-link id="top" href="#categories">Go To Categories</scroll-link>
-
-                <calculator :items="['one','two']"></calculator>
-
-                @include('vue-examples/modal', ['heading' => 'test', 'content' => 'yeah buddy'])
-                @include('vue-examples/dropdown', ['heading' => 'test', 'content' => 'yeah buddy'])
-
-                @include('vue-examples/confirm-dialog')
-
-                <div id="categories">
-                    <h2 class="font-bold mb-6">Testimonials</h2>
-                    <div class="flex">
-                        <div class="w-1/3 h-48 bg-gray-200 p-4">
-                            <scroll-link href="#app">Go Back up</scroll-link>
-                        </div>
-                        <div class="w-1/3 h-48 bg-gray-200 p-4">Item</div>
-                        <div class="w-1/3 h-48 bg-gray-200 p-4">Item</div>
+        <div class="main-content flex flex-wrap mx-auto w-full bg-green-800 p-4">
+            @foreach($game->players as $player)
+                <div class="flex border-b-4 border-white-600 py-5">
+                    <div class="flex flex-wrap  w-full md:w-1/2 mb-5 ">
+                        <h2 class="text-2xl text-white font-black w-full">Player #{{$loop->iteration}}</h2>
+                        @foreach($player->hand as $card)
+                            <card
+                                image="{{$card->image}}"
+                                description="{{$card->description}}">
+                            </card>
+                        @endforeach
+                    </div>
+                    @php
+                        $amount = rand(5,10000);
+                        $chip = new Poker\Chip($amount);
+                        $chips = $chip->split();
+                    @endphp
+                    <div class="flex  w-1/4 sm:w-full ">
+                        <h3 class="text-2xl text-white font-black mr-20 block">${{$amount}}</h3>
+                        @foreach($chips as $chip)
+                        {{--    <div class="min-w-1/8 max-w-1/8"
+                                 style="transform:translateX(-{{$loop->iteration * 30}}px)">
+                                <img class="w-full" src="{{$chip->image}}" alt="{{$chip->value}}"/>
+                            </div>--}}
+                            <chip
+                                image="{{$chip->image}}"
+                                amount="{{$chip->value}}"
+                                iteration="{{$loop->iteration}}">
+                            </chip>
+                        @endforeach
                     </div>
                 </div>
+            @endforeach
 
-            </div>
-{{--            <trigger-form></trigger-form>--}}
+        </div>
 
     </div>
-   <visible when-hidden="#top">
-        <button class="bg-blue-400 hover:bg-blue-600 rounded-full w-24 h-24 text-white text-4xl fixed z-10 bottom-0 right-0">+</button>
-   </visible>
+    <visible when-hidden="#nav">
+        <button
+            class="bg-blue-400 hover:bg-blue-600 rounded-full w-24 h-24 text-white text-4xl fixed z-10 bottom-0 right-0">
+            +
+        </button>
+    </visible>
     <flash-message></flash-message>
 @endsection
