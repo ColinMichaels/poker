@@ -2,15 +2,15 @@
 
 namespace Poker;
 
-class Hand extends Card
+class Hand extends Game
 {
     private $cards; //cards in hand
-    private $score; //hands score
+    private $score; //hands score;
 
     public function __construct() {
         $this->clearHand();
+        parent::__construct();
     }
-
     public function calculateScore($hand) {
         foreach ($this->getRanks() as $rank) {
             echo $rank;

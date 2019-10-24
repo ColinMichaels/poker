@@ -24,7 +24,8 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $game = (new Game)->create(7);
+        $game = (new Game)->create(7)->deal();
+
         return view('index')->withGame($game);
     }
 }

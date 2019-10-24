@@ -4,22 +4,20 @@ namespace Poker;
 class Player extends Game
 {
 
-	public $name,$hand, $score, $wallet, $is_current;
+	public $name,$hand, $wallet;
 
-	public function __construct(Deck $deck) {
-
-		parent::__construct();
-		$this->hand = $deck->draw(5);
-		$this->wallet = 100;
-		$this->score = 0;
-		$this->is_current = false;
+	public function __construct() {
+		$this->hand = new Hand();
+		$this->wallet = rand(5,10000);
+        parent::__construct();
 
 	}
 
-	public function score(){
+	public function chips(){
 
-		return array_sum($this->hand);
-	}
+         return (new Chip($this->wallet))->split();
+
+    }
 
 	public function getWallet(){
 		return $this->wallet;
@@ -30,5 +28,9 @@ class Player extends Game
 		 return  $this->wallet -= $amount;
 
 	}
+
+    public function draw($card){
+       $this->hand->addCardToHand($card);
+    }
 
 }

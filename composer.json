@@ -21,7 +21,8 @@
         "nunomaduro/collision": "^3.0",
         "phpunit/phpunit": "^8.0",
         "phpspec/phpspec" : "~4.2.0",
-        "fetzi/phpspec-watcher": "^1.0"
+        "fetzi/phpspec-watcher": "^1.0",
+        "ext-json": "*"
     },
     "config": {
         "optimize-autoloader": true,

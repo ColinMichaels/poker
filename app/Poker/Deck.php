@@ -1,56 +1,57 @@
 <?php
+
 namespace Poker;
 
-class Deck
-{
-	const SUITS = ['diamonds', 'hearts', 'spades','clubs'];
-	const VALUES = [1,2,3,4,5,6,7,8,9,10,11,12,13];
-	const TOTAL_CARDS = 52;
-	const SUIT_COUNT = 13;
+class Deck {
 
-	public $cards, $count;
+    const SUITS = [ 'diamonds', 'hearts', 'spades', 'clubs' ];
+    const SUIT_COUNT = 13;
 
-	public function __construct() {
-		$this->deal();
-		$this->count = 0;
-	}
+    public $cards, $total_cards;
+    public $cards_in_suit;
 
-	public function suits()
-    {
-        return count(self::SUITS );
+    public function __construct($cards_in_suit = self::SUIT_COUNT) {
+        $this->total_cards = 0;
+        $this->cards_in_suit = $cards_in_suit;
+        $this->deal();
     }
 
-    public function deal(){
-
-	     foreach(self::SUITS as $suit){
-	     	for($card = 0; $card < self::SUIT_COUNT; $card++){
-	     		   $this->cards[] = new Card($suit,$card +1);
-	        }
-	     }
-
-	     return $this;
-
+    public function suits() {
+        return count( self::SUITS );
     }
-    public function shuffle(){
 
-    	 shuffle($this->cards);
-    	 return $this;
+    public function deal() {
+
+        foreach ( self::SUITS as $suit ) {
+            for ( $card = 0; $card < 13; $card ++ ) {
+                $this->cards[]     = new Card( $suit, $card + 1 );
+                $this->total_cards += 1;
+            }
+        }
+
+        return $this;
 
     }
 
-    public function hasCount()
-    {
-        return count($this->cards);
+    public function shuffle() {
+
+        shuffle( $this->cards );
+        return $this;
     }
 
-    public function draw($num_of_cards){
+    public function removeCard( $card ) {
 
-		$hand =[];
-		for($i = 0; $i< $num_of_cards; $i++){
-			  $hand[] =  $this->cards[$this->count];
-			  unset($this->cards[$this->count]);
-			  $this->count += 1;
-		}
-		return $hand;
+        unset( $this->cards[ $card ] );
+
     }
+
+    public function hasCount() {
+        return count( $this->cards );
+    }
+
+    public function reset() {
+        $this->deal()->shuffle();
+    }
+
 }
+

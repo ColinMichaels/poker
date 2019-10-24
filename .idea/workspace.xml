@@ -2,127 +2,24 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1eee6476-c5d8-4dc1-b068-da2be4a7c407" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/jsonSchemas.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/php-test-framework.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.phpspec-watcher.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Http/Controllers/GameController.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Poker/Card.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Poker/Chip.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Poker/Deck.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Poker/EvaluateHand.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Poker/Game.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Poker/Hand.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Poker/Player.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Poker/Primes.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Poker/Suit.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/spec/Poker/CardSpec.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/spec/Poker/ChipSpec.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/spec/Poker/DeckSpec.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/spec/Poker/EvaluateHandSpec.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/spec/Poker/GameSpec.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/spec/Poker/HandSpec.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/spec/Poker/SuitSpec.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/database/migrations/2019_10_22_153716_create_games_table.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/database/seeds/AdminUserSeeder.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/phpspec.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/10C.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/10D.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/10H.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/10S.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/11C.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/11D.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/11H.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/11S.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/2C.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/2D.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/2H.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/2S.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/3C.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/3D.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/3H.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/3S.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/4C.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/4D.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/4H.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/4S.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/5C.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/5D.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/5H.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/5S.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/6C.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/6D.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/6H.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/6S.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/7C.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/7D.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/7H.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/7S.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/8C.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/8D.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/8H.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/8S.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/9C.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/9D.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/9H.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/9S.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/AC.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/AD.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/AH.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/AS.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/Card_back_01.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/Card_back_02.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/Card_back_06.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/JC.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/JD.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/JH.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/JS.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/KC.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/KD.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/KH.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/KS.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/QC.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/QD.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/QH.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/QS.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/cards/Red_52_Faces_v.2.0.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/chips/1.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/chips/10.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/chips/100.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/chips/1000.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/chips/25.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/chips/5.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/chips/50.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/chips/500.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/sounds/card.mp3" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/sounds/cha-ching.mp3" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/sounds/chip.mp3" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/sounds/chip2.mp3" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/sounds/chip3.mp3" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/sounds/chips.mp3" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/sounds/shuffle.mp3" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/sounds/tada.mp3" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/components/Poker/Card.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/components/Poker/Chip.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/nav/default.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/laravel-tw-vue-starter.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Poker.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/laravel-readme.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/sections/footer.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/sections/header.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/HomeController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/HomeController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Poker/Deck.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Poker/Deck.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Poker/EvaluateHand.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Poker/EvaluateHand.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Poker/Game.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Poker/Game.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Poker/Hand.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Poker/Hand.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Poker/Player.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Poker/Player.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/spec/Poker/GameSpec.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/spec/Poker/GameSpec.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/composer.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/composer.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/seeds/DatabaseSeeder.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/seeds/DatabaseSeeder.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/css/app.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/css/app.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/InlineSvg.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/InlineSvg.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/auth/login.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/auth/login.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/readme.md" beforeDir="false" afterPath="$PROJECT_DIR$/readme.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/Poker/Card.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/Poker/Card.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/index.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/index.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/layouts/app.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layouts/app.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -289,21 +186,21 @@
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/public/Poker/sounds" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_package_manager_path" value="npm" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/public/Poker/sounds" />
-      <recent name="$PROJECT_DIR$/public/Poker/chips" />
-      <recent name="$PROJECT_DIR$" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/public/Poker/sounds" />
       <recent name="$PROJECT_DIR$/resources/js/components/Poker" />
       <recent name="$PROJECT_DIR$/resources/js/components" />
       <recent name="$PROJECT_DIR$/app/spec/Poker" />
       <recent name="$PROJECT_DIR$/app" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/public/Poker/sounds" />
+      <recent name="$PROJECT_DIR$/public/Poker/chips" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -351,7 +248,11 @@
       <updated>1571667514200</updated>
       <workItem from="1571667515504" duration="37000" />
       <workItem from="1571756177945" duration="5253000" />
-      <workItem from="1571762744244" duration="11773000" />
+      <workItem from="1571762744244" duration="25793000" />
+      <workItem from="1571883813237" duration="292000" />
+      <workItem from="1571884311608" duration="20000" />
+      <workItem from="1571885482881" duration="1899000" />
+      <workItem from="1571887830531" duration="13000" />
     </task>
     <servers />
   </component>
