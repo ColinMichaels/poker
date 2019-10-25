@@ -1,17 +1,28 @@
 <?php
 namespace Poker;
 
-class Player extends Game
+use App\User;
+use Illuminate\Database\Eloquent\Model;
+
+class Player extends User
 {
 
-	public $name,$hand, $wallet;
+	public $name, $hand, $wallet;
 
-	public function __construct() {
+	const STARTING_WALLET = 0;
+	protected $guarded = ['*'];
+
+	public function __construct($wallet = null) {
 		$this->hand = new Hand();
-		$this->wallet = rand(5,10000);
-        parent::__construct();
+		$this->wallet = $wallet ?? rand(5,10000); //Player::STARTING_WALLET;
+        $this->name = 'Player-'.uniqid();
+
 
 	}
+
+	public function user(){
+	    return $this->belongsTo(User::class, 'user_id');
+    }
 
 	public function chips(){
 

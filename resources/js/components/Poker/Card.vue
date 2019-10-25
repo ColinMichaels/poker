@@ -2,7 +2,7 @@
     <div class="card-container" :class="{flipped: !flipped}" @click="flip">
         <div class="card">
             <div class="card-front">
-                <img :src="image" :alt="description"/>
+                <img :src="card_front" :alt="description"/>
             </div>
             <div class="card-back">
                 <img :src="card_back" :alt="description"/>
@@ -14,15 +14,37 @@
 <script>
     import {Howl} from 'howler';
 
+    import  {SUITS} from './suits';
+    import  {NAMES} from './names';
+
+    let Card = class Card{
+        constructor(suit, value){
+            this.suit = suit;
+            this.value = value;
+        }
+    };
+
     let sound = new Howl({
         src: ['/Poker/sounds/card.mp3']
     });
+
+    const imagePath = '/Poker/cards/';
+
     export default {
         name: "PokerCard",
-        props: ['image', 'description'],
+        props: {
+            name,
+            is_flipped: {
+                type: Boolean,
+                default: true
+            }
+        },
         data(){
           return{
               card_back : '/Poker/cards/Card_back_06.svg',
+              card_front : '/Poker/cards/AS.svg',
+              description: '',
+              suit: 'D',
               flipped: false
           }
         },
@@ -30,18 +52,30 @@
             flip() {
                 sound.play();
                 this.flipped = !this.flipped;
+            },
+            setImage(){
+               this.card_front = imagePath + this.name + '.svg';
+            },
+            setDescription(){
+                 let name = this.name.match(/\d+/g);
+                 let suit = this.name.match(/[A-Z]+/g);
+                 this.description = NAMES[name]  + " of "+ SUITS[suit];
             }
+        },
+        mounted(){
+          this.setImage();
+          this.setDescription()
         }
     }
 </script>
 <style>
     .card-container{
         perspective: 1000px;
-        @apply my-3 mx-1 h-full;
+        @apply my-4 mx-1 h-full;
         position: relative;
     }
     .card-container.flipped .card{
-        transform: rotateY(180deg);
+        transform: rotateY(180deg) translateY(120px);
     }
 
     .card{
@@ -53,8 +87,8 @@
         position: absolute;
     }
     .card, .card-front, .card-back{
-        @apply w-1/5 h-full;
-        min-width:75px;
+        @apply w-1/2 h-full;
+        min-width:100px;
     }
 
     .card-front{

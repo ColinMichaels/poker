@@ -23,16 +23,21 @@ class Game extends Model {
     const NUM_CARDS_PER = 5;
     const MAX_PLAYERS = 8;
 
+    const STARTING_PLAYER = 0;
+    const STARTING_POT = 0;
+
+    const DEFAULT_GAME_VIEW = "games.poker.index";
+
 
     public $players, $deck, $pot, $cur_player, $round, $last_bet, $card_count;
-    protected $BET_MIN, $MAX_PLAYERS, $NUM_CARDS_PER;
+    protected $BET_MAX,$BET_MIN, $MAX_PLAYERS, $NUM_CARDS_PER;
 
     public function __construct($options = null) {
 
         $this->deck = new Deck;
         $this->deck = $this->deck->shuffle();
-        $this->pot        = 0;
-        $this->cur_player = 0;
+        $this->pot        = Game::STARTING_POT;
+        $this->cur_player = Game::STARTING_PLAYER;
         $this->round      = 1;
         $this->card_count = $this->deck->total_cards;
         $this->setOptions( $options );
@@ -54,11 +59,11 @@ class Game extends Model {
     }
 
     public function advance(){
-
          $this->round += 1;
          $this->cur_player = 0;
          foreach($this->players as $player){
-               $player->draw($this->deck->cards[$this->card_count]);
+               $player->draw($this->getTopCard());
+               $this->remove_card_from_deck();
          }
     }
 
@@ -75,9 +80,9 @@ class Game extends Model {
         return $this->pot;
     }
 
-    public function create( $num_players ) {
+    public function start( $num_players = Game::NUM_CARDS_PER ) {
 
-        if ( $num_players >= $this->MAX_PLAYERS ) {
+        if ( $num_players > $this->MAX_PLAYERS ) {
             throw new InvalidArgumentException();
         }
         for ( $i = 0; $i < $num_players; $i ++ ) {

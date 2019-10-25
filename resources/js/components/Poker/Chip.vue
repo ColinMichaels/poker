@@ -1,5 +1,5 @@
 <template>
-    <div class="poker-chip min-w-1/8 max-w-1/8" @click="flip" :style="offset">
+    <div class="poker-chip w-20 h-20" @click="flip" :style="offset">
         <img class="w-full" :src="image" :alt="amount"/>
     </div>
 </template>
@@ -15,21 +15,61 @@
     let chip3 = new Howl({
         src: ['/Poker/sounds/chip3.mp3']
     });
+
+    const imagePath = '/Poker/chips/';
+    const denominations = [1,5,10,25,50,100,500,1000];
+
+    class Chip{
+          constructor(amount){
+              this.amount = amount;
+          }
+
+    }
+
     export default {
         name: "PokerChip",
-        props: ['image', 'amount','iteration'],
+        props: {
+            amount : {
+                type: String,
+                required: false,
+                default: 1
+            },
+            iteration :{
+                type: Number,
+                required: false,
+                default: 0
+            }
+        },
         data(){
             return {
                offset: "transform:translateX(-"+(this.iteration * 40)+"px)",
-                sounds: [chip, chip2, chip3]
+                sounds: [chip, chip2, chip3],
+                image: imagePath + '1.svg'
             }
         },
         methods:{
             flip(){
-                let total_sounds = this.sounds.length;
-                let cur_sound = Math.floor(Math.random() * Math.floor(total_sounds));
+                let cur_sound = Math.floor(Math.random() * Math.floor(this.sounds.length));
                 this.sounds[cur_sound].play();
+            },
+            getImage(){
+                this.image  =  imagePath + this.amount + ".svg"
+            },
+            split(amount){
+                let chips = [];
+                denominations.reverse().forEach(function(denomination){
+                    while(amount >= denomination  ) {
+                        if ( amount > 0 ) {
+                            chips.push( new Chip(denomination));
+                            amount -= denomination;
+                        }
+                    }
+                });
+                return chips;
             }
+        },
+        mounted(){
+            this.getImage();
         }
     }
 </script>

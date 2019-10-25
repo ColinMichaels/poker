@@ -11,8 +11,18 @@
 |
 */
 
-Route::get('/', 'HomeController@index');
+use Illuminate\Http\Resources\Json\Resource;
+
+Route::get( '/', 'HomeController@index' );
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::get( '/home', 'HomeController@index' )->name( 'home' );
+
+Route::resources( [
+    'games'   => 'GameController',
+    'decks'   => 'DeckController',
+    'players' => 'PlayerController',
+    'cards'   => 'CardController'
+] );
+
 

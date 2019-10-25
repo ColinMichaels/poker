@@ -15,11 +15,11 @@ class CreateGamesTable extends Migration
     {
         Schema::create('games', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->morphs( 'typeable');
-            $table->unsignedTinyInteger( 'min_bet');
-            $table->unsignedTinyInteger( 'max_bet');
-            $table->unsignedTinyInteger( 'min_players');
-            $table->unsignedTinyInteger( 'max_players');
+            $table->string('name')->default('poker');
+            $table->unsignedTinyInteger( 'min_bet')->default(0);
+            $table->unsignedInteger( 'max_bet')->default( 1000);
+            $table->unsignedTinyInteger( 'min_players')->default(2);
+            $table->unsignedTinyInteger( 'max_players')->default(8);
             $table->timestamps();
         });
     }

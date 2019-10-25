@@ -4,6 +4,7 @@ namespace spec\Poker;
 
 use Poker\Deck;
 use PhpSpec\ObjectBehavior;
+use Poker\Suit;
 use Prophecy\Argument;
 
 class DeckSpec extends ObjectBehavior
@@ -14,7 +15,7 @@ class DeckSpec extends ObjectBehavior
     }
 
     function it_should_have_four_suits(){
-    	$this->suits()->shouldReturn( 4);
+    	$this->suits()->shouldReturn( Suit::SUITS);
     }
 
     function it_should_have_52_cards(){
