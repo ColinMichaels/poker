@@ -12,4 +12,4 @@
     <!-- Styles -->
     <link href="{{ mix('css/app.css') }}" rel="stylesheet">
 </head>
-<body class="bg-black h-screen antialiased leading-none">
+<body class="bg-black h-screen antialiased leading-none text-white">

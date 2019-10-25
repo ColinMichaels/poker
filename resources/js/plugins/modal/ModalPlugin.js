@@ -1,15 +1,15 @@
 import ModalComponent from './ModalComponent';
 
-let Plugin = {
+let ModalPlugin = {
     install: function (Vue, options = {}) {
         Vue.component(options.name || 'modal', ModalComponent);
 
-        Plugin.events = new Vue();
+        ModalPlugin.events = new Vue();
 
         Vue.prototype.$modal = {
             show(name, params = {}) {
                 location.hash = name;
-                Plugin.events.$emit('show', params);  // message, cancel-button, confirm-button
+                ModalPlugin.events.$emit('show', params);  // message, cancel-button, confirm-button
             },
 
             hide(name) {
@@ -26,7 +26,7 @@ let Plugin = {
                 return new Promise((resolve, reject) => {
                     this.show('dialog', params);
 
-                    Plugin.events.$on(
+                    ModalPlugin.events.$on(
                         'clicked', confirmed => resolve(confirmed)
                     );
                 });
@@ -35,4 +35,4 @@ let Plugin = {
     }
 };
 
-export default Plugin;
+export default ModalPlugin;

@@ -23,7 +23,7 @@
 </template>
 
 <script>
-    import Modal from '../plugins/modal/ModalPlugin';
+    import Modal from '../../plugins/modal/ModalPlugin';
     export default {
         data() {
             return {

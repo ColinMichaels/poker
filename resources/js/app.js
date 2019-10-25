@@ -1,25 +1,29 @@
 require('./bootstrap');
 
+import Inertia from 'inertia'
 import Vue from 'vue';
+import VueMeta from 'vue-meta';
 
 import PokerChip from "./components/Poker/Chip";
 import PokerCard from "./components/Poker/Card";
-import ScrollLink from './components/ScrollLink';
-import DropDown from './components/DropDown';
-import Visible from "./components/Visible";
-import ConfirmButton from "./components/ConfirmButton";
-import ConfirmDialog from "./components/ConfirmDialog";
-import FlashMessage from "./components/FlashMessage";
-import TriggerForm from "./components/TriggerForm";
-import Calculator from "./components/Calculator";
-import SidebarMenu from "./components/SidebarMenu";
-
+import ScrollLink from './components/shared/ScrollLink';
+import DropDown from './components/shared/DropDown';
+import Visible from "./components/shared/Visible";
+import ConfirmButton from "./components/shared/ConfirmButton";
+import ConfirmDialog from "./components/shared/ConfirmDialog";
+import FlashMessage from "./components/shared/FlashMessage";
+import TriggerForm from "./components/shared/TriggerForm";
+import Calculator from "./components/shared/Calculator";
+import SidebarMenu from "./components/shared/SidebarMenu";
 
 import Modal from "./plugins/modal/ModalPlugin";
+import Game from "./plugins/game/GamePlugin";
 
 window.Vue = Vue;
 window.Bus = new Vue();
 Vue.use(Modal);
+Vue.use(VueMeta);
+Vue.use(Game);
 
 Vue.component('chip', PokerChip);
 Vue.component('card', PokerCard);
@@ -34,9 +38,13 @@ Vue.component('calculator', Calculator);
 Vue.component('sidebar-menu', SidebarMenu);
 
 
+let app = document.getElementById('app')
 
-const app = new Vue({
-    el: '#app',
+new Vue({
+    metaInfo: {
+        title : 'Loading..',
+        titleTemplate: '%s | Poker'
+    },
     methods: {
         confirm(message) {
             this.$modal.dialog(message)
@@ -53,5 +61,12 @@ const app = new Vue({
                     }
                 });
         }
-    }
-});
+    },
+    render: h => h(InertiaApp, {
+        props: {
+            initialPage: JSON.parse(app.dataset.page),
+            resolveComponent: name => import(`@/Pages/${name}`).then(module => module.default),
+        },
+    }),
+}).$mount(app)
+

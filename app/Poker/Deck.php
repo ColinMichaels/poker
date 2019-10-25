@@ -4,7 +4,7 @@ namespace Poker;
 
 class Deck {
 
-    const SUITS = [ 'diamonds', 'hearts', 'spades', 'clubs' ];
+
     const SUIT_COUNT = 13;
 
     public $cards, $total_cards;
@@ -17,12 +17,12 @@ class Deck {
     }
 
     public function suits() {
-        return count( self::SUITS );
+        return Suit::SUITS;
     }
 
     public function deal() {
 
-        foreach ( self::SUITS as $suit ) {
+        foreach ( Suit::SUITS as $suit ) {
             for ( $card = 0; $card < 13; $card ++ ) {
                 $this->cards[]     = new Card( $suit, $card + 1 );
                 $this->total_cards += 1;
