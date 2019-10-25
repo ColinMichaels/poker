@@ -13,10 +13,11 @@
 
 use Illuminate\Http\Resources\Json\Resource;
 
-Route::get( '/', 'HomeController@index' );
+Route::get( '/' , 'HomeController')->middleware('auth');
+
 Auth::routes();
 
-Route::get( '/home', 'HomeController@index' )->name( 'home' );
+Route::get( '/home', 'HomeController' )->name( 'home' );
 
 Route::resources( [
     'games'   => 'GameController',

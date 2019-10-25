@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="{{ app()->getLocale() }}">
+<html lang="{{ app()->getLocale() }}" class="h-full bg-grey-lighter">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -14,11 +14,8 @@
     <!-- Scripts -->
     <script src="{{ mix('js/app.js') }}"></script>
 </head>
-<body class="bg-black h-screen antialiased leading-none text-white">
+<body class="bg-white h-screen antialiased leading-none text-white">
     @inertia
-    <div id="app" data-component="{{ $component ?? '' }}" data-props="{{ (isset($props)) ? json_encode($props) : '' }}">
-
-    </div>
 </body>
 </html>
 

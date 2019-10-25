@@ -14,16 +14,24 @@ class AdminUserSeeder extends Seeder
     public function run()
     {
         $admin = new User;
-        $admin->name = 'Admin';
+        $admin->first_name = 'Admin';
         $admin->email = env('MAIL_FROM_ADDRESS');
         $admin->password = bcrypt('admin');
         $admin->save();
 
         $demo = new User;
-        $demo->name = 'Demo Player';
+        $demo->first_name = 'Demo Player';
         $demo->email = 'demo@poker.com';
         $demo->password = bcrypt('demo');
         $demo->save();
+
+        $player = new \Poker\Player;
+        $player->name = "Demo Player";
+        $player->user_id = $demo->id;
+        $player->wallet = 10000;
+        $player->wins = 0;
+        $player->games_played = 0;
+        $player->save();
 
     }
 }

@@ -26,10 +26,11 @@
 </template>
 
 <script>
-    import GameComponent  from "./GamePlugin";
+    import Layout from '@/Shared/Layout';
+    import GameComponent  from "@/plugins/game/GamePlugin";
     import {Howl} from 'howler';
-    import Deck from "../../components/Poker/Deck";
-    import Card from "../../components/Poker/Card";
+    import Deck from "@/components/Poker/Deck";
+    import Card from "@/components/Poker/Card";
     import Chip from "../../components/Poker/Chip";
     let sound = new Howl({
         src: ['/Poker/sounds/shuffle.mp3']
@@ -38,6 +39,10 @@
 
     export default {
         name: "Game",
+        metaInfo :{
+            title : "Game Dashboard",
+            layout : Layout
+        },
         props: ['name'],
         components:{
              Deck, Card

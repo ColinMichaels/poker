@@ -2,75 +2,56 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1eee6476-c5d8-4dc1-b068-da2be4a7c407" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/symfony2.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Http/Controllers/CardController.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Http/Controllers/DeckController.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Http/Controllers/PlayerController.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Http/Resources/Game.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Http/Resources/Games.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Http/Resources/Player.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Http/Resources/Players.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Http/Resources/PokerCards.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Http/Resources/PokerChips.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Http/Resources/PokerDeck.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/database/factories/GameFactory.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/database/factories/PlayerFactory.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/database/migrations/2019_10_24_172347_create_players_table.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/database/seeds/GamesTableSeeder.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/database/seeds/PlayersTableSeeder.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/components/Poker/Deck.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/components/Poker/names.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/components/Poker/suits.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/components/shared/ClockComponent.Vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/components/shared/LoadingButton.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/components/shared/SidebarMenu.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/plugins/game/GameComponent.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/plugins/game/GamePlugin.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/games/poker/index.blade.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/games/poker/modals/start.blade.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/modals/cancel.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/public/js/0.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/js/Pages/Auth/Login.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/js/Pages/Dashboard/Index.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/js/Shared/Dropdown.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/js/Shared/FileInput.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/js/Shared/FlashMessages.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/js/Shared/Icon.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/js/Shared/Layout.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/js/Shared/LoadingButton.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/js/Shared/Logo.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/js/Shared/MainMenu.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/js/Shared/Pagination.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/js/Shared/SearchFilter.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/js/Shared/SelectInput.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/js/Shared/TextInput.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/js/Shared/TextareaInput.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/js/Shared/TrashedMessage.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/app.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/Poker.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Poker.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/GameController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/GameController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Auth/LoginController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Auth/LoginController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Auth/VerificationController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Auth/VerificationController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/HomeController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/HomeController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Poker/Card.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Poker/Card.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Poker/Deck.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Poker/Deck.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Poker/Game.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Poker/Game.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Poker/Player.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Poker/Player.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Poker/Suit.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Poker/Suit.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/spec/Poker/DeckSpec.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/spec/Poker/DeckSpec.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/spec/Poker/GameSpec.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/spec/Poker/GameSpec.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Providers/AppServiceProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Providers/AppServiceProvider.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/User.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/User.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/composer.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/composer.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/factories/MenuFactory.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/factories/MenuFactory.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/migrations/2019_10_22_153716_create_games_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2019_10_22_153716_create_games_table.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/seeds/DatabaseSeeder.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/seeds/DatabaseSeeder.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/factories/UserFactory.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/factories/UserFactory.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2014_10_12_000000_create_users_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2014_10_12_000000_create_users_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/seeds/AdminUserSeeder.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/seeds/AdminUserSeeder.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/seeds/PlayersTableSeeder.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/seeds/PlayersTableSeeder.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/Card_back_01.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/Card_back_01.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/Card_back_06.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/Card_back_06.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/css/app.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/css/app.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/mix-manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/mix-manifest.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/Calculator.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/shared/Calculator.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/ConfirmButton.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/shared/ConfirmButton.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/ConfirmDialog.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/shared/ConfirmDialog.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/DropDown.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/shared/DropDown.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/FlashMessage.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/shared/FlashMessage.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/InlineSvg.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/shared/InlineSvg.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/Modal.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/shared/Modal.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/Poker/Card.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/Poker/Card.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/Poker/Chip.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/Poker/Chip.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/ScrollLink.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/shared/ScrollLink.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/SidebarMenu.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/TriggerForm.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/shared/TriggerForm.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/Visible.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/shared/Visible.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/plugins/modal/ModalPlugin.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/plugins/modal/ModalPlugin.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/plugins/game/GameComponent.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/plugins/game/GameComponent.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/auth/login.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/auth/login.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/auth/passwords/email.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/auth/passwords/email.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/auth/passwords/reset.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/auth/passwords/reset.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/auth/register.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/auth/register.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/auth/verify.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/auth/verify.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/games/poker/index.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/games/poker/index.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/home.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/home.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/index.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/index.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/layouts/app.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layouts/app.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/layouts/app.blade.php" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/sections/header.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/sections/header.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tailwind.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/tailwind.config.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/webpack.mix.js" beforeDir="false" afterPath="$PROJECT_DIR$/webpack.mix.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -111,14 +92,28 @@
         <item name="schemas" type="d4e8921:DatabaseStructure$FamilyGroup" />
         <item name="poker: schema" type="76f4a085:MysqlImplModel$Schema" />
       </path>
+      <path>
+        <item name="Database" type="3277223f:DatabaseStructure$DbRootGroup" />
+        <item name="root@localhost" type="feb32156:DbDataSourceImpl" />
+        <item name="schemas" type="d4e8921:DatabaseStructure$FamilyGroup" />
+        <item name="poker: schema" type="76f4a085:MysqlImplModel$Schema" />
+        <item name="players: table" type="285a2a93:MysqlImplModel$Table" />
+      </path>
+      <path>
+        <item name="Database" type="3277223f:DatabaseStructure$DbRootGroup" />
+        <item name="root@localhost" type="feb32156:DbDataSourceImpl" />
+        <item name="schemas" type="d4e8921:DatabaseStructure$FamilyGroup" />
+        <item name="poker: schema" type="76f4a085:MysqlImplModel$Schema" />
+        <item name="users: table" type="285a2a93:MysqlImplModel$Table" />
+      </path>
     </expand>
     <select />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Vue Single File Component" />
         <option value="JavaScript File" />
+        <option value="Vue Single File Component" />
       </list>
     </option>
   </component>
@@ -224,6 +219,7 @@
       <path value="$PROJECT_DIR$/vendor/phpspec/php-diff" />
       <path value="$PROJECT_DIR$/vendor/react/event-loop" />
       <path value="$PROJECT_DIR$/vendor/fetzi/phpspec-watcher" />
+      <path value="$PROJECT_DIR$/vendor/inertiajs/inertia-laravel" />
     </include_path>
   </component>
   <component name="ProjectId" id="1SW7ZXvS3DoDmcb7n1oBC0iatKD" />
@@ -234,7 +230,7 @@
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/node_modules" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/resources/js/Pages" />
     <property name="node.js.detected.package.stylelint" value="true" />
     <property name="node.js.path.for.package.stylelint" value="project" />
     <property name="node.js.selected.package.stylelint" value="$PROJECT_DIR$/node_modules" />
@@ -243,18 +239,18 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/resources/views" />
       <recent name="$PROJECT_DIR$/resources/js/components/shared" />
       <recent name="$PROJECT_DIR$/public/Poker/sounds" />
       <recent name="$PROJECT_DIR$/resources/js/components/Poker" />
       <recent name="$PROJECT_DIR$/resources/js/components" />
-      <recent name="$PROJECT_DIR$/app/spec/Poker" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/resources/js/Pages" />
+      <recent name="$PROJECT_DIR$/resources/js/Shared" />
       <recent name="$PROJECT_DIR$/resources/js/components/shared" />
       <recent name="$PROJECT_DIR$/resources/js/components" />
       <recent name="$PROJECT_DIR$" />
-      <recent name="$PROJECT_DIR$/public/Poker/sounds" />
-      <recent name="$PROJECT_DIR$/public/Poker/chips" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -279,7 +275,17 @@
     <option name="allServicesViewState">
       <serviceView>
         <treeState>
-          <expand />
+          <expand>
+            <path>
+              <item name="services root" type="e789fda9:ObjectUtils$Sentinel" />
+              <item name="com.intellij.execution.services.ServiceModel$ServiceGroupNode@9a2c2d2c" type="7427dc5b:ServiceModel$ServiceGroupNode" />
+            </path>
+            <path>
+              <item name="services root" type="e789fda9:ObjectUtils$Sentinel" />
+              <item name="com.intellij.execution.services.ServiceModel$ServiceGroupNode@9a2c2d2c" type="7427dc5b:ServiceModel$ServiceGroupNode" />
+              <item name="com.intellij.execution.services.ServiceModel$ServiceNode@41c58d28" type="9fbbdea:ServiceModel$ServiceNode" />
+            </path>
+          </expand>
           <select />
         </treeState>
       </serviceView>
@@ -312,7 +318,8 @@
       <workItem from="1571933004771" duration="13059000" />
       <workItem from="1571968452938" duration="1950000" />
       <workItem from="1571970599856" duration="345000" />
-      <workItem from="1572013380849" duration="10592000" />
+      <workItem from="1572013380849" duration="13518000" />
+      <workItem from="1572038087699" duration="4035000" />
     </task>
     <servers />
   </component>
@@ -341,7 +348,6 @@
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/resources/js/components/Poker/Deck.vue</url>
           <line>12</line>
-          <properties lambdaOrdinal="-1" />
           <option name="timeStamp" value="1" />
         </line-breakpoint>
       </breakpoints>

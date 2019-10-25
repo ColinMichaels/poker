@@ -11,5 +11,7 @@
 
     <!-- Styles -->
     <link href="{{ mix('css/app.css') }}" rel="stylesheet">
+    <!-- Scripts -->
+    <script src="{{ mix('js/app.js') }}"></script>
 </head>
 <body class="bg-black h-screen antialiased leading-none text-white">
