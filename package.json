@@ -35,6 +35,7 @@
     },
     "dependencies": {
         "gsap": "^2.1.3",
+        "hooper": "^0.3.4",
         "in-viewport": "^3.6.0"
     }
 }

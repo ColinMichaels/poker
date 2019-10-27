@@ -17,6 +17,10 @@
                     </div>
                     <div class="bg-white border-b w-full p-4 md:py-0 md:px-12 text-sm md:text-base flex justify-between items-center">
                         <div class="mt-1 mr-4">{{ $page.auth.user.first_name }}</div>
+                        <div class="player-stats">
+                            <p>Wallet: ${{$page.auth.user.player.wallet}}</p>
+                            <p>Wins/Losses: </p>
+                        </div>
                         <dropdown class="mt-1" placement="bottom-end">
                             <div class="flex items-center cursor-pointer select-none group">
                                 <div class="text-grey-darkest group-hover:text-indigo-dark focus:text-indigo-dark mr-1 whitespace-no-wrap">
@@ -63,6 +67,11 @@
             return {
                 showUserMenu: false,
                 accounts: null,
+            }
+        },
+        computed:{
+            playerStats(){
+                return $page.auth.user.player.wins;
             }
         },
         methods: {
