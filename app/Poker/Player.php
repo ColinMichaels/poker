@@ -4,20 +4,17 @@ namespace Poker;
 use App\User;
 use Illuminate\Database\Eloquent\Model;
 
-class Player extends User
+class Player extends Model
 {
 
-	public $name, $hand, $wallet;
+	public $name, $hand;
 
 	const STARTING_WALLET = 0;
 	protected $guarded = ['*'];
 
 	public function __construct($wallet = null) {
 		$this->hand = new Hand();
-		$this->wallet = $wallet ?? rand(5,10000); //Player::STARTING_WALLET;
         $this->name = 'Player-'.uniqid();
-
-
 	}
 
 	public function user(){
@@ -30,9 +27,6 @@ class Player extends User
 
     }
 
-	public function getWallet(){
-		return $this->wallet;
-	}
 
 	public function withdraw($amount){
 

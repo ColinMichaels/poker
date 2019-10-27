@@ -11,6 +11,7 @@ class HomeController extends Controller
     public function __invoke()
     {
 
-        return Inertia::render('Dashboard/Index');
+       return Inertia::render('Dashboard/Index');
+
     }
 }

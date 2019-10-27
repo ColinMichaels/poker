@@ -39,6 +39,10 @@ class User extends Authenticatable
     ];
 
     public function players(){
-        return $this->hasMany( Player::class);
+        return Player::all();
+    }
+
+    public function player(){
+        return $this->hasOne(Player::class)->first();
     }
 }

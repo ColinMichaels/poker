@@ -1,5 +1,5 @@
 <template>
-    <div class="card-container" :class="{flipped: !flipped}" @click="flip">
+    <div class="card-container" :class="{flipped: flipped}" @click="flip">
         <div class="card">
             <div class="card-front">
                 <img :src="card_front" :alt="description"/>
@@ -68,35 +68,3 @@
         }
     }
 </script>
-<style>
-    .card-container{
-        perspective: 1000px;
-        @apply my-4 mx-1 h-full;
-        position: relative;
-    }
-    .card-container.flipped .card{
-        transform: rotateY(180deg) translateY(120px);
-    }
-
-    .card{
-        transition: transform 1s;
-        transform-style: preserve-3d;
-    }
-    .card-front, .card-back{
-        backface-visibility: hidden;
-        position: absolute;
-    }
-    .card, .card-front, .card-back{
-        @apply w-1/2 h-full;
-        min-width:100px;
-    }
-
-    .card-front{
-        z-index: 2;
-        /* for firefox 31 */
-        transform: rotateY(0deg);
-    }
-    .card-back{
-        transform: rotateY(180deg);
-    }
-</style>

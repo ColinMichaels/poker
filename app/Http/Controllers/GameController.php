@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Redirect;
+use Inertia\Inertia;
 use Poker\Game;
 use App\Http\Resources\Game as GameResource;
 use App\Http\Resources\Games as GamesCollection;
@@ -12,6 +15,14 @@ class GameController extends Controller
 {
 
     public function index()
+    {
+        return Inertia::render('Game/Index', [
+            'filters' => Request::all('search', 'role', 'trashed'),
+            'games' => Game::all()->toArray(),
+        ]);
+    }
+
+    public function toJson()
     {
         return  new GamesCollection( Game::all());
     }
