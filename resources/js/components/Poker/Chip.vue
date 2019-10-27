@@ -6,6 +6,7 @@
 
 <script>
     import {Howl} from 'howler';
+    import {denominations} from "./denominations";
     let chip = new Howl({
         src : [ '/Poker/sounds/chip.mp3' ]
     });
@@ -17,17 +18,15 @@
     });
 
     const imagePath = '/Poker/chips/';
-    const denominations = [1,5,10,25,50,100,500,1000];
-
-    class Chip{
+    /*class Chip{
           constructor(amount){
               this.amount = amount;
           }
 
-    }
+    }*/
 
     export default {
-        name: "PokerChip",
+        name: "Chip",
         props: {
             amount : {
                 type: String,

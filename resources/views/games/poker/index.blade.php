@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('app')
 @section('content')
     <div class="full mx-auto flex flex-row">
         <div class="sidebar-menu h-screen w-1/6 bg-gray-900 h-full p-4">

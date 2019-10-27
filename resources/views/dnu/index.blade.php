@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('app')
 @section('content')
     <div class="h-full  mx-auto flex flex-row">
          <sidebar-menu :items="['5 Card','7 Card', 'Hold`em']"></sidebar-menu>
