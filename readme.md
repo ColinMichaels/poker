@@ -3,6 +3,10 @@
 
 This is a learning project. 
 
+## Source
+
+[https://github.com/ColinMichaels/poker][https://github.com/ColinMichaels/poker]
+
 ## Usage
 
 The concept here is for me to practice PHPSpec , VueJs , Laravel, Tailwind , and learning Inertia.   
