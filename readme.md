@@ -5,7 +5,7 @@ This is a learning project.
 
 ## Source
 
-[https://github.com/ColinMichaels/poker][https://github.com/ColinMichaels/poker]
+[https://github.com/ColinMichaels/poker]
 
 ## Usage
 
