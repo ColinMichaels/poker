@@ -7,6 +7,14 @@ This is a learning project.
 
 gihub : [https://github.com/ColinMichaels/poker](https://github.com/ColinMichaels/poker)
 
+## Demo
+
+wip: [http://poker.colinmichaels.com](http://poker.colinmichaels.com)
+
+## Inspiration
+
+
+
 ## Usage
 
 The concept here is for me to practice PHPSpec , VueJs , Laravel, Tailwind , and learning Inertia.   
