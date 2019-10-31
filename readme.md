@@ -9,11 +9,11 @@ gihub : [https://github.com/ColinMichaels/poker](https://github.com/ColinMichael
 
 ## Demo
 
-wip: [http://poker.colinmichaels.com](http://poker.colinmichaels.com)
+coming soon 
 
 ## Inspiration
 
-
+Many thanks to all those people in the open source community.  And those that share and collaborate. I will list borrowed snipits and inspirations.   
 
 ## Usage
 
