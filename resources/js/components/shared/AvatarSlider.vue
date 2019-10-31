@@ -1,10 +1,11 @@
 <template>
-    <div class="avatars flex py-2">
-        <hooper :settings="settings">
+    <div class="avatars flex mt-10 -mb-10">
+        <hooper :settings="settings" class="select-none focus:outline-none focus:shadow-none" >
             <slide v-for="avatar in avatars"
                    v-bind:name="avatar.name"
-                   v-bind:key="avatar.name">
-                <avatar :name="avatar.name" :bgcolor="avatar.bgcolor" :sound="avatar.sound"></avatar>
+                   v-bind:key="avatar.name"
+                   v-bind:selected="selected">
+                <avatar :name="avatar.name" :bgcolor="avatar.bgcolor" :sound="avatar.sound" @click.once="selectAvatar(avatar)"></avatar>
             </slide>
         </hooper>
     </div>
@@ -19,9 +20,25 @@
         data(){
             return{
                 settings:{
-                  itemsToShow: 4,
-                    infiniteScroll : true
+                    itemsToShow: 3,
+                    infiniteScroll : true,
+                    autoPlay: true,
+                    breakpoints:{
+                        1200:{
+                           itemsToShow: 8,
+                        },
+                        1000:{
+                            itemsToShow: 5,
+                        },
+                        800:{
+                            itemsToShow: 4
+                        },
+                        475:{
+                            itemsToShow : 3
+                        }
+                    }
                 },
+                selected: null,
                 avatars : [
                         {
                             name: 'robot-03',
@@ -78,6 +95,12 @@
                     },
                 ]
             }
+        },
+        methods:{
+          selectAvatar(avatar){
+              console.log(avatar);
+              this.selected = 1;
+          }
         },
         components: {
             Hooper,

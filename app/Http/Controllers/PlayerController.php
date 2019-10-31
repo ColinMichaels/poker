@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 
+use Illuminate\Support\Facades\Auth;
 use Poker\Player;
 use App\Http\Resources\Player as PlayerResource;
 use App\Http\Resources\Players as PLayersCollection;
@@ -38,7 +39,7 @@ class PlayerController extends Controller
 
     public function edit(Player $player)
     {
-        //
+
     }
 
     public function update(Request $request, Player $player)

@@ -4,99 +4,111 @@
             <card
                 :ref="card"
                 v-for="card in cards"
-                v-bind:name="card"
-                v-bind:key="card"
-                :is_flipped="is_flipped"
-                ></card>
+                :name="card.name"
+                :key="card.id"
+                :rank="card.rank"
+                :is_flipped="false"
+            ></card>
         </div>
+       <!-- <div class="font-mono bg-white text-black p-4 my-5">
+            <ul>
+                <li v-for="card in cards"
+                    :key="card.id"
+                    :rank="card.rank"
+                    :name="card.name">
+                    {{card.name}}
+                </li>
+            </ul>
+        </div>-->
     </div>
 </template>
 
 <script>
-    import GameComponent  from "@/plugins/game/GamePlugin";
+    import Game from "@/plugins/game/GamePlugin";
     import {TweenMax, Power2, TimelineLite} from "gsap/TweenMax";
-    import Draggable from "gsap/Draggable";
+    import AudioPlugin from "@/plugins/audio/AudioPlugin";
+    import CardsList from "@/plugins/game/cardsList";
+
+    let shuffleSound = AudioPlugin.load('/Poker/sounds/shuffle.mp3');
     import Card from "./Card";
+
     const total_cards = 52;
+
+    const initData = ()=>({
+        is_flipped: false,
+        cards: Game.store().cards,
+        play_hand : [],
+        position: Math.floor(Math.random() * (52 - 1 ) +1)
+    });
+
     export default {
         name: "Deck",
-        data(){
-            return{
-                is_flipped : false,
-                cards: {
-                    0: "2C",
-                    1: "3C",
-                    2: "4C",
-                    3: "5C",
-                    4: "6C",
-                    5: "7C",
-                    6: "8C",
-                    7: "9C",
-                    8: "10C",
-                    9: "JC",
-                    10: "AC",
-                    11: "QC",
-                    12: "KC",
-                    13: "2D",
-                    14: "3D",
-                    15: "4D",
-                    16: "5D",
-                    17: "6D",
-                    18: "7D",
-                    19: "8D",
-                    20: "9D",
-                    21: "10D",
-                    22: "JD",
-                    23: "AD",
-                    24: "QD",
-                    25: "KD",
-                    26: "2H",
-                    27: "3H",
-                    28: "4H",
-                    29: "5H",
-                    30: "6H",
-                    31: "7H",
-                    32: "8H",
-                    33: "9H",
-                    34: "10H",
-                    35: "JH",
-                    36: "AH",
-                    37: "QH",
-                    38: "KH",
-                    39: "2S",
-                    40: "3S",
-                    41: "4S",
-                    42: "5S",
-                    43: "6S",
-                    44: "7S",
-                    45: "8S",
-                    46: "9S",
-                    47: "10S",
-                    48: "JS",
-                    49: "AS",
-                    50: "QS",
-                    51: "KS"
-                }
-            }
+        data() {
+            return initData();
         },
-        components:{
+        components: {
             Card
         },
-        methods:{
-            deal(){
+        methods: {
+            deal(num_per) {
+                this.resetDeck();
+                this.is_flipped= false;
+                this.shuffle();
+            },
+            draw(card) {
+               let deck_card = this.cards[this.position];
+                Game.broadcast('card.start', deck_card.name);
+               if(deck_card.name === card){
+                   Game.broadcast('game.end');
+                   AudioPlugin.play('/Poker/sounds/tada.mp3');
+                   if(confirm(  'you found the card it was the '+ deck_card.description + '\n would you like to play again?'))
+                        this.resetDeck();
+
+               }
 
             },
+            resetDeck(){
+                console.log('I should be resetting');
+                Object.assign(this.$data , initData());
+                Object.assign(this.$data.cards, CardsList);
+                shuffleSound.play();
+            },
             flip() {
-                sound.play();
-                this.flipped = !this.flipped;
+                this.is_flipped = !this.is_flipped;
             },
-            shuffleDeck(){
-               this.cards =  _.shuffle(this.cards)
+            shuffle() {
+                TweenMax.staggerFromTo('.card-container', 0.3,
+                    {
+                        rotation: 360,
+                        y: 190,
+                        ease: Sine.easeOut,
+                        cycle: {
+                            x: [2000, 2000, 2000, -200, -250, -250, 0],
+                            y: [0]
+                        }
+                    },
+                    {
+                        rotation: 0,
+                        y: 0,
+                        x: 0,
+                        ease: Sine.easeIn,
+                    }
+                    , 0.1);
+
+                this.cards = _.shuffle(this.cards);
+                shuffleSound.play();
             },
+            updateCard(card){
+                this.draw(card);
+            }
         },
-        mounted(){
-           GameComponent.events.$on('deck.shuffle', this.shuffleDeck );
-            GameComponent.events.$on('deck.flip', this.flip );
+        mounted() {
+            this.deal();
+            Game.listen('card.clicked', this.updateCard);
+            Game.listen('deck.shuffle', this.shuffle);
+            Game.listen('deck.deal', this.deal);
+            Game.listen('deck.flip', this.flip);
+            Game.listen('deck.reset', this.resetDeck);
         }
     }
 </script>

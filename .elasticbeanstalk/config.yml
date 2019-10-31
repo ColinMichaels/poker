@@ -1,0 +1,26 @@
+branch-defaults:
+  inertia:
+    environment: Practicepoker-env
+environment-defaults:
+  Practicepoker-env:
+    branch: master
+    repository: https://github.com/ColinMichaels/poker.git
+global:
+  application_name: PracticePoker
+  default_ec2_keyname: AWS_laravel
+  default_platform: arn:aws:elasticbeanstalk:us-east-1::platform/PHP 7.3 running on
+    64bit Amazon Linux/2.9.0
+  default_region: us-east-1
+  include_git_submodules: true
+  instance_profile: null
+  platform_name: null
+  platform_version: 0.2
+  profile: eb-cli
+  sc: git
+  workspace_type: Application
+container_commands:
+  change_storage_permisssions:
+     command: "sudo chmod -R 777 /var/www/html/Poker/storage"
+     change_bootstrap_permisssions:
+     command: "sudo chmod -R 777 /var/www/html/Poker/bootstrap"
+

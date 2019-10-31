@@ -18,7 +18,7 @@ Vue.use(Audio);
 Vue.use(Modal);
 Vue.use(PortalVue);
 Vue.use(VueMeta);
-Vue.use(Game);
+Vue.use(Game,{key : process.env.MIX_GAME_KEY});
 
 let app = document.getElementById('app');
 

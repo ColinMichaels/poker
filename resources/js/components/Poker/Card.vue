@@ -1,5 +1,5 @@
 <template>
-    <div class="card-container" :class="{flipped: flipped}" @click="flip">
+    <div class="card-container" :class="{flipped: !flipped}" @click="clicked">
         <div class="card">
             <div class="card-front">
                 <img :src="card_image_front" :alt="description"/>
@@ -12,21 +12,11 @@
 </template>
 
 <script>
-    import {Howl} from 'howler';
-
     import  {SUITS} from './suits';
     import  {NAMES} from './names';
-
-    let Card = class Card{
-        constructor(suit, value){
-            this.suit = suit;
-            this.value = value;
-        }
-    };
-
-    let sound = new Howl({
-        src: ['/Poker/sounds/card.mp3']
-    });
+    import Game from '@/plugins/game/GamePlugin';
+    import AudioPlugin from "@/plugins/audio/AudioPlugin";
+    let sound = AudioPlugin.load('/Poker/sounds/card.mp3');
 
     const imagePath = '/Poker/cards/';
 
@@ -36,21 +26,27 @@
             name,
             is_flipped: {
                 type: Boolean,
-                default: true
-            }
+                default: false
+            },
+            is_frozen:{
+               type: Boolean,
+               default: false
+            },
         },
         data() {
             return {
                 card_back: '/Poker/cards/Card_back_06.svg',
                 card_front: '/Poker/cards/AS.svg',
-                suit: 'D',
-                flipped: false
+                flipped : this.is_flipped
             }
         },
         methods: {
-            flip() {
-                sound.play();
-                this.flipped = !this.flipped;
+            clicked() {
+                if(!this.is_frozen) {
+                    sound.play();
+                    this.flipped = !this.flipped;
+                    Game.broadcast('card.clicked', this.name);
+                }
             }
         },
         computed: {

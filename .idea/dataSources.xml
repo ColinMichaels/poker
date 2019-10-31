@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
+    <data-source source="LOCAL" name="AWS-RDS-laravel-poker" uuid="90c8bb83-51c3-46ab-86aa-4f2e2ec0cf5e">
+      <driver-ref>mysql.8</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://aa12axqtmsq6y0t.cwmperpjudj5.us-east-1.rds.amazonaws.com:3306/</jdbc-url>
+    </data-source>
+  </component>
+</project>

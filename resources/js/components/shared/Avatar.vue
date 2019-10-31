@@ -1,6 +1,6 @@
 <template>
-    <div class="rounded-full mx-2" :class="bgcolor ? bgcolor : 'bg-white'" @click="$audio.play(sound ? sndSrc :  '/Poker/sounds/cha-ching.mp3')">
-        <img :alt="name" :src="imgSrc" class="p-4" width="150px" height="150px" />
+    <div class="rounded-full mx-4 overflow-hidden border-8 border-gray-800 shadow hover:border-red-600" :class="bgcolor ? bgcolor : 'bg-white'" @click="$audio.play(sound ? sndSrc :  '/Poker/sounds/cha-ching.mp3')">
+        <img :alt="name" :src="imgSrc"  />
     </div>
 </template>
 
