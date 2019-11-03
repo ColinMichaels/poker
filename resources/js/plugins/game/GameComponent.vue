@@ -29,8 +29,13 @@
             <h3 class="text-white text-3xl font-black mb-20">{{this.name.toUpperCase()}} <span class="text-sm ml-3">Find the card in the deck in the least amount of rounds.</span></h3>
 
             <div class="game flex flex-wrap  justify-around">
+                <div id="dealer" class="w-1/2 mb-4 sm:w-1/6">
+                    <avatar name="muslim-woman" bgcolor="bg-gray-800"></avatar>
+                    <h4 class="text-2xl font-black text-white text-center">DEALER</h4>
+                </div>
                 <deck></deck>
-                <div class="flex w-3/4 my-8">
+                <div class="flex my-8">
+                    <avatar :name="player_avatar" bgcolor="bg-blue-600 w-1/5"></avatar>
                     <chips></chips>
                 </div>
                 <div class="btn-container">
@@ -95,6 +100,7 @@
     import Card from "@/components/Poker/Card";
     import Chips from "@/components/Poker/Chips";
     import AvatarSlider from "@/components/shared/AvatarSlider";
+    import Avatar from "@/components/shared/Avatar";
 
 
     const defaultData = ()=> ({
@@ -110,6 +116,7 @@
         player_hand: 0,
         player_wallet: 0,
         players:[],
+        player_avatar: 'robot-01'
     });
 
 
@@ -124,6 +131,7 @@
             }
         },
         components: {
+            Avatar,
             Deck, Card, Chips, AvatarSlider
         },
         data() {
@@ -152,7 +160,8 @@
             getCard(card){
                 this.current_card = card;
                 this.card_chosen.push(card);
-                console.log('clicked on Game Component'+ this.current_card);
+                console.log('GC:'+ this.current_card);
+                console.log('CD:' + Game.getCardDescription(this.current_card))
                 if(this.round < 51){
                     this.round += 1;
                 }else{
@@ -210,8 +219,13 @@
             Game.listen('game.end', this.endGame);
             Game.listen('chip.add', this.addToHand);
             Game.listen('card.clicked', this.getCard);
-            Game.listen('card.start', this.setCardToFind)
-            this.getPlayerWallet();
+            Game.listen('card.start', this.setCardToFind);
+            //this.getPlayerWallet();
+
+            let handTest2 = Game.rankHand(["10S", "10D", "10H", "JD", "AS"]);
+            console.info(handTest2);
+
+
         }
     }
 </script>

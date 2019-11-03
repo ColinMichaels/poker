@@ -2,154 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1eee6476-c5d8-4dc1-b068-da2be4a7c407" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.elasticbeanstalk/config.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Http/Controllers/HandsController.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Http/Controllers/HowToController.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Http/Controllers/PlayerWalletController.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Http/Controllers/RulesController.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/Pages/Error/Index.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/Pages/Hands/Hands.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/Pages/Hands/Index.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/Pages/HowTo/GameRules.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/Pages/HowTo/Index.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/Pages/HowTo/games/DrawHigh.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/Pages/HowTo/games/JacksOrBetter.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/Pages/HowTo/games/Lowball.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/Pages/HowTo/games/MississippiStud.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/Pages/HowTo/games/Omaha.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/Pages/HowTo/games/Razz.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/Pages/HowTo/games/SevenCardStud.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/Pages/HowTo/games/SevenCardStudHighLow.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/Pages/HowTo/games/TexasHoldem.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/Pages/HowTo/howto.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/Pages/HowTo/rules.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/plugins/game/cardsList.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/plugins/spotify/Spotify.class.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/plugins/spotify/SpotifyComponent.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/plugins/spotify/SpotifyPlugin.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/plugins/spotify/api_examples/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/plugins/spotify/api_examples/LICENSE" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/plugins/spotify/api_examples/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/plugins/spotify/api_examples/authorization_code/app.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/plugins/spotify/api_examples/authorization_code/public/index.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/plugins/spotify/api_examples/client_credentials/app.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/plugins/spotify/api_examples/implicit_grant/app.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/plugins/spotify/api_examples/implicit_grant/public/index.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/plugins/spotify/api_examples/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/Poker.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Poker.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.env.staging" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/js/plugins/game/reference.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Exceptions/Handler.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Exceptions/Handler.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/PlayerController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/PlayerController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/UsersController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/UsersController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/composer.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/composer.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/database/seeds/AdminUserSeeder.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/seeds/AdminUserSeeder.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/avatars/andy-warhol.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/avatars/andy-warhol.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/avatars/barack-obama.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/avatars/barack-obama.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/avatars/batman.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/avatars/batman.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/avatars/brazilian-native-man.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/avatars/brazilian-native-man.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/avatars/brazilian-native-woman.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/avatars/brazilian-native-woman.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/avatars/charlie-chaplin.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/avatars/charlie-chaplin.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/avatars/construction-worker-black-woman.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/avatars/construction-worker-black-woman.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/avatars/dalai-lama.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/avatars/dalai-lama.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/avatars/dave-grohl.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/avatars/dave-grohl.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/avatars/donald-trump.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/avatars/donald-trump.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/avatars/footballer-cristiano-ronaldo.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/avatars/footballer-cristiano-ronaldo.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/avatars/footballer-luis-suarez.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/avatars/footballer-luis-suarez.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/avatars/footballer-neymar-jr.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/avatars/footballer-neymar-jr.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/avatars/girl-in-ballcap.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/avatars/girl-in-ballcap.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/avatars/mahatma-gandhi.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/avatars/mahatma-gandhi.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/avatars/malcolm-x.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/avatars/malcolm-x.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/avatars/matrix-trinity.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/avatars/matrix-trinity.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/avatars/mick-jagger.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/avatars/mick-jagger.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/avatars/muslim-man.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/avatars/muslim-man.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/avatars/muslim-woman.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/avatars/muslim-woman.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/avatars/nikola-tesla.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/avatars/nikola-tesla.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/avatars/player_02.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/avatars/player_02.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/avatars/player_f_01.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/avatars/player_f_01.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/avatars/robot-01.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/avatars/robot-01.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/avatars/robot-02.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/avatars/robot-02.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/avatars/robot-03.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/avatars/robot-03.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/avatars/superhero-black-panther.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/avatars/superhero-black-panther.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/avatars/traditiona-japanese-man.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/avatars/traditiona-japanese-man.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/avatars/traditional-african-man.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/avatars/traditional-african-man.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/avatars/traditional-african-woman.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/avatars/traditional-african-woman.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/avatars/traditional-indian-man.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/avatars/traditional-indian-man.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/avatars/traditional-indian-woman.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/avatars/traditional-indian-woman.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/avatars/traditional-japanese-woman.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/avatars/traditional-japanese-woman.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/10C.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/10C.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/10D.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/10D.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/10H.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/10H.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/10S.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/10S.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/11C.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/11C.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/11D.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/11D.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/11H.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/11H.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/11S.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/11S.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/2C.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/2C.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/2H.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/2H.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/2S.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/2S.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/3C.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/3C.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/3D.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/3D.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/3H.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/3H.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/3S.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/3S.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/4C.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/4C.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/4D.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/4D.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/4H.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/4H.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/4S.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/4S.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/5C.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/5C.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/5D.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/5D.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/5H.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/5H.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/5S.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/5S.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/6C.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/6C.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/6D.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/6D.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/6H.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/6H.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/6S.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/6S.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/7C.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/7C.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/7D.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/7D.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/7H.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/7H.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/7S.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/7S.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/8C.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/8C.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/8D.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/8D.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/8H.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/8H.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/8S.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/8S.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/9C.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/9C.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/9D.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/9D.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/9H.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/9H.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/9S.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/9S.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/AC.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/AC.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/AD.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/AD.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/AH.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/AH.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/AS.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/AS.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/Card_back_01.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/Card_back_01.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/Card_back_02.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/Card_back_02.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/Card_back_06.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/Card_back_06.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/JC.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/JC.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/JD.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/JD.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/JH.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/JH.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/JS.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/JS.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/KC.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/KC.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/KD.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/KD.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/KH.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/KH.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/KS.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/KS.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/QC.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/QC.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/QD.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/QD.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/QH.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/QH.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/QS.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/QS.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/cards/Red_52_Faces_v.2.0.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/cards/Red_52_Faces_v.2.0.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/chips/1.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/chips/1.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/chips/10.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/chips/10.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/chips/100.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/chips/100.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/chips/1000.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/chips/1000.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/chips/25.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/chips/25.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/chips/5.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/chips/5.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/chips/50.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/chips/50.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/Poker/chips/500.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/Poker/chips/500.svg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/css/app.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/css/app.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/js/3.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/3.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/js/4.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/4.js" afterDir="false" />
@@ -159,36 +15,14 @@
       <change beforePath="$PROJECT_DIR$/public/js/9.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/9.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/app.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/mix-manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/mix-manifest.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/Pages/Auth/Login.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/Pages/Auth/Login.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/Pages/Dashboard/Index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/Pages/Dashboard/Index.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/Pages/Users/Edit.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/Pages/Users/Edit.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/Shared/Layout.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/Shared/Layout.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/Shared/MainMenu.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/Shared/MainMenu.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/app.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/components/Poker/Card.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/Poker/Card.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/Poker/Chip.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/Poker/Chip.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/Poker/Chips.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/Poker/Chips.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/components/Poker/Deck.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/Poker/Deck.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/Poker/cardsList.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/shared/Avatar.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/shared/Avatar.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/shared/AvatarSlider.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/shared/AvatarSlider.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/Poker/names.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/plugins/game/archive/names.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/Poker/suits.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/plugins/game/archive/suits.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/plugins/game/GameComponent.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/plugins/game/GameComponent.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/plugins/game/GamePlugin.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/plugins/game/GamePlugin.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/plugins/modal/ModalComponent.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/plugins/modal/ModalComponent.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/plugins/game/cardsList.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/plugins/game/cardsList.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/sass/_poker.scss" beforeDir="false" afterPath="$PROJECT_DIR$/resources/sass/_poker.scss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/app.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/app.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/dnu/home.blade.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/dnu/index.blade.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/dnu/welcome.blade.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/games/poker/index.blade.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/games/poker/modals/start.blade.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/vue-examples/confirm-dialog.blade.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/vue-examples/dropdown.blade.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/vue-examples/modal.blade.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/api.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tailwind.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/tailwind.config.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/webpack.mix.js" beforeDir="false" afterPath="$PROJECT_DIR$/webpack.mix.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -216,18 +50,12 @@
     <expand>
       <path>
         <item name="Database" type="3277223f:DatabaseStructure$DbRootGroup" />
-        <item name="AWS-RDS-laravel-poker" type="feb32156:DbDataSourceImpl" />
+        <item name="root@localhost" type="feb32156:DbDataSourceImpl" />
       </path>
       <path>
         <item name="Database" type="3277223f:DatabaseStructure$DbRootGroup" />
-        <item name="AWS-RDS-laravel-poker" type="feb32156:DbDataSourceImpl" />
+        <item name="root@localhost" type="feb32156:DbDataSourceImpl" />
         <item name="schemas" type="d4e8921:DatabaseStructure$FamilyGroup" />
-      </path>
-      <path>
-        <item name="Database" type="3277223f:DatabaseStructure$DbRootGroup" />
-        <item name="AWS-RDS-laravel-poker" type="feb32156:DbDataSourceImpl" />
-        <item name="schemas" type="d4e8921:DatabaseStructure$FamilyGroup" />
-        <item name="laravel-poker: schema" type="76f4a085:MysqlImplModel$Schema" />
       </path>
     </expand>
     <select />
@@ -333,7 +161,7 @@
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/resources/js/plugins/spotify/api_examples" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="node.js.detected.package.stylelint" value="true" />
     <property name="node.js.path.for.package.stylelint" value="project" />
     <property name="node.js.selected.package.stylelint" value="$PROJECT_DIR$/node_modules" />
@@ -342,18 +170,18 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/resources/js/plugins/game/archive" />
       <recent name="$PROJECT_DIR$/resources/js/plugins/game" />
       <recent name="$PROJECT_DIR$/resources/js/Pages/Hands" />
       <recent name="$PROJECT_DIR$/resources/views/dnu" />
       <recent name="$PROJECT_DIR$/resources/views" />
-      <recent name="$PROJECT_DIR$/resources/js/components/shared" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/resources/js/plugins/spotify/api_examples" />
       <recent name="$PROJECT_DIR$/public/Poker/sounds" />
       <recent name="$PROJECT_DIR$/resources/js/Pages" />
       <recent name="$PROJECT_DIR$/app" />
-      <recent name="$PROJECT_DIR$/public/Poker/avatars" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -421,7 +249,9 @@
       <workItem from="1572131241999" duration="84518000" />
       <workItem from="1572397577830" duration="11884000" />
       <workItem from="1572451454219" duration="3474000" />
-      <workItem from="1572454962559" duration="13631000" />
+      <workItem from="1572454962559" duration="25484000" />
+      <workItem from="1572622197541" duration="4173000" />
+      <workItem from="1572627208231" duration="11739000" />
     </task>
     <servers />
   </component>
@@ -466,6 +296,12 @@
           <url>file://$PROJECT_DIR$/resources/js/Pages/HowTo/games/SevenCardStud.vue</url>
           <line>8</line>
           <option name="timeStamp" value="9" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/resources/js/components/Poker/Card.vue</url>
+          <line>38</line>
+          <properties lambdaOrdinal="-1" />
+          <option name="timeStamp" value="10" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
