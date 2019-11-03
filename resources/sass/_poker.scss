@@ -1,15 +1,17 @@
 .card-container{
     perspective: 1000px;
-    @apply my-4 mx-1 h-full;
+    @apply mx-1 h-full;
+    height:150px;
     position: relative;
 }
 .card-container.flipped .card{
-    transform: rotateY(180deg) translateY(120px);
+    transform: rotateY(180deg);
 }
 
 .card{
-    transition: transform 1s;
+    transition: transform 0.5s;
     transform-style: preserve-3d;
+    cursor:pointer;
 }
 .card-front, .card-back{
     backface-visibility: hidden;
@@ -17,7 +19,7 @@
 }
 .card, .card-front, .card-back{
     @apply w-1/2 h-full;
-    min-width:100px;
+    min-width:95px; // card smallest size
 }
 
 .card-front{
@@ -27,4 +29,9 @@
 }
 .card-back{
     transform: rotateY(180deg);
+}
+
+.hand{
+    height:100px;
+    display:block;
 }

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <ul  class="w-1/2 flex">
+        <ul class="flex">
             <li v-for="amount in this.amounts">
                 <chip :amount="amount.toString()"></chip>
             </li>
@@ -24,6 +24,3 @@
     }
 </script>
 
-<style scoped>
-
-</style>

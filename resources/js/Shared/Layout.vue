@@ -1,8 +1,8 @@
 <template>
     <div>
         <portal-target name="dropdown" slim />
-        <div class="flex flex-col bg-gray-800">
-            <div class="h-screen flex flex-col" @click="hideDropdownMenus">
+        <div class="flex flex-col bg-gray-1000">
+            <div class="h-screen flex flex-col select-none focus:outline-none focus:shadow-none" @click="hideDropdownMenus">
                 <div class="md:flex">
                     <div class="bg-white md:flex-no-shrink md:w-56 px-4 py-2 flex items-center justify-between md:justify-center">
                         <inertia-link class="mx-auto text-center px-4" href="/">
@@ -15,20 +15,27 @@
                             </div>
                         </dropdown>
                     </div>
-                    <div class="bg-white border-b w-full p-4 md:py-0 md:px-12 text-sm md:text-base flex justify-between items-center">
+                    <div class="bg-white w-full p-4 md:py-0 md:px-12 text-sm md:text-base flex justify-between items-center">
                         <div class="mt-1 mr-4">{{ $page.auth.user.first_name }}</div>
+                        <div class="player-stats">
+                            <div class="stats py-2 px-4 bg-gray-800 text-white rounded shadow font-extrabold">
+                                <span class="text-gray-500">WALLET:</span> ${{$page.auth.user.player.wallet}}
+                                   <span class="text-gray-500"> WINS:</span> {{$page.auth.user.player.wins}}
+                            </div>
+
+                        </div>
                         <dropdown class="mt-1" placement="bottom-end">
                             <div class="flex items-center cursor-pointer select-none group">
-                                <div class="text-grey-darkest group-hover:text-indigo-dark focus:text-indigo-dark mr-1 whitespace-no-wrap">
+                                <div class="text-grey-1000 group-hover:text-red-800 focus:text-red-900 mr-1 whitespace-no-wrap">
                                     <span>{{ $page.auth.user.first_name }}</span>
                                     <span class="hidden md:inline">{{ $page.auth.user.last_name }}</span>
                                 </div>
                                 <icon class="w-5 h-5 group-hover:fill-indigo-dark fill-grey-darkest focus:fill-indigo-dark" name="cheveron-down" />
                             </div>
                             <div slot="dropdown" class="mt-2 py-2 shadow-lg bg-white rounded text-sm">
-                                <inertia-link class="block px-6 py-2 hover:bg-indigo hover:text-white" :href="'users/edit/' + $page.auth.user.id ">My Profile</inertia-link>
-                                <inertia-link class="block px-6 py-2 hover:bg-indigo hover:text-white" href="/users">Manage Users</inertia-link>
-                                <inertia-link class="block px-6 py-2 hover:bg-indigo hover:text-white" href="/logout" method="post">Logout</inertia-link>
+                                <inertia-link class="block px-6 py-2 hover:bg-gray-800 hover:text-white" :href="route('users.edit', $page.auth.user.id)">My Profile</inertia-link>
+                                <inertia-link class="block px-6 py-2 hover:bg-gray-800 hover:text-white" href="/users">Manage Users</inertia-link>
+                                <inertia-link class="block px-6 py-2 hover:bg-gray-800 hover:text-white" href="/logout" method="post">Logout</inertia-link>
                             </div>
                         </dropdown>
                     </div>
@@ -65,13 +72,16 @@
                 accounts: null,
             }
         },
+        computed:{
+
+        },
         methods: {
             url() {
                 return location.pathname.substr(1)
             },
             hideDropdownMenus() {
                 this.showUserMenu = false
-            },
+            }
         },
     }
 </script>

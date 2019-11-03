@@ -66,7 +66,6 @@ class UsersController extends Controller
                 'first_name' => $user->first_name,
                 'last_name' => $user->last_name,
                 'email' => $user->email,
-                'owner' => $user->owner,
                 'deleted_at' => $user->deleted_at,
             ],
         ]);

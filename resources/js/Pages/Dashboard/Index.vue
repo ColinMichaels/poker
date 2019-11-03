@@ -1,8 +1,7 @@
 <template>
-	        <div>
-                <h1 class="mb-8 font-bold text-3xl">Dashboard</h1>
-                <p class="mb-12 leading-normal">Welcome To Poker</p>
-            </div>
+
+                <game-component name="poker"></game-component>
+
 </template>
 
 <script>

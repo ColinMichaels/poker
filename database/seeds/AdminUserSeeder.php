@@ -3,6 +3,8 @@
 use Illuminate\Database\Seeder;
 
 use App\User;
+use Poker\Player;
+
 
 class AdminUserSeeder extends Seeder
 {
@@ -20,12 +22,13 @@ class AdminUserSeeder extends Seeder
         $admin->save();
 
         $demo = new User;
-        $demo->first_name = 'Demo Player';
+        $demo->first_name = 'Demo';
+        $demo->last_name = 'Player';
         $demo->email = 'demo@poker.com';
         $demo->password = bcrypt('demo');
         $demo->save();
 
-        $player = new \Poker\Player;
+        $player = new Player;
         $player->name = "Demo Player";
         $player->user_id = $demo->id;
         $player->wallet = 10000;

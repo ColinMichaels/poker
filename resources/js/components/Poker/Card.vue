@@ -1,33 +1,18 @@
 <template>
-    <div class="card-container" :class="{flipped: flipped}" @click="flip">
+    <div class="card-container" :class="{flipped: !flipped}" @click="clicked"  >
         <div class="card">
-            <div class="card-front">
-                <img :src="card_front" :alt="description"/>
+            <div class="card-front" >
+                <img :src="card_image_front"/>
             </div>
             <div class="card-back">
-                <img :src="card_back" :alt="description"/>
+                <img :src="card_back"/>
             </div>
         </div>
     </div>
 </template>
 
 <script>
-    import {Howl} from 'howler';
-
-    import  {SUITS} from './suits';
-    import  {NAMES} from './names';
-
-    let Card = class Card{
-        constructor(suit, value){
-            this.suit = suit;
-            this.value = value;
-        }
-    };
-
-    let sound = new Howl({
-        src: ['/Poker/sounds/card.mp3']
-    });
-
+    import Game from '@/plugins/game/GamePlugin';
     const imagePath = '/Poker/cards/';
 
     export default {
@@ -36,35 +21,34 @@
             name,
             is_flipped: {
                 type: Boolean,
-                default: true
-            }
+                default: false
+            },
+            is_frozen:{
+               type: Boolean,
+               default: false
+            },
         },
-        data(){
-          return{
-              card_back : '/Poker/cards/Card_back_06.svg',
-              card_front : '/Poker/cards/AS.svg',
-              description: '',
-              suit: 'D',
-              flipped: false
-          }
+        data() {
+            return {
+                card_back: Game.store().card_back,
+                card_front: '/Poker/cards/AS.svg',
+                flipped : this.is_flipped
+            }
         },
         methods: {
-            flip() {
-                sound.play();
-                this.flipped = !this.flipped;
-            },
-            setImage(){
-               this.card_front = imagePath + this.name + '.svg';
-            },
-            setDescription(){
-                 let name = this.name.match(/\d+/g);
-                 let suit = this.name.match(/[A-Z]+/g);
-                 this.description = NAMES[name]  + " of "+ SUITS[suit];
+            clicked() {
+                if(!this.is_frozen) {
+                    this.$emit('card-clicked', this);
+                }
             }
         },
-        mounted(){
-          this.setImage();
-          this.setDescription()
+        computed: {
+            card_image_front() {
+                return this.card_front = imagePath + this.name + '.svg';
+            },
+            description() {
+               return  Game.getCardDescription(this.name);
+            }
         }
     }
 </script>

@@ -9,7 +9,7 @@ export const NAMES  = {
     8 : 'Eight',
     9 : 'Nine',
     10 : 'Ten',
-    11 : 'Jack',
+    J : 'Jack',
     Q : 'Queen',
     K : 'King'
 };

@@ -2,107 +2,27 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1eee6476-c5d8-4dc1-b068-da2be4a7c407" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.eslintrc.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Http/Controllers/ImagesController.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Http/Controllers/UsersController.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Model.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/avatars/andy-warhol.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/avatars/barack-obama.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/avatars/batman.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/avatars/brazilian-native-man.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/avatars/brazilian-native-woman.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/avatars/charlie-chaplin.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/avatars/construction-worker-black-woman.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/avatars/dalai-lama.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/avatars/dave-grohl.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/avatars/footballer-cristiano-ronaldo.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/avatars/footballer-luis-suarez.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/avatars/footballer-neymar-jr.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/avatars/girl-in-ballcap.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/avatars/mahatma-gandhi.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/avatars/malcolm-x.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/avatars/matrix-trinity.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/avatars/mick-jagger.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/avatars/muslim-man.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/avatars/muslim-woman.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/avatars/nikola-tesla.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/avatars/robot-01.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/avatars/robot-02.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/avatars/robot-03.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/avatars/superhero-black-panther.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/avatars/traditiona-japanese-man.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/avatars/traditional-african-man.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/avatars/traditional-african-woman.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/avatars/traditional-indian-man.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/avatars/traditional-indian-woman.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/avatars/traditional-japanese-woman.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/logos/poker_logo.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/logos/poker_logo.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/logos/poker_logo_full@3x.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/logos/poker_logo_main.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/sounds/im-batman.mp3" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/sounds/robot-2.mp3" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/Poker/sounds/robot-blip.mp3" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/js/3.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/js/4.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/js/5.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/js/6.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/js/7.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/js/9.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/Pages/Game/Index.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/Pages/Users/Create.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/Pages/Users/Edit.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/Pages/Users/Index.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/Shared/LogoMain.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/components/Poker/Chips.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/components/Poker/Player.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/components/Poker/Table.php.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/components/Poker/cardsList.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/components/Poker/denominations.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/components/shared/Avatar.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/plugins/audio/AudioPlugin.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/plugins/game/start-modal.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/sass/_modal.scss" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/sass/_poker.scss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/Poker.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Poker.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/laravel-plugin.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/laravel-plugin.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.env.staging" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/js/plugins/game/reference.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Auth/LoginController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Auth/LoginController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/GameController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/GameController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/HomeController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/HomeController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Poker/Player.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Poker/Player.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Providers/AppServiceProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Providers/AppServiceProvider.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/User.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/User.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/composer.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/composer.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/seeds/AdminUserSeeder.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/seeds/AdminUserSeeder.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/css/app.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/css/app.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/js/0.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/js/3.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/3.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/js/4.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/4.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/js/5.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/5.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/js/6.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/6.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/js/7.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/7.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/js/9.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/9.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/app.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/mix-manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/mix-manifest.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/Pages/Auth/Login.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/Pages/Auth/Login.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/Pages/Dashboard/Index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/Pages/Dashboard/Index.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/Shared/Layout.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/Shared/Layout.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/Shared/Logo.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/Shared/Logo.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/Shared/MainMenu.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/Shared/MainMenu.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/Shared/TextInput.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/Shared/TextInput.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/app.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/components/Poker/Card.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/Poker/Card.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/Poker/Chip.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/Poker/Chip.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/components/Poker/Deck.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/Poker/Deck.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/shared/Modal.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/shared/Modal.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/Poker/names.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/plugins/game/archive/names.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/Poker/suits.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/plugins/game/archive/suits.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/plugins/game/GameComponent.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/plugins/game/GameComponent.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/plugins/modal/ModalComponent.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/plugins/modal/ModalComponent.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/sass/app.scss" beforeDir="false" afterPath="$PROJECT_DIR$/resources/sass/app.scss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/app.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/app.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/home.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/dnu/home.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/index.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/dnu/index.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/welcome.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/dnu/welcome.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/webpack.mix.js" beforeDir="false" afterPath="$PROJECT_DIR$/webpack.mix.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/plugins/game/GamePlugin.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/plugins/game/GamePlugin.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/plugins/game/cardsList.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/plugins/game/cardsList.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/sass/_poker.scss" beforeDir="false" afterPath="$PROJECT_DIR$/resources/sass/_poker.scss" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -137,40 +57,15 @@
         <item name="root@localhost" type="feb32156:DbDataSourceImpl" />
         <item name="schemas" type="d4e8921:DatabaseStructure$FamilyGroup" />
       </path>
-      <path>
-        <item name="Database" type="3277223f:DatabaseStructure$DbRootGroup" />
-        <item name="root@localhost" type="feb32156:DbDataSourceImpl" />
-        <item name="schemas" type="d4e8921:DatabaseStructure$FamilyGroup" />
-        <item name="poker: schema" type="76f4a085:MysqlImplModel$Schema" />
-      </path>
-      <path>
-        <item name="Database" type="3277223f:DatabaseStructure$DbRootGroup" />
-        <item name="root@localhost" type="feb32156:DbDataSourceImpl" />
-        <item name="schemas" type="d4e8921:DatabaseStructure$FamilyGroup" />
-        <item name="poker: schema" type="76f4a085:MysqlImplModel$Schema" />
-        <item name="games: table" type="285a2a93:MysqlImplModel$Table" />
-      </path>
-      <path>
-        <item name="Database" type="3277223f:DatabaseStructure$DbRootGroup" />
-        <item name="root@localhost" type="feb32156:DbDataSourceImpl" />
-        <item name="schemas" type="d4e8921:DatabaseStructure$FamilyGroup" />
-        <item name="poker: schema" type="76f4a085:MysqlImplModel$Schema" />
-        <item name="players: table" type="285a2a93:MysqlImplModel$Table" />
-      </path>
-      <path>
-        <item name="Database" type="3277223f:DatabaseStructure$DbRootGroup" />
-        <item name="root@localhost" type="feb32156:DbDataSourceImpl" />
-        <item name="schemas" type="d4e8921:DatabaseStructure$FamilyGroup" />
-        <item name="poker: schema" type="76f4a085:MysqlImplModel$Schema" />
-        <item name="users: table" type="285a2a93:MysqlImplModel$Table" />
-      </path>
     </expand>
     <select />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
+        <option value="HTML File" />
         <option value="JavaScript File" />
+        <option value="package.json" />
         <option value="Vue Single File Component" />
       </list>
     </option>
@@ -184,99 +79,54 @@
   <component name="PhpWorkspaceProjectConfiguration">
     <include_path>
       <path value="$PROJECT_DIR$/vendor/dnoegel/php-xdg-base-dir" />
-      <path value="$PROJECT_DIR$/vendor/myclabs/deep-copy" />
-      <path value="$PROJECT_DIR$/vendor/mockery/mockery" />
       <path value="$PROJECT_DIR$/vendor/monolog/monolog" />
       <path value="$PROJECT_DIR$/vendor/swiftmailer/swiftmailer" />
-      <path value="$PROJECT_DIR$/vendor/filp/whoops" />
-      <path value="$PROJECT_DIR$/vendor/scrivo/highlight.php" />
-      <path value="$PROJECT_DIR$/vendor/facade/flare-client-php" />
-      <path value="$PROJECT_DIR$/vendor/facade/ignition-contracts" />
-      <path value="$PROJECT_DIR$/vendor/facade/ignition" />
       <path value="$PROJECT_DIR$/vendor/erusev/parsedown" />
-      <path value="$PROJECT_DIR$/vendor/phpdocumentor/reflection-common" />
-      <path value="$PROJECT_DIR$/vendor/phpdocumentor/reflection-docblock" />
-      <path value="$PROJECT_DIR$/vendor/nunomaduro/collision" />
       <path value="$PROJECT_DIR$/vendor/vlucas/phpdotenv" />
-      <path value="$PROJECT_DIR$/vendor/phpdocumentor/type-resolver" />
-      <path value="$PROJECT_DIR$/vendor/hamcrest/hamcrest-php" />
       <path value="$PROJECT_DIR$/vendor/laravel/framework" />
       <path value="$PROJECT_DIR$/vendor/laravel/tinker" />
       <path value="$PROJECT_DIR$/vendor/psy/psysh" />
-      <path value="$PROJECT_DIR$/vendor/phpspec/prophecy" />
       <path value="$PROJECT_DIR$/vendor/symfony/event-dispatcher" />
       <path value="$PROJECT_DIR$/vendor/symfony/translation" />
       <path value="$PROJECT_DIR$/vendor/jakub-onderka/php-console-highlighter" />
-      <path value="$PROJECT_DIR$/vendor/phpunit/php-code-coverage" />
       <path value="$PROJECT_DIR$/vendor/symfony/service-contracts" />
-      <path value="$PROJECT_DIR$/vendor/sebastian/type" />
       <path value="$PROJECT_DIR$/vendor/symfony/polyfill-intl-idn" />
       <path value="$PROJECT_DIR$/vendor/nesbot/carbon" />
       <path value="$PROJECT_DIR$/vendor/symfony/polyfill-iconv" />
       <path value="$PROJECT_DIR$/vendor/jakub-onderka/php-console-color" />
-      <path value="$PROJECT_DIR$/vendor/phpunit/php-timer" />
       <path value="$PROJECT_DIR$/vendor/symfony/process" />
-      <path value="$PROJECT_DIR$/vendor/sebastian/resource-operations" />
-      <path value="$PROJECT_DIR$/vendor/phpunit/phpunit" />
       <path value="$PROJECT_DIR$/vendor/symfony/debug" />
-      <path value="$PROJECT_DIR$/vendor/sebastian/environment" />
-      <path value="$PROJECT_DIR$/vendor/phpunit/php-text-template" />
       <path value="$PROJECT_DIR$/vendor/symfony/routing" />
-      <path value="$PROJECT_DIR$/vendor/sebastian/code-unit-reverse-lookup" />
-      <path value="$PROJECT_DIR$/vendor/phpunit/php-file-iterator" />
       <path value="$PROJECT_DIR$/vendor/symfony/mime" />
-      <path value="$PROJECT_DIR$/vendor/sebastian/exporter" />
       <path value="$PROJECT_DIR$/vendor/symfony/http-kernel" />
-      <path value="$PROJECT_DIR$/vendor/sebastian/object-reflector" />
       <path value="$PROJECT_DIR$/vendor/symfony/polyfill-ctype" />
-      <path value="$PROJECT_DIR$/vendor/sebastian/global-state" />
-      <path value="$PROJECT_DIR$/vendor/phpunit/php-token-stream" />
       <path value="$PROJECT_DIR$/vendor/symfony/var-dumper" />
-      <path value="$PROJECT_DIR$/vendor/sebastian/comparator" />
       <path value="$PROJECT_DIR$/vendor/symfony/console" />
-      <path value="$PROJECT_DIR$/vendor/sebastian/diff" />
       <path value="$PROJECT_DIR$/vendor/symfony/translation-contracts" />
-      <path value="$PROJECT_DIR$/vendor/sebastian/version" />
       <path value="$PROJECT_DIR$/vendor/symfony/http-foundation" />
       <path value="$PROJECT_DIR$/vendor/doctrine/inflector" />
       <path value="$PROJECT_DIR$/vendor/nikic/php-parser" />
       <path value="$PROJECT_DIR$/vendor/symfony/css-selector" />
-      <path value="$PROJECT_DIR$/vendor/sebastian/object-enumerator" />
       <path value="$PROJECT_DIR$/vendor/symfony/finder" />
-      <path value="$PROJECT_DIR$/vendor/sebastian/recursion-context" />
       <path value="$PROJECT_DIR$/vendor/symfony/polyfill-php73" />
       <path value="$PROJECT_DIR$/vendor/symfony/event-dispatcher-contracts" />
       <path value="$PROJECT_DIR$/vendor/ramsey/uuid" />
       <path value="$PROJECT_DIR$/vendor/symfony/polyfill-mbstring" />
-      <path value="$PROJECT_DIR$/vendor/doctrine/instantiator" />
       <path value="$PROJECT_DIR$/vendor/symfony/polyfill-php72" />
       <path value="$PROJECT_DIR$/vendor/doctrine/lexer" />
       <path value="$PROJECT_DIR$/vendor/psr/container" />
-      <path value="$PROJECT_DIR$/vendor/phar-io/version" />
       <path value="$PROJECT_DIR$/vendor/psr/simple-cache" />
       <path value="$PROJECT_DIR$/vendor/psr/log" />
-      <path value="$PROJECT_DIR$/vendor/phar-io/manifest" />
       <path value="$PROJECT_DIR$/vendor/opis/closure" />
       <path value="$PROJECT_DIR$/vendor/dragonmantank/cron-expression" />
       <path value="$PROJECT_DIR$/vendor/phpoption/phpoption" />
       <path value="$PROJECT_DIR$/vendor/tijsverkoyen/css-to-inline-styles" />
-      <path value="$PROJECT_DIR$/vendor/fzaninotto/faker" />
       <path value="$PROJECT_DIR$/vendor/paragonie/random_compat" />
       <path value="$PROJECT_DIR$/vendor/composer" />
-      <path value="$PROJECT_DIR$/vendor/theseer/tokenizer" />
       <path value="$PROJECT_DIR$/vendor/fideloper/proxy" />
-      <path value="$PROJECT_DIR$/vendor/webmozart/assert" />
       <path value="$PROJECT_DIR$/vendor/league/flysystem" />
       <path value="$PROJECT_DIR$/vendor/egulias/email-validator" />
-      <path value="$PROJECT_DIR$/vendor/laravel-frontend-presets/tailwindcss" />
       <path value="/usr/local/Cellar/php@7.2/7.2.22/bin" />
-      <path value="$PROJECT_DIR$/vendor/yosymfony/resource-watcher" />
-      <path value="$PROJECT_DIR$/vendor/jolicode/jolinotif" />
-      <path value="$PROJECT_DIR$/vendor/symfony/yaml" />
-      <path value="$PROJECT_DIR$/vendor/phpspec/phpspec" />
-      <path value="$PROJECT_DIR$/vendor/phpspec/php-diff" />
-      <path value="$PROJECT_DIR$/vendor/react/event-loop" />
-      <path value="$PROJECT_DIR$/vendor/fetzi/phpspec-watcher" />
       <path value="$PROJECT_DIR$/vendor/inertiajs/inertia-laravel" />
       <path value="$PROJECT_DIR$/vendor/psr/http-message" />
       <path value="$PROJECT_DIR$/vendor/intervention/image" />
@@ -284,6 +134,21 @@
       <path value="$PROJECT_DIR$/vendor/ralouphie/getallheaders" />
       <path value="$PROJECT_DIR$/vendor/guzzlehttp/psr7" />
       <path value="$PROJECT_DIR$/vendor/tightenco/ziggy" />
+      <path value="$PROJECT_DIR$/vendor/symfony/yaml" />
+      <path value="$PROJECT_DIR$/vendor/react/event-loop" />
+      <path value="$PROJECT_DIR$/vendor/fzaninotto/faker" />
+      <path value="$PROJECT_DIR$/vendor/laravel-frontend-presets/tailwindcss" />
+      <path value="$PROJECT_DIR$/vendor/scrivo/highlight.php" />
+      <path value="$PROJECT_DIR$/vendor/jolicode/jolinotif" />
+      <path value="$PROJECT_DIR$/vendor/fetzi/phpspec-watcher" />
+      <path value="$PROJECT_DIR$/vendor/nunomaduro/collision" />
+      <path value="$PROJECT_DIR$/vendor/mockery/mockery" />
+      <path value="$PROJECT_DIR$/vendor/hamcrest/hamcrest-php" />
+      <path value="$PROJECT_DIR$/vendor/yosymfony/resource-watcher" />
+      <path value="$PROJECT_DIR$/vendor/filp/whoops" />
+      <path value="$PROJECT_DIR$/vendor/facade/flare-client-php" />
+      <path value="$PROJECT_DIR$/vendor/facade/ignition" />
+      <path value="$PROJECT_DIR$/vendor/facade/ignition-contracts" />
     </include_path>
   </component>
   <component name="ProjectId" id="1SW7ZXvS3DoDmcb7n1oBC0iatKD" />
@@ -292,9 +157,11 @@
   </component>
   <component name="PropertiesComponent">
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
+    <property name="DatabaseDriversLRU" value="mysql" />
+    <property name="DefaultHtmlFileTemplate" value="HTML File" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/resources/js/Pages" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="node.js.detected.package.stylelint" value="true" />
     <property name="node.js.path.for.package.stylelint" value="project" />
     <property name="node.js.selected.package.stylelint" value="$PROJECT_DIR$/node_modules" />
@@ -303,18 +170,18 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/resources/js/plugins/game/archive" />
+      <recent name="$PROJECT_DIR$/resources/js/plugins/game" />
+      <recent name="$PROJECT_DIR$/resources/js/Pages/Hands" />
       <recent name="$PROJECT_DIR$/resources/views/dnu" />
       <recent name="$PROJECT_DIR$/resources/views" />
-      <recent name="$PROJECT_DIR$/resources/js/components/shared" />
-      <recent name="$PROJECT_DIR$/public/Poker/sounds" />
-      <recent name="$PROJECT_DIR$/resources/js/components/Poker" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/resources/js/plugins/spotify/api_examples" />
+      <recent name="$PROJECT_DIR$/public/Poker/sounds" />
       <recent name="$PROJECT_DIR$/resources/js/Pages" />
       <recent name="$PROJECT_DIR$/app" />
-      <recent name="$PROJECT_DIR$/public/Poker/avatars" />
-      <recent name="$PROJECT_DIR$/app/Http/Controllers" />
-      <recent name="$PROJECT_DIR$" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -339,7 +206,12 @@
     <option name="allServicesViewState">
       <serviceView>
         <treeState>
-          <expand />
+          <expand>
+            <path>
+              <item name="services root" type="e789fda9:ObjectUtils$Sentinel" />
+              <item name="com.intellij.execution.services.ServiceModel$ServiceGroupNode@c4b74ba8" type="7427dc5b:ServiceModel$ServiceGroupNode" />
+            </path>
+          </expand>
           <select />
         </treeState>
       </serviceView>
@@ -374,7 +246,12 @@
       <workItem from="1571970599856" duration="345000" />
       <workItem from="1572013380849" duration="13518000" />
       <workItem from="1572038087699" duration="4035000" />
-      <workItem from="1572131241999" duration="14403000" />
+      <workItem from="1572131241999" duration="84518000" />
+      <workItem from="1572397577830" duration="11884000" />
+      <workItem from="1572451454219" duration="3474000" />
+      <workItem from="1572454962559" duration="25484000" />
+      <workItem from="1572622197541" duration="4173000" />
+      <workItem from="1572627208231" duration="11739000" />
     </task>
     <servers />
   </component>
@@ -407,8 +284,24 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/resources/js/Shared/Layout.vue</url>
-          <line>42</line>
+          <line>49</line>
           <option name="timeStamp" value="3" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/resources/js/Pages/HowTo/games/TexasHoldem.vue</url>
+          <line>46</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/resources/js/Pages/HowTo/games/SevenCardStud.vue</url>
+          <line>8</line>
+          <option name="timeStamp" value="9" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/resources/js/components/Poker/Card.vue</url>
+          <line>38</line>
+          <properties lambdaOrdinal="-1" />
+          <option name="timeStamp" value="10" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

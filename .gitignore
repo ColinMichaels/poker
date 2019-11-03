@@ -12,3 +12,8 @@ npm-debug.log
 yarn-error.log
 .idea/codeStyles/Project.xml
 /public/js/
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml

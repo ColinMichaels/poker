@@ -1,21 +1,16 @@
 <template>
-    <div class="poker-chip w-20 h-20" @click="flip" :style="offset">
-        <img class="w-full" :src="image" :alt="amount"/>
+    <div class="poker-chip w-auto" @click="chipClicked" :style="offset">
+        <img class="w-full" :src="getImage" :alt="amount"/>
     </div>
 </template>
 
 <script>
-    import {Howl} from 'howler';
+    import GamePlugin from "@/plugins/game/GamePlugin";
+    import AudioPlugin from "@/plugins/audio/AudioPlugin";
     import {denominations} from "./denominations";
-    let chip = new Howl({
-        src : [ '/Poker/sounds/chip.mp3' ]
-    });
-    let chip2 = new Howl({
-        src: ['/Poker/sounds/chip2.mp3']
-    });
-    let chip3 = new Howl({
-        src: ['/Poker/sounds/chip3.mp3']
-    });
+    let chip = AudioPlugin.load( '/Poker/sounds/chip.mp3');
+    let chip2 = AudioPlugin.load('/Poker/sounds/chip2.mp3');
+    let chip3 = AudioPlugin.load('/Poker/sounds/chip3.mp3');
 
     const imagePath = '/Poker/chips/';
     /*class Chip{
@@ -47,12 +42,10 @@
             }
         },
         methods:{
-            flip(){
+            chipClicked(){
                 let cur_sound = Math.floor(Math.random() * Math.floor(this.sounds.length));
                 this.sounds[cur_sound].play();
-            },
-            getImage(){
-                this.image  =  imagePath + this.amount + ".svg"
+                GamePlugin.events.$emit('chip.add', this.amount);
             },
             split(amount){
                 let chips = [];
@@ -67,8 +60,10 @@
                 return chips;
             }
         },
-        mounted(){
-            this.getImage();
+        computed:{
+            getImage(){
+                 return  imagePath + this.amount + ".svg"
+            }
         }
     }
 </script>
