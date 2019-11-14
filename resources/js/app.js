@@ -1,30 +1,37 @@
- require('./bootstrap');
+require('./bootstrap');
 import Vue from 'vue';
 
 import VueMeta from 'vue-meta';
-import { InertiaApp } from '@inertiajs/inertia-vue'
+import {InertiaApp} from '@inertiajs/inertia-vue'
 import PortalVue from 'portal-vue'
 
- import Audio from "./plugins/audio/AudioPlugin";
+import Audio from "./plugins/audio/AudioPlugin";
 import Modal from "./plugins/modal/ModalPlugin";
 import Game from "./plugins/game/GamePlugin";
+import Spotify from "./plugins/spotify/SpotifyPlugin";
 
 window.Vue = Vue;
 window.Bus = new Vue();
 Vue.config.productionTip = false
-Vue.mixin({ methods: { route: window.route } });
+Vue.mixin({methods: {route: window.route}});
 Vue.use(InertiaApp);
 Vue.use(Audio);
 Vue.use(Modal);
 Vue.use(PortalVue);
 Vue.use(VueMeta);
-Vue.use(Game,{key : process.env.MIX_GAME_KEY});
+Vue.use(Game, {key: process.env.MIX_GAME_KEY});
+Vue.use(Spotify,
+    {
+        client_id: process.env.MIX_SPOTIFY_CLIENT_ID,
+        client_secret: process.env.MIX_SPOTIFY_CLIENT_SECRET,
+        callback_url: process.env.MIX_SPOTIFY_CALLBACK_URL
+    });
 
 let app = document.getElementById('app');
 
 new Vue({
     metaInfo: {
-        title : 'Loading..',
+        title: 'Loading..',
         titleTemplate: '%s | Poker'
     },
     methods: {

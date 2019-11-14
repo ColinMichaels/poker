@@ -10,7 +10,7 @@
     export default {
         name: "index",
         components:{
-            GameComponent
+            GameComponent,
         },
         metaInfo: {
             title: 'Poker',

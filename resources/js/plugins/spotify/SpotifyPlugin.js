@@ -5,12 +5,10 @@ let SpotifyPlugin = {
         Vue.component('spotify', SpotifyComponent);
 
         SpotifyPlugin.events = new Vue();
-
-        Vue.prototype.$game = {
+         console.log('Spotify Plugin loaded');
+        Vue.prototype.$spotify = {
             start(name,params = {}){
-                console.log('i should be starting, a game of '+name);
-                location.hash = name;
-                SpotifyPlugin.events.$emit('spotify.loaded', name);
+                SpotifyPlugin.events.$emit('spotify.loaded');
             },
         }
     },

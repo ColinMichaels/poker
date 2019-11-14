@@ -1,15 +1,20 @@
 <template>
-    <div>
-        <h1>{{ title }}</h1>
-        <div>{{ description }}</div>
+    <div class="bg-gray-500 text-white font-mono p-4">
+        <h1 class="text-3xl text-red-500 mb-6"><i class="fa fa-exclamation-triangle"></i> {{ title }}</h1>
+        <pre>{{ description }}</pre>
     </div>
 </template>
 
 <script>
+    import Layout from "@/Shared/Layout";
     export default {
         props: {
             status: Number,
         },
+        metaInfo:{
+            title: "Server Error"
+        },
+        layout: Layout,
         computed: {
             title() {
                 return {

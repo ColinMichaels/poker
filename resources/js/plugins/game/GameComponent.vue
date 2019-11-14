@@ -154,9 +154,6 @@
             bet(amount){
                 this.current_bet += parseInt(amount);
             },
-            loadPlayers() {
-
-            },
             getCard(card){
                 this.current_card = card;
                 this.card_chosen.push(card);

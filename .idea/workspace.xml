@@ -2,27 +2,46 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1eee6476-c5d8-4dc1-b068-da2be4a7c407" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.env.staging" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/js/plugins/game/reference.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/webServers.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Http/Controllers/SpotifyController.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/js/Pages/Spotify/Auth.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/js/Pages/Spotify/Index.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/js/Pages/Spotify/Playlist.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/js/Pages/Spotify/Playlists.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/js/Pages/Spotify/Profile.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/js/filters/index.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/js/plugins/spotify/Player.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/js/plugins/spotify/auth.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/storage/debugbar/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/Poker.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Poker.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/deployment.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/deployment.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/seeds/AdminUserSeeder.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/seeds/AdminUserSeeder.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/css/app.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/css/app.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/js/3.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/3.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/js/4.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/4.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/js/5.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/5.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/js/6.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/6.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/js/7.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/7.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/js/9.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/9.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Exceptions/Handler.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Exceptions/Handler.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/CardController.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/DeckController.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Providers/AppServiceProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Providers/AppServiceProvider.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/composer.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/composer.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/js/3.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/js/4.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/js/5.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/js/6.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/js/7.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/js/9.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/js/app.js" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/public/mix-manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/mix-manifest.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/Pages/Error/Index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/Pages/Error/Index.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/Pages/Game/Index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/Pages/Game/Index.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/Shared/MainMenu.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/Shared/MainMenu.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/app.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/components/Poker/Card.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/Poker/Card.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/components/Poker/Deck.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/Poker/Deck.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/Poker/names.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/plugins/game/archive/names.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/Poker/suits.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/plugins/game/archive/suits.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/plugins/game/GameComponent.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/plugins/game/GameComponent.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/plugins/game/GamePlugin.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/plugins/game/GamePlugin.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/plugins/game/cardsList.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/plugins/game/cardsList.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/sass/_poker.scss" beforeDir="false" afterPath="$PROJECT_DIR$/resources/sass/_poker.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/plugins/spotify/SpotifyComponent.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/plugins/spotify/SpotifyComponent.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/plugins/spotify/SpotifyPlugin.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/plugins/spotify/SpotifyPlugin.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -47,25 +66,15 @@
     <option name="HIDDEN_KINDS">
       <set />
     </option>
-    <expand>
-      <path>
-        <item name="Database" type="3277223f:DatabaseStructure$DbRootGroup" />
-        <item name="root@localhost" type="feb32156:DbDataSourceImpl" />
-      </path>
-      <path>
-        <item name="Database" type="3277223f:DatabaseStructure$DbRootGroup" />
-        <item name="root@localhost" type="feb32156:DbDataSourceImpl" />
-        <item name="schemas" type="d4e8921:DatabaseStructure$FamilyGroup" />
-      </path>
-    </expand>
+    <expand />
     <select />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="HTML File" />
-        <option value="JavaScript File" />
         <option value="package.json" />
+        <option value="JavaScript File" />
         <option value="Vue Single File Component" />
       </list>
     </option>
@@ -149,6 +158,9 @@
       <path value="$PROJECT_DIR$/vendor/facade/flare-client-php" />
       <path value="$PROJECT_DIR$/vendor/facade/ignition" />
       <path value="$PROJECT_DIR$/vendor/facade/ignition-contracts" />
+      <path value="$PROJECT_DIR$/vendor/jwilsson/spotify-web-api-php" />
+      <path value="$PROJECT_DIR$/vendor/maximebf/debugbar" />
+      <path value="$PROJECT_DIR$/vendor/barryvdh/laravel-debugbar" />
     </include_path>
   </component>
   <component name="ProjectId" id="1SW7ZXvS3DoDmcb7n1oBC0iatKD" />
@@ -161,6 +173,12 @@
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="true" />
+    <property name="WebServerToolWindowPanel.toolwindow.highlight.mappings" value="true" />
+    <property name="WebServerToolWindowPanel.toolwindow.highlight.symlinks" value="true" />
+    <property name="WebServerToolWindowPanel.toolwindow.show.date" value="false" />
+    <property name="WebServerToolWindowPanel.toolwindow.show.permissions" value="false" />
+    <property name="WebServerToolWindowPanel.toolwindow.show.size" value="false" />
+    <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/New Scratch File" value="PHP" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="node.js.detected.package.stylelint" value="true" />
     <property name="node.js.path.for.package.stylelint" value="project" />
@@ -169,19 +187,19 @@
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/resources/js/plugins/game/archive" />
-      <recent name="$PROJECT_DIR$/resources/js/plugins/game" />
-      <recent name="$PROJECT_DIR$/resources/js/Pages/Hands" />
-      <recent name="$PROJECT_DIR$/resources/views/dnu" />
-      <recent name="$PROJECT_DIR$/resources/views" />
-    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/resources/js/plugins/spotify/api_examples" />
       <recent name="$PROJECT_DIR$/public/Poker/sounds" />
       <recent name="$PROJECT_DIR$/resources/js/Pages" />
       <recent name="$PROJECT_DIR$/app" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/resources/js/Pages/Spotify" />
+      <recent name="$PROJECT_DIR$/resources/js/plugins/game/archive" />
+      <recent name="$PROJECT_DIR$/resources/js/plugins/game" />
+      <recent name="$PROJECT_DIR$/resources/js/Pages/Hands" />
+      <recent name="$PROJECT_DIR$/resources/views/dnu" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -251,7 +269,15 @@
       <workItem from="1572451454219" duration="3474000" />
       <workItem from="1572454962559" duration="25484000" />
       <workItem from="1572622197541" duration="4173000" />
-      <workItem from="1572627208231" duration="11739000" />
+      <workItem from="1572627208231" duration="16606000" />
+      <workItem from="1572887358381" duration="1186000" />
+      <workItem from="1572888561428" duration="39215000" />
+      <workItem from="1573152145441" duration="1678000" />
+      <workItem from="1573342856893" duration="2606000" />
+      <workItem from="1573484852590" duration="30000" />
+      <workItem from="1573484896441" duration="1683000" />
+      <workItem from="1573566464759" duration="4562000" />
+      <workItem from="1573595218746" duration="3052000" />
     </task>
     <servers />
   </component>
@@ -300,8 +326,12 @@
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/resources/js/components/Poker/Card.vue</url>
           <line>38</line>
-          <properties lambdaOrdinal="-1" />
           <option name="timeStamp" value="10" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/resources/js/Pages/Spotify/Playlist.vue</url>
+          <line>46</line>
+          <option name="timeStamp" value="11" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

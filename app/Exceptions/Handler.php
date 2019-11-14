@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use Exception;
+use Inertia\Inertia;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 
 class Handler extends ExceptionHandler
@@ -48,7 +49,7 @@ class Handler extends ExceptionHandler
     {
         $response =  parent::render($request, $exception);
         if ($request->header('X-Inertia') && in_array($response->status(), [500, 503, 404, 403])) {
-            return Inertia::render('Error', ['status' => $response->status()])
+            return Inertia::render('Error/Index', ['status' => $response->status()])
                           ->toResponse($request)
                           ->setStatusCode($response->status());
         }

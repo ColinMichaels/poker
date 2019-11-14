@@ -7,7 +7,7 @@
                     :name="card.name"
                     :key="card.name"
                     :is_flipped="is_flipped"
-                    v-on:card-clicked="remove"
+                    v-on:card-clicked="flip"
                 ></card>
         </div>
     </div>
@@ -43,9 +43,9 @@
         },
         methods: {
             remove(card){
-                card.flipped = !card.flipped;
+
                 Game.sound('/Poker/sounds/card.mp3');
-                _.slice(this.cards, _.findIndex(this.cards,  card.name ));
+                //_.slice(this.cards, _.findIndex(this.cards,  card.name ));
             },
             deal(num_per) {
                 this.resetDeck();
@@ -68,25 +68,25 @@
                 Object.assign(this.$data , initData());
 
             },
-            flip() {
-                this.is_flipped = !this.is_flipped;
-
-                console.log(this.$refs)
-                // TweenMax.set(this, {
-                //     css:{
-                //         transformStyle:"preserve-3d",
-                //         perspective:1000,
-                //         perspectiveOrigin: '50% 50% 0px'
-                //     }
-                // });
+            flip(card) {
+                console.log(card._uid);
+                card.flipped = !card.flipped;
+                TweenMax.set(card, {
+                    css:{
+                        transformStyle:"preserve-3d",
+                        perspective:1000,
+                        perspectiveOrigin: '50% 50% 0px'
+                    }
+                });
                 Game.sound('/Poker/sounds/card.mp3');
             },
             shuffle() {
 
-               let shuffler =  TweenMax.fromTo(['#dealer','.card-container'], 0.3,
+               let shuffler =  TweenMax.fromTo(['.card-container','.card'], 0.3,
                     {
                         rotation: 360,
-                        y: 190,
+                        y: 20,
+                        x: -20,
                         ease: Sine.easeOut,
                     },
                     {

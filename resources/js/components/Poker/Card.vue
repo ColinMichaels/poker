@@ -2,10 +2,10 @@
     <div class="card-container" :class="{flipped: !flipped}" @click="clicked"  >
         <div class="card">
             <div class="card-front" >
-                <img :src="card_image_front"/>
+                <img :src="card_image_front" alt="card_front"/>
             </div>
             <div class="card-back">
-                <img :src="card_back"/>
+                <img :src="card_back" alt="card_back"/>
             </div>
         </div>
     </div>
