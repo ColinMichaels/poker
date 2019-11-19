@@ -23,7 +23,7 @@
         "resolve-url-loader": "^3.1.1",
         "sass": "^1.23.6",
         "sass-loader": "^7.1.0",
-        "tailwindcss": "^1.0",
+        "tailwindcss": "^1.1",
         "vue": "^2.5.17",
         "vue-template-compiler": "^2.6.4",
         "@inertiajs/inertia": "^0.1.7",
