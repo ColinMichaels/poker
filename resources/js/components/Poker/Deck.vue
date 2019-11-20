@@ -15,7 +15,7 @@
 
 <script>
     import Game from "@/plugins/game/GamePlugin";
-    import {TweenMax} from "gsap/TweenMax";
+    import {TweenMax} from "gsap/gsap-core";
     import Draggable from "gsap/Draggable";
     import Card from "./Card";
 

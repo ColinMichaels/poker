@@ -4,9 +4,6 @@
       <inertia-link class="flex items-center group py-5" :href="route('home')">
         <div :class="isUrl('home') ? 'text-white' : 'text-gray-700 group-hover:text-white'"><i class="fa fa-home"></i> Start</div>
       </inertia-link>
-        <inertia-link class="flex items-center group py-5" :href="route('games.index')">
-            <div :class="isUrl('games') ? 'text-white  hover:text-gray-700' : 'text-gray-700 hover:text-white'"><i class="fa fa-gamepad"></i> Game</div>
-        </inertia-link>
         <inertia-link class="flex items-center group py-5" :href="route('hands.index')">
             <div :class="isUrl('hands') ? 'text-white  hover:text-gray-700' : 'text-gray-700 hover:text-white'"><i class="fa fa-gamepad"></i> Hands</div>
         </inertia-link>

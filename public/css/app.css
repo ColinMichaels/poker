@@ -17471,23 +17471,23 @@ video {
 }
 
 .fast{
-  -webkit-animation-delay: 800ms;
-          animation-delay: 800ms;
+  -webkit-animation-duration: 800ms;
+          animation-duration: 800ms;
 }
 
 .faster{
-  -webkit-animation-delay: 500ms;
-          animation-delay: 500ms;
+  -webkit-animation-duration: 500ms;
+          animation-duration: 500ms;
 }
 
 .slow{
-  -webkit-animation-delay: 2000ms;
-          animation-delay: 2000ms;
+  -webkit-animation-duration: 2000ms;
+          animation-duration: 2000ms;
 }
 
 .slower{
-  -webkit-animation-delay: 3000ms;
-          animation-delay: 3000ms;
+  -webkit-animation-duration: 3000ms;
+          animation-duration: 3000ms;
 }
 
 .bounce{
@@ -31287,23 +31287,23 @@ video {
   }
 
   .sm\:fast{
-    -webkit-animation-delay: 800ms;
-            animation-delay: 800ms;
+    -webkit-animation-duration: 800ms;
+            animation-duration: 800ms;
   }
 
   .sm\:faster{
-    -webkit-animation-delay: 500ms;
-            animation-delay: 500ms;
+    -webkit-animation-duration: 500ms;
+            animation-duration: 500ms;
   }
 
   .sm\:slow{
-    -webkit-animation-delay: 2000ms;
-            animation-delay: 2000ms;
+    -webkit-animation-duration: 2000ms;
+            animation-duration: 2000ms;
   }
 
   .sm\:slower{
-    -webkit-animation-delay: 3000ms;
-            animation-delay: 3000ms;
+    -webkit-animation-duration: 3000ms;
+            animation-duration: 3000ms;
   }
 
   .sm\:bounce{
@@ -42568,23 +42568,23 @@ video {
   }
 
   .md\:fast{
-    -webkit-animation-delay: 800ms;
-            animation-delay: 800ms;
+    -webkit-animation-duration: 800ms;
+            animation-duration: 800ms;
   }
 
   .md\:faster{
-    -webkit-animation-delay: 500ms;
-            animation-delay: 500ms;
+    -webkit-animation-duration: 500ms;
+            animation-duration: 500ms;
   }
 
   .md\:slow{
-    -webkit-animation-delay: 2000ms;
-            animation-delay: 2000ms;
+    -webkit-animation-duration: 2000ms;
+            animation-duration: 2000ms;
   }
 
   .md\:slower{
-    -webkit-animation-delay: 3000ms;
-            animation-delay: 3000ms;
+    -webkit-animation-duration: 3000ms;
+            animation-duration: 3000ms;
   }
 
   .md\:bounce{
@@ -53849,23 +53849,23 @@ video {
   }
 
   .lg\:fast{
-    -webkit-animation-delay: 800ms;
-            animation-delay: 800ms;
+    -webkit-animation-duration: 800ms;
+            animation-duration: 800ms;
   }
 
   .lg\:faster{
-    -webkit-animation-delay: 500ms;
-            animation-delay: 500ms;
+    -webkit-animation-duration: 500ms;
+            animation-duration: 500ms;
   }
 
   .lg\:slow{
-    -webkit-animation-delay: 2000ms;
-            animation-delay: 2000ms;
+    -webkit-animation-duration: 2000ms;
+            animation-duration: 2000ms;
   }
 
   .lg\:slower{
-    -webkit-animation-delay: 3000ms;
-            animation-delay: 3000ms;
+    -webkit-animation-duration: 3000ms;
+            animation-duration: 3000ms;
   }
 
   .lg\:bounce{
@@ -65130,23 +65130,23 @@ video {
   }
 
   .xl\:fast{
-    -webkit-animation-delay: 800ms;
-            animation-delay: 800ms;
+    -webkit-animation-duration: 800ms;
+            animation-duration: 800ms;
   }
 
   .xl\:faster{
-    -webkit-animation-delay: 500ms;
-            animation-delay: 500ms;
+    -webkit-animation-duration: 500ms;
+            animation-duration: 500ms;
   }
 
   .xl\:slow{
-    -webkit-animation-delay: 2000ms;
-            animation-delay: 2000ms;
+    -webkit-animation-duration: 2000ms;
+            animation-duration: 2000ms;
   }
 
   .xl\:slower{
-    -webkit-animation-delay: 3000ms;
-            animation-delay: 3000ms;
+    -webkit-animation-duration: 3000ms;
+            animation-duration: 3000ms;
   }
 
   .xl\:bounce{

@@ -24,7 +24,7 @@ class AdminUserSeeder extends Seeder
         $demo = new User;
         $demo->first_name = 'Demo';
         $demo->last_name = 'Player';
-        $demo->email = 'demo@poker.com';
+        $demo->email = 'demo@cardpractice.com';
         $demo->password = bcrypt('demo');
         $demo->save();
 

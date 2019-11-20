@@ -4,8 +4,8 @@
         <div class="flex flex-col bg-gray-1000">
             <div class="h-screen flex flex-col select-none focus:outline-none focus:shadow-none" @click="hideDropdownMenus">
                 <div class="md:flex">
-                    <div class="bg-white md:flex-no-shrink md:w-56 px-4 py-2 flex items-center justify-between md:justify-center">
-                        <inertia-link class="mx-auto text-center px-4" href="/">
+                    <div class="bg-white md:flex-no-shrink md:w-56 px-6 py-2 flex items-center justify-between md:justify-center">
+                        <inertia-link class="mx-auto text-center pl-2" href="/">
                             <logo class="fill-white" />
                         </inertia-link>
                         <dropdown class="md:hidden" placement="bottom-end">

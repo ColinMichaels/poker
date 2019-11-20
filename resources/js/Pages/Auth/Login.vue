@@ -5,7 +5,7 @@
         <div class="px-10 py-12">
             <logo></logo>
             <div class="mx-auto mt-6 w-50 border-b-4" ></div>
-          <text-input v-model="form.email" :errors="$page.errors.email" class="mt-10" label="Email" type="email" placeholder="demo@poker.com" autofocus autocapitalize="off" />
+          <text-input v-model="form.email" :errors="$page.errors.email" class="mt-10" label="Email" type="email" placeholder="demo@cardpractice.com" autofocus autocapitalize="off" />
           <text-input v-model="form.password" class="mt-6" label="Password"  type="password" placeholder="demo" />
           <label class="mt-6 select-none flex items-center" for="remember">
             <input id="remember" v-model="form.remember" class="mr-1" type="checkbox">

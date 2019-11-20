@@ -3,7 +3,7 @@
   <component name="WebServers">
     <option name="servers">
       <webServer id="db7686ec-6ab8-4509-9bff-f52a001a3c39" name="Raspberry" url="http://192.168.1.14">
-        <fileTransfer host="192.168.1.14" port="22" rootFolder="/var/www/html" accessType="SFTP">
+        <fileTransfer host="192.168.1.14" port="22" rootFolder="/var/www/html/poker" accessType="SFTP">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
           </advancedOptions>

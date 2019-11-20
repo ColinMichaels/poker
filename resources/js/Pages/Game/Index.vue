@@ -1,6 +1,6 @@
 <template>
     <div>
-        <game-component name="poker"></game-component>
+        <game-component name="Card Practice"></game-component>
     </div>
 </template>
 
