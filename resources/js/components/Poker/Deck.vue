@@ -1,27 +1,28 @@
 <template>
     <div>
-        <div class="flex flex-wrap" id="deck" :class="{is_flipped: !is_flipped}" >
+        <transition-group name="shuffleDeck" tag="div" class="flex flex-wrap" id="deck" :class="{is_flipped: !is_flipped}" ref="deck" >
                 <card
-                    :ref="card"
+                    :ref="card.name"
                     v-for="card in cards"
                     :name="card.name"
                     :key="card.name"
                     :is_flipped="is_flipped"
                     v-on:card-clicked="flip"
                 ></card>
-        </div>
+        </transition-group>
     </div>
 </template>
 
 <script>
     import Game from "@/plugins/game/GamePlugin";
-    import {TweenMax} from "gsap/gsap-core";
+    import {gsap, CSSPlugin, TweenMax} from "gsap/all";
+    gsap.registerPlugin(CSSPlugin);
     import Draggable from "gsap/Draggable";
     import Card from "./Card";
 
     const initData = ()=>({
         is_flipped: false,
-        cards: Game.store().cards,
+        cards: Game.store().cards.slice(0,5),
         play_hand : [],
         position: Math.floor(Math.random() * (52 - 1 ) +1),
         selected: null
@@ -32,7 +33,7 @@
         data() {
             return {
                 is_flipped: false,
-                cards: Game.store().cards,
+                cards: initData().cards,
                 play_hand : [],
                 position: Math.floor(Math.random() * (52 - 1 ) +1),
                 selected: null
@@ -43,7 +44,6 @@
         },
         methods: {
             remove(card){
-
                 Game.sound('/Poker/sounds/card.mp3');
                 //_.slice(this.cards, _.findIndex(this.cards,  card.name ));
             },
@@ -61,72 +61,41 @@
                         this.resetDeck();
 
                }
-
             },
             resetDeck(){
-                console.log('I should be resetting');
                 Object.assign(this.$data , initData());
 
             },
             flip(card) {
-                console.log(card._uid);
                 card.flipped = !card.flipped;
-                TweenMax.set(card, {
-                    css:{
-                        transformStyle:"preserve-3d",
-                        perspective:1000,
-                        perspectiveOrigin: '50% 50% 0px'
-                    }
-                });
                 Game.sound('/Poker/sounds/card.mp3');
             },
+            flipAll(dir){
+                this.is_flipped = !this.is_flipped;
+                this.cards.forEach((card)=>{
+                     let cur_card = this.$refs[card.name][0];
+                     if(cur_card !== undefined){
+                         cur_card.flipped = this.is_flipped;
+                     }
+                });
+                Game.sound('/Poker/sounds/card.mp3');
+
+            },
             shuffle() {
-
-               let shuffler =  TweenMax.fromTo(['.card-container','.card'], 0.3,
-                    {
-                        rotation: 360,
-                        y: 20,
-                        x: -20,
-                        ease: Sine.easeOut,
-                    },
-                    {
-                        rotation: 0,
-                        y: 0,
-                        x: 0,
-                        ease: Sine.easeIn,
-                    }
-                    , 0.1);
-
+                this.cards =   _.shuffle(this.cards);
                 Game.sound('/Poker/sounds/shuffle.mp3');
-
-               shuffler.eventCallback('onComplete', () => {
-                   this.cards = _.shuffle(this.cards);
-
-               });
-
-
-
             },
             updateCard(card){
                 this.draw(card);
             }
         },
         mounted() {
-            this.deal();
             Game.listen('deck.shuffle', this.shuffle);
             Game.listen('deck.deal', this.deal);
-            Game.listen('deck.flip', this.flip);
+            Game.listen('deck.flip', this.flipAll);
             Game.listen('deck.reset', this.resetDeck);
-            Draggable.create("#deck", {
-                type: "y",
-                bounds : document.getElementById('app'),
-                onClick:function(){
-                    console.log('clicked')
-                },
-                onDragEnd:function(){
-                    console.log('drag ended');
-                }
-            });
+        }, updated(){
+
         }
     }
 </script>

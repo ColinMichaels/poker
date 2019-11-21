@@ -1,5 +1,5 @@
 <template>
-    <div class="card-container" :class="{flipped: !flipped}" @click="clicked"  >
+    <div class="card-container" :class="{flipped: !flipped}" @click="clicked">
         <div class="card">
             <div class="card-front" >
                 <img :src="card_image_front" alt="card_front"/>

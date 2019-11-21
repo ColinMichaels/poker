@@ -102,7 +102,6 @@
     import AvatarSlider from "@/components/shared/AvatarSlider";
     import Avatar from "@/components/shared/Avatar";
 
-
     const defaultData = ()=> ({
         is_running: false,
         toggle_debug: false,
@@ -157,8 +156,8 @@
             getCard(card){
                 this.current_card = card;
                 this.card_chosen.push(card);
-                console.log('GC:'+ this.current_card);
-                console.log('CD:' + Game.getCardDescription(this.current_card))
+                // console.log('GC:'+ this.current_card);
+                // console.log('CD:' + Game.getCardDescription(this.current_card))
                 if(this.round < 51){
                     this.round += 1;
                 }else{
