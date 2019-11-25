@@ -46,18 +46,11 @@
         },
         methods:{
             controls(uri, event){
-              this.$inertia.post('/spotify/controls/'+event,
+              axios.put('/spotify/controls/'+event,
                   {
-                      uri: uri,
-                      access_token: localStorage.spotify_access_token
-                  },
-                  {
-                      replace: true
+                      uri: uri
                   }
-
-              ).then((response)=>{
-                  console.log(response);
-              });
+              );
             }
         },
         props: ['playlist', 'tracks']

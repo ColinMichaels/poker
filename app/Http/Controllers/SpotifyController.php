@@ -27,7 +27,11 @@ class SpotifyController extends Controller
                 'playlist-read-private',
                 'user-read-email',
                 'user-read-private',
-                'app-remote-control'
+                'app-remote-control',
+                'user-read-currently-playing',
+                'user-read-playback-state',
+                'user-modify-playback-state',
+                'user-read-recently-played'
             ],
            'state' => csrf_token()
        ];
@@ -113,6 +117,7 @@ class SpotifyController extends Controller
          $playlist = $api->getPlaylist($playlist_id);
          $tracks =  $api->getPlaylistTracks($playlist_id);
 
+
          return Inertia::render('Spotify/Playlist', [
              'playlist' => $playlist,
              'tracks' => $tracks->items
@@ -123,15 +128,18 @@ class SpotifyController extends Controller
      public function controls($event){
          $api = new SpotifyWebAPI();
          $api->setAccessToken( $this->getAccessToken() );
+
          $uri = request('uri', 'spotify:track:6I1HRAkeErdwrOJIfRrfIO');
-        // $api->play(false, [ 'uris' => [$uri]]);
-         $current_track = $api->getMyCurrentTrack();
-         dd($current_track);
+         $api->play(false, [ 'uris' => [$uri]]);
 
      }
 
-    public function delete(){ // spotify // logoout
-
+    public function logout(){ // spotify // logoout
+        return Inertia::render( 'Spotify/Index', [
+            'login_url' => $this->auth,
+            'is_logged_in' => false,
+            'user_data' => null
+        ]);
     }
 
     /**

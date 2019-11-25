@@ -3,10 +3,15 @@
   <component name="ChangeListManager">
     <list default="true" id="1eee6476-c5d8-4dc1-b068-da2be4a7c407" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/SpotifyController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/SpotifyController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/js/10.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/10.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/js/28.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/28.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/js/30.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/30.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/app.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/mix-manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/mix-manifest.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/Poker/Deck.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/Poker/Deck.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/app.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/app.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/Pages/Spotify/Playlist.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/Pages/Spotify/Playlist.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/Pages/Spotify/Profile.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/Pages/Spotify/Profile.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -243,6 +248,9 @@
       <workItem from="1573484896441" duration="1683000" />
       <workItem from="1573566464759" duration="4562000" />
       <workItem from="1573595218746" duration="3052000" />
+      <workItem from="1574694578221" duration="144000" />
+      <workItem from="1574706965286" duration="2435000" />
+      <workItem from="1574710021638" duration="3313000" />
     </task>
     <servers />
   </component>
@@ -287,11 +295,6 @@
           <url>file://$PROJECT_DIR$/resources/js/Pages/HowTo/games/SevenCardStud.vue</url>
           <line>8</line>
           <option name="timeStamp" value="9" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/resources/js/Pages/Spotify/Playlist.vue</url>
-          <line>46</line>
-          <option name="timeStamp" value="11" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

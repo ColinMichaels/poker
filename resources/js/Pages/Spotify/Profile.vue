@@ -7,6 +7,10 @@
            <a :href="user_data.uri">View Profile <i class="fa fa-eye"></i></a>
            <p>type: {{user_data.type}}</p>
 
+           <inertia-link class="flex items-center group py-5" :href="route('spotify.logout')" method="post" replace>
+               <div class="text-white  hover:text-gray-700"><i class="fa fa-list-ul"></i> Logout</div>
+           </inertia-link>
+
            <inertia-link class="flex items-center group py-5" :href="route('spotify.playlists')">
                <div class="text-white  hover:text-gray-700"><i class="fa fa-list-ul"></i> Playlists</div>
            </inertia-link>
