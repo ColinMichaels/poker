@@ -17,7 +17,7 @@ Route::middleware('auth')->group(function() {
     Route::get( '/', 'HomeController' )->name( 'root' );
     Route::get( '/home', 'HomeController' )->name( 'home' );
 
-    Route::get('spotify/callback', 'SpotifyController@callback');
+    Route::any('spotify/callback', 'SpotifyController@callback');
     Route::get('spotify/playlists','SpotifyController@playlists')->name('spotify.playlists');
     Route::post('spotify/playlist', 'SpotifyController@getPlaylist');
     Route::any('spotify/controls/{event}', 'SpotifyController@controls');

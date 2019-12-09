@@ -1,48 +1,27 @@
 <template>
     <div :id="name">
-        <button class="hover:underline text-gray-300  text-xs absolute right-0 pr-4" @click="toggleDebug">{{ debug ? 'Hide' : 'Show'}} Debug</button>
-        <div id="debug" class="mb-10" v-show="debug">
-            <div class="bg-gray-200 py-4 px-6 font-mon flex flex-row">
-                <div class="w-1/4">
-                    <p>Wallet (db): {{$page.auth.user.player.wallet}}<br>
-                    Wallet (async): {{ player_wallet }}<br>
-                    Current Money At Table : {{ player_hand }}<br>
-                    Bet: {{ current_bet }}<br>
-                    Last Bet: {{last_bet}}<br>
-                        Round: {{round }}</p>
-                </div>
-                    <div class="flex flex-col my-4"  v-show="current_card">
-                        <h4>Card to Find: {{card_to_find}}</h4>
-                        <h4>Current Card: {{current_card}}</h4>
-                        <div class="w-full overflow-scroll h-32 my-2">
-                            <ul class="flex flex-wrap-reverse">
-                                <li class="w-1/8" v-for="card in card_chosen">
-                                    <card :name="card" :is_flipped="true" :is_frozen="true"></card>
-                                </li>
-                            </ul>
-                        </div>
-                        <h3>Cards Chosen: {{card_chosen}}</h3>
-                    </div>
-            </div>
-        </div>
+
         <div v-show="is_running">
             <h3 class="text-white text-3xl font-black mb-20">{{this.name.toUpperCase()}} <span class="text-sm ml-3">Find the card in the deck in the least amount of rounds.</span></h3>
 
             <div class="game flex flex-wrap  justify-around">
-                <div id="dealer" class="w-1/2 mb-4 sm:w-1/6">
-                    <avatar name="muslim-woman" bgcolor="bg-gray-800"></avatar>
+                <div id="dealer" class="w-1/2 mb-4 sm:w-1/12">
+                    <avatar name="matrix-trinity" bgcolor="bg-gray-800"/>
                     <h4 class="text-2xl font-black text-white text-center">DEALER</h4>
                 </div>
-                <deck></deck>
-                <div class="flex my-8">
-                    <avatar :name="player_avatar" bgcolor="bg-blue-600 w-1/5"></avatar>
-                    <chips></chips>
+                <deck/>
+                <div class="flex m-8">
+                    <div v-for="player in num_players">
+                        {{player}}
+                        <avatar :name="player_avatar" bgcolor="bg-blue-600 w-1/5"/>
+                        <chips class="flex flex-wrap w-full px-3" />
+                    </div>
                 </div>
                 <div class="btn-container">
-                    <button class="btn py-2 px-4 rounded bg-white text-blue-900" @click="deal">Deal</button>
-                    <button class="btn py-2 px-4 rounded bg-white text-blue-900" @click="flip">Flip</button>
-                    <button class="btn py-2 px-4 rounded bg-white text-blue-900" @click="shuffle">Shuffle</button>
-                    <button class="btn py-2 px-4 rounded bg-white text-blue-900" @click="startGame">New Game</button>
+                    <button class="btn py-2 px-4 bg-white text-black" @click="deal">Deal</button>
+                    <button class="btn py-2 px-4 bg-white text-black" @click="flip">Flip</button>
+                    <button class="btn py-2 px-4 bg-white text-black" @click="shuffle">Shuffle</button>
+                    <button class="btn py-2 px-4 bg-white text-black" @click="startGame">New Game</button>
                 </div>
             </div>
         </div>
@@ -58,7 +37,7 @@
             <h2 class="text-2xl text-white font-black my-4 animated slideInDown mb-4">Welcome to
                 {{name.toUpperCase()}}</h2>
             <p class="text-sm text-center text-white">Select your avatar below:</p>
-            <avatar-slider></avatar-slider>
+            <avatar-slider/>
             <button
                 class="animated tada delay-3s bg-blue-700 hover:bg-blue-900 px-4 py-4 rounded text-3xl font-black text-white w-1/2 mx-auto mt-20 md:mt-40"
                 @click="$modal.show('start-game')">Start Game
@@ -71,7 +50,7 @@
         <!--   GAME START MODAL -->
         <modal class="flex-auto" name="start-game">
             <h1 class="font-bold text-2xl mb-6">Ready to play, {{ $page.auth.user.first_name }} ?</h1>
-            <chips class="flex h-full w-full"></chips>
+            <chips class="flex h-full w-full"/>
             <template v-slot:footer>
                 <div class="flex-col">
                     <div class="mb-4">
@@ -114,7 +93,7 @@
         last_bet: 0,
         player_hand: 0,
         player_wallet: 0,
-        players:[],
+        num_players:3,
         player_avatar: 'robot-01'
     });
 
@@ -134,7 +113,21 @@
             Deck, Card, Chips, AvatarSlider
         },
         data() {
-            return defaultData();
+            return{
+                is_running: false,
+                toggle_debug: false,
+                round: 0,
+                current_bet: 0,
+                current_card: null,
+                card_chosen: [],
+                card_to_find : null,
+                pot: 0,
+                last_bet: 0,
+                player_hand: 0,
+                player_wallet: 0,
+                num_players:3,
+                player_avatar: 'robot-01'
+            }
         },
         methods: {
             startGame() {
@@ -156,8 +149,6 @@
             getCard(card){
                 this.current_card = card;
                 this.card_chosen.push(card);
-                // console.log('GC:'+ this.current_card);
-                // console.log('CD:' + Game.getCardDescription(this.current_card))
                 if(this.round < 51){
                     this.round += 1;
                 }else{
@@ -211,15 +202,15 @@
             }
         },
         mounted() {
-            Game.listen('game.start', this.startGame);
-            Game.listen('game.end', this.endGame);
-            Game.listen('chip.add', this.addToHand);
+            Game.listen('game.start',   this.startGame);
+            Game.listen('game.end',     this.endGame);
+            Game.listen('chip.add',     this.addToHand);
             Game.listen('card.clicked', this.getCard);
-            Game.listen('card.start', this.setCardToFind);
+            Game.listen('card.start',   this.setCardToFind);
             //this.getPlayerWallet();
 
-            let handTest2 = Game.rankHand(["10S", "10D", "10H", "JD", "AS"]);
-            console.info(handTest2);
+            // let handTest2 = Game.rankHand(["10S", "10D", "10H", "JD", "AS"]);
+            // console.info(handTest2);
 
 
         }

@@ -4,7 +4,7 @@
                 :login_url="login_url"
                 v-if="!is_logged_in"
             ></spotify-auth>
-            <profile v-if="is_logged_in" :user_data="user_data"></profile>
+            <profile v-if="is_logged_in" :user_data="user_data" :current_track="current_track"></profile>
         </div>
 </template>
 
@@ -14,7 +14,7 @@
     import Profile from "./Profile";
     export default {
         name: "Index",
-        props: ['login_url','is_logged_in', 'user_data'],
+        props: ['login_url','is_logged_in', 'user_data','current_track'],
         metaInfo:{
             title: "Spotify Login"
         },

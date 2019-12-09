@@ -19,11 +19,6 @@
                 error: false
             }
         },
-        props: ['login_url'],
-        methods: {
-            login () {
-                this.$inertia.reload('/spotify/auth/edit');
-            }
-        }
+        props: ['login_url']
     }
 </script>

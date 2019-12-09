@@ -2,18 +2,28 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1eee6476-c5d8-4dc1-b068-da2be4a7c407" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/resources/js/plugins/game/DebugComponent.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/Poker.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Poker.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/SpotifyController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/SpotifyController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/js/0.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/0.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/js/10.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/10.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/js/28.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/28.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/js/23.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/23.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/js/27.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/27.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/js/30.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/30.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/app.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/mix-manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/mix-manifest.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/Pages/Spotify/Playlist.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/Pages/Spotify/Playlist.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/Pages/Dashboard/Index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/Pages/Dashboard/Index.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/Pages/Spotify/Auth.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/Pages/Spotify/Auth.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/Pages/Spotify/Index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/Pages/Spotify/Index.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/Pages/Spotify/Profile.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/Pages/Spotify/Profile.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/Shared/MainMenu.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/Shared/MainMenu.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/Poker/Chip.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/Poker/Chip.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/Poker/Chips.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/Poker/Chips.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/Poker/Deck.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/Poker/Deck.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/plugins/game/GameComponent.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/plugins/game/GameComponent.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
     </list>
-    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -36,7 +46,17 @@
     <option name="HIDDEN_KINDS">
       <set />
     </option>
-    <expand />
+    <expand>
+      <path>
+        <item name="Database" type="3277223f:DatabaseStructure$DbRootGroup" />
+        <item name="root@localhost" type="feb32156:DbDataSourceImpl" />
+      </path>
+      <path>
+        <item name="Database" type="3277223f:DatabaseStructure$DbRootGroup" />
+        <item name="root@localhost" type="feb32156:DbDataSourceImpl" />
+        <item name="schemas" type="d4e8921:DatabaseStructure$FamilyGroup" />
+      </path>
+    </expand>
     <select />
   </component>
   <component name="FileTemplateManagerImpl">
@@ -137,6 +157,11 @@
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="2" id="Add" />
   </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
   <component name="PropertiesComponent">
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="DatabaseDriversLRU" value="mysql" />
@@ -172,18 +197,6 @@
       <recent name="$PROJECT_DIR$/resources/views/dnu" />
     </key>
   </component>
-  <component name="RunDashboard">
-    <option name="ruleStates">
-      <list>
-        <RuleState>
-          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
-        </RuleState>
-        <RuleState>
-          <option name="name" value="StatusDashboardGroupingRule" />
-        </RuleState>
-      </list>
-    </option>
-  </component>
   <component name="RunManager">
     <configuration name="phpspec.yml" type="PhpSpecConfigurationType" factoryName="PHPSpec">
       <PhpTestRunnerSettings scope="ConfigurationFile" />
@@ -191,18 +204,15 @@
     </configuration>
   </component>
   <component name="ServiceViewManager">
-    <option name="allServicesViewState">
-      <serviceView>
-        <treeState>
-          <expand>
-            <path>
-              <item name="services root" type="e789fda9:ObjectUtils$Sentinel" />
-              <item name="com.intellij.execution.services.ServiceModel$ServiceGroupNode@c4b74ba8" type="7427dc5b:ServiceModel$ServiceGroupNode" />
-            </path>
-          </expand>
-          <select />
-        </treeState>
-      </serviceView>
+    <option name="viewStates">
+      <list>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
+      </list>
     </option>
   </component>
   <component name="SvnConfiguration">
@@ -250,7 +260,12 @@
       <workItem from="1573595218746" duration="3052000" />
       <workItem from="1574694578221" duration="144000" />
       <workItem from="1574706965286" duration="2435000" />
-      <workItem from="1574710021638" duration="3313000" />
+      <workItem from="1574710021638" duration="5797000" />
+      <workItem from="1574872173674" duration="1905000" />
+      <workItem from="1575739277507" duration="1969000" />
+      <workItem from="1575752718337" duration="20000" />
+      <workItem from="1575752753835" duration="19000" />
+      <workItem from="1575914747218" duration="141000" />
     </task>
     <servers />
   </component>
@@ -272,6 +287,24 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="-1592" y="466" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1575752733563">
+      <screen x="-2560" y="23" width="2560" height="1417" />
+    </state>
+    <state x="-1592" y="466" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575752733563" />
+    <state x="-1417" y="501" key="com.intellij.database.view.ui.DbObjectDialog" timestamp="1575914771646">
+      <screen x="-2560" y="23" width="2560" height="1417" />
+    </state>
+    <state x="-1417" y="501" key="com.intellij.database.view.ui.DbObjectDialog/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575914771646" />
+    <state x="-1603" y="564" key="com.intellij.ide.util.TipDialog" timestamp="1575752754451">
+      <screen x="-2560" y="23" width="2560" height="1417" />
+    </state>
+    <state x="-1603" y="564" key="com.intellij.ide.util.TipDialog/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575752754451" />
+    <state x="-1615" y="348" width="670" height="676" key="search.everywhere.popup" timestamp="1575744497676">
+      <screen x="-2560" y="23" width="2560" height="1417" />
+    </state>
+    <state x="-1615" y="348" width="670" height="676" key="search.everywhere.popup/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575744497676" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

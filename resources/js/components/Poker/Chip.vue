@@ -13,12 +13,6 @@
     let chip3 = AudioPlugin.load('/Poker/sounds/chip3.mp3');
 
     const imagePath = '/Poker/chips/';
-    /*class Chip{
-          constructor(amount){
-              this.amount = amount;
-          }
-
-    }*/
 
     export default {
         name: "Chip",

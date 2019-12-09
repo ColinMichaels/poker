@@ -1,5 +1,5 @@
 <template>
-    <div id="deck" ref="deck" :class="{is_flipped: !is_flipped}"  class="flex flex-wrap shuffle" >
+    <div id="deck" ref="deck" :class="{is_flipped: !is_flipped}" class="flex flex-wrap" >
             <card
                 :ref="card.name"
                 v-for="card in cards"
@@ -7,7 +7,7 @@
                 :key="card.name"
                 :is_flipped="is_flipped"
                 v-on:card-clicked="flip"
-            ></card>
+            />
     </div>
 </template>
 
@@ -17,7 +17,7 @@
 
     const initData = () => ({
         is_flipped: false,
-        cards: Game.store().cards.slice(0, 5),
+        cards: Game.store().cards,
         play_hand: [],
         position: Math.floor(Math.random() * (52 - 1) + 1),
         selected: null

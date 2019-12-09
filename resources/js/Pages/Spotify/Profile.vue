@@ -14,6 +14,7 @@
            <inertia-link class="flex items-center group py-5" :href="route('spotify.playlists')">
                <div class="text-white  hover:text-gray-700"><i class="fa fa-list-ul"></i> Playlists</div>
            </inertia-link>
+           {{current_track}}
 
        </div>
 </template>
@@ -21,6 +22,6 @@
 <script>
     export default {
         name: "Profile",
-        props: ['user_data']
+        props: ['user_data', 'current_track']
     }
 </script>

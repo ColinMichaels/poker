@@ -1,8 +1,8 @@
 <template>
     <div>
         <ul class="flex">
-            <li v-for="amount in this.amounts">
-                <chip :amount="amount.toString()"></chip>
+            <li v-for="denomination in this.denominations">
+                <chip :amount="denomination.toString()"/>
             </li>
         </ul>
     </div>
@@ -10,7 +10,6 @@
 
 <script>
     import Chip from "./Chip";
-    import {denominations} from "./denominations";
     export default {
         name: "Chips",
         components: {
@@ -18,7 +17,7 @@
         },
         data(){
             return{
-                amounts : denominations
+                denominations :[1,5,10,25,50,100,500,1000],
             }
         }
     }

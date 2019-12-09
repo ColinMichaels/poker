@@ -13,6 +13,9 @@
         <inertia-link class="flex items-center group py-5" :href="route('spotify.index')">
             <div :class="isUrl('spotify') ? 'text-green-500  hover:text-green-800' : 'text-gray-700 hover:text-green-800'"><i class="fab fa-spotify"></i> Spotify</div>
         </inertia-link>
+        <a class="flex items-center group py-5" href="https://github.com/ColinMichaels/poker" target="_blank">
+            <div  class="text-gray-700 hover:text-blue-800"><i class="fab fa-github"></i> GitHub</div>
+        </a>
     </div>
   </div>
 </template>

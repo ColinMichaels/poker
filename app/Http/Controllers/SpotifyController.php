@@ -67,6 +67,7 @@ class SpotifyController extends Controller
             $api = new SpotifyWebAPI();
             $api->setAccessToken( $this->session->getAccessToken());
             $user_data = $api->me();
+            $current_track = $api->getMyCurrentTrack();
             session([
                 'spotify_access_token'=> $this->access_token,
                 'spotify_refresh_token' => $this->refresh_token,
@@ -75,7 +76,8 @@ class SpotifyController extends Controller
             ]);
             return Inertia::render( 'Spotify/Index', [
                 'is_logged_in' => session('spotify_is_logged_in'),
-                'user_data' => $user_data
+                'user_data' => $user_data,
+                'current_track' => $current_track
             ]);
         }else{
              return redirect('/spotify');
@@ -88,12 +90,14 @@ class SpotifyController extends Controller
         $api = new SpotifyWebAPI();
         $api->setAccessToken( $this->access_token);
         $user_data = $api->me();
+        $current_track = $api->getMyCurrentTrack();
 
         return Inertia::render( 'Spotify/Index', [
             'is_logged_in' => true,
             'access_token' => $this->access_token,
             'refresh_token' => $this->refresh_token,
-            'user_data' => $user_data
+            'user_data' => $user_data ,
+            'current_track' => $current_track
         ]);
     }
 
