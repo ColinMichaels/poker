@@ -3839,16 +3839,16 @@
         },
         {
             "name": "laravel-frontend-presets/tailwindcss",
-            "version": "2.1.0",
+            "version": "2.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel-frontend-presets/tailwindcss.git",
-                "reference": "acc0a70558b829d34597040ff8dfa9e3cb417cda"
+                "reference": "8f51a1571e869eb58f43bcfaf079a6c420ee4735"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel-frontend-presets/tailwindcss/zipball/acc0a70558b829d34597040ff8dfa9e3cb417cda",
-                "reference": "acc0a70558b829d34597040ff8dfa9e3cb417cda",
+                "url": "https://api.github.com/repos/laravel-frontend-presets/tailwindcss/zipball/8f51a1571e869eb58f43bcfaf079a6c420ee4735",
+                "reference": "8f51a1571e869eb58f43bcfaf079a6c420ee4735",
                 "shasum": ""
             },
             "require": {
@@ -3877,7 +3877,7 @@
                 "preset",
                 "tailwindcss"
             ],
-            "time": "2019-10-14T22:15:37+00:00"
+            "time": "2019-12-08T08:22:49+00:00"
         },
         {
             "name": "maximebf/debugbar",
