@@ -9,10 +9,19 @@
                     <avatar name="matrix-trinity" bgcolor="bg-gray-800"/>
                     <h4 class="text-2xl font-black text-white text-center">DEALER</h4>
                 </div>
-                <deck/>
-                <div class="flex m-8">
-                    <div v-for="player in num_players">
-                        {{player}}
+                <div class="flex flex-no-wrap m-8">
+                    <div v-for="player in num_players" class="flex flex-wrap">
+                        <button class="btn py-2 px-4 bg-gray-200 text-black" @click="rankPlayerHand(table_hands[player - 1])">Rank Hand</button>
+                        <div v-for="card in table_hands[player - 1]" class="flex flex-wrap">
+                            <card
+                                :ref="card"
+                                :name="card"
+                                :key="card"
+                                :is_flipped="true"
+                                v-on:card-clicked="flipCard"
+                            />
+                        </div>
+
                         <avatar :name="player_avatar" bgcolor="bg-blue-600 w-1/5"/>
                         <chips class="flex flex-wrap w-full px-3" />
                     </div>
@@ -89,15 +98,17 @@
         current_card: null,
         card_chosen: [],
         card_to_find : null,
+        deck : Game.getDeck(),
         pot: 0,
         last_bet: 0,
+        hands: [],
         player_hand: 0,
         player_wallet: 0,
-        num_players:3,
+        table_hands: [],
+        num_cards: 5,
+        num_players:6,
         player_avatar: 'robot-01'
     });
-
-
 
     export default {
         name: "Game",
@@ -113,27 +124,24 @@
             Deck, Card, Chips, AvatarSlider
         },
         data() {
-            return{
-                is_running: false,
-                toggle_debug: false,
-                round: 0,
-                current_bet: 0,
-                current_card: null,
-                card_chosen: [],
-                card_to_find : null,
-                pot: 0,
-                last_bet: 0,
-                player_hand: 0,
-                player_wallet: 0,
-                num_players:3,
-                player_avatar: 'robot-01'
-            }
+            return defaultData()
         },
         methods: {
             startGame() {
                 //this.updatePlayerWallet(parseInt(this.player_hand) * -1);
                 Game.broadcast('deck.reset');
                 Object.assign(this.$data, defaultData());
+                this.deck = _.shuffle(this.deck);
+
+
+                for(let i = 0; i< this.num_players; i++){
+                    let hand = [];
+                    for(let x = 0; x < this.num_cards; x++){
+                         this.current_card += 1;
+                         hand.push(this.deck[this.current_card].name);
+                    }
+                    this.table_hands.push(hand);
+                }
                 this.is_running = true;
             },
             endGame(){
@@ -165,6 +173,10 @@
             },
             flip() {
                 Game.broadcast('deck.flip');
+            },
+            flipCard(card) {
+                card.flipped = !card.flipped;
+                Game.sound('/Poker/sounds/card.mp3');
             },
             getPlayerWallet() {
                 axios.get('/wallet')
@@ -199,7 +211,14 @@
             },
             toggleDebug(){
                 this.debug = !this.debug;
+            },
+            rankPlayerHand(hand){
+                let thisHand = Game.rankHand(hand);
+                alert(thisHand.evaluatedHand);
             }
+        },
+        computed:{
+
         },
         mounted() {
             Game.listen('game.start',   this.startGame);

@@ -2,27 +2,15 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1eee6476-c5d8-4dc1-b068-da2be4a7c407" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/resources/js/plugins/game/DebugComponent.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/Poker.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Poker.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/public/js/35.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/SpotifyController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/SpotifyController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/js/0.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/0.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/js/10.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/10.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/js/23.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/23.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/js/27.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/27.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/js/30.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/30.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/js/34.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/34.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/js/5.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/5.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/js/7.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/7.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/app.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/mix-manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/mix-manifest.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/Pages/Dashboard/Index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/Pages/Dashboard/Index.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/Pages/Spotify/Auth.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/Pages/Spotify/Auth.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/Pages/Spotify/Index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/Pages/Spotify/Index.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/Pages/Spotify/Profile.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/Pages/Spotify/Profile.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/Shared/MainMenu.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/Shared/MainMenu.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/Poker/Chip.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/Poker/Chip.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/Poker/Chips.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/Poker/Chips.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/Poker/Deck.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/Poker/Deck.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/plugins/game/GameComponent.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/plugins/game/GameComponent.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -75,7 +63,8 @@
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/app/Poker/Game.php" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" />
   </component>
-  <component name="PhpWorkspaceProjectConfiguration">
+  <component name="PhpDebugGeneral" listening_started="true" />
+  <component name="PhpWorkspaceProjectConfiguration" interpreter_name="PHP 7.2 (1)">
     <include_path>
       <path value="$PROJECT_DIR$/vendor/dnoegel/php-xdg-base-dir" />
       <path value="$PROJECT_DIR$/vendor/monolog/monolog" />
@@ -125,7 +114,7 @@
       <path value="$PROJECT_DIR$/vendor/fideloper/proxy" />
       <path value="$PROJECT_DIR$/vendor/league/flysystem" />
       <path value="$PROJECT_DIR$/vendor/egulias/email-validator" />
-      <path value="/usr/local/Cellar/php@7.2/7.2.22/bin" />
+      <path value="/usr/local/Cellar/php@7.2/7.2.25/bin" />
       <path value="$PROJECT_DIR$/vendor/inertiajs/inertia-laravel" />
       <path value="$PROJECT_DIR$/vendor/psr/http-message" />
       <path value="$PROJECT_DIR$/vendor/intervention/image" />
@@ -166,6 +155,7 @@
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="DatabaseDriversLRU" value="mysql" />
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="true" />
     <property name="WebServerToolWindowPanel.toolwindow.highlight.mappings" value="true" />
@@ -179,7 +169,7 @@
     <property name="node.js.path.for.package.stylelint" value="project" />
     <property name="node.js.selected.package.stylelint" value="$PROJECT_DIR$/node_modules" />
     <property name="nodejs_package_manager_path" value="npm" />
-    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+    <property name="settings.editor.selected.configurable" value="preferences.pathVariables" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -197,11 +187,24 @@
       <recent name="$PROJECT_DIR$/resources/views/dnu" />
     </key>
   </component>
-  <component name="RunManager">
-    <configuration name="phpspec.yml" type="PhpSpecConfigurationType" factoryName="PHPSpec">
-      <PhpTestRunnerSettings scope="ConfigurationFile" />
+  <component name="RunManager" selected="JavaScript Debug.GameComponent.vue">
+    <configuration name="GameComponent.vue" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/Poker/resources/js/plugins/game/GameComponent.vue" useBuiltInWebServerPort="true">
       <method v="2" />
     </configuration>
+    <configuration name="phpspec.yml" type="PhpSpecConfigurationType" factoryName="PHPSpec">
+      <CommandLine>
+        <PhpTestInterpreterSettings>
+          <option name="interpreterName" value="PHP 7.2 (1)" />
+        </PhpTestInterpreterSettings>
+      </CommandLine>
+      <PhpTestRunnerSettings method="" scope="ConfigurationFile" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JavaScript Debug.GameComponent.vue" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="ServiceViewManager">
     <option name="viewStates">
@@ -266,6 +269,9 @@
       <workItem from="1575752718337" duration="20000" />
       <workItem from="1575752753835" duration="19000" />
       <workItem from="1575914747218" duration="141000" />
+      <workItem from="1575915459031" duration="148000" />
+      <workItem from="1575928219281" duration="3091000" />
+      <workItem from="1575998264455" duration="258000" />
     </task>
     <servers />
   </component>
@@ -289,22 +295,86 @@
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
   </component>
   <component name="WindowStateProjectService">
+    <state x="-1570" y="316" key="#PHP" timestamp="1575997751162">
+      <screen x="-2560" y="23" width="2560" height="1417" />
+    </state>
+    <state x="-1570" y="316" key="#PHP/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575997751162" />
     <state x="-1592" y="466" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1575752733563">
       <screen x="-2560" y="23" width="2560" height="1417" />
     </state>
     <state x="-1592" y="466" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575752733563" />
+    <state x="-1553" y="403" key="#phpspec.yml" timestamp="1575997777019">
+      <screen x="-2560" y="23" width="2560" height="1417" />
+    </state>
+    <state x="-1553" y="403" key="#phpspec.yml/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575997777019" />
+    <state width="2518" height="501" key="GridCell.Tab.0.bottom" timestamp="1575999847734">
+      <screen x="-2560" y="23" width="2560" height="1417" />
+    </state>
+    <state width="2518" height="501" key="GridCell.Tab.0.bottom/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575999847734" />
+    <state width="2518" height="501" key="GridCell.Tab.0.center" timestamp="1575999847733">
+      <screen x="-2560" y="23" width="2560" height="1417" />
+    </state>
+    <state width="2518" height="501" key="GridCell.Tab.0.center/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575999847733" />
+    <state width="2518" height="501" key="GridCell.Tab.0.left" timestamp="1575999847733">
+      <screen x="-2560" y="23" width="2560" height="1417" />
+    </state>
+    <state width="2518" height="501" key="GridCell.Tab.0.left/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575999847733" />
+    <state width="2518" height="501" key="GridCell.Tab.0.right" timestamp="1575999847733">
+      <screen x="-2560" y="23" width="2560" height="1417" />
+    </state>
+    <state width="2518" height="501" key="GridCell.Tab.0.right/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575999847733" />
+    <state width="2518" height="501" key="GridCell.Tab.1.bottom" timestamp="1575999847735">
+      <screen x="-2560" y="23" width="2560" height="1417" />
+    </state>
+    <state width="2518" height="501" key="GridCell.Tab.1.bottom/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575999847735" />
+    <state width="2518" height="501" key="GridCell.Tab.1.center" timestamp="1575999847734">
+      <screen x="-2560" y="23" width="2560" height="1417" />
+    </state>
+    <state width="2518" height="501" key="GridCell.Tab.1.center/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575999847734" />
+    <state width="2518" height="501" key="GridCell.Tab.1.left" timestamp="1575999847734">
+      <screen x="-2560" y="23" width="2560" height="1417" />
+    </state>
+    <state width="2518" height="501" key="GridCell.Tab.1.left/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575999847734" />
+    <state width="2518" height="501" key="GridCell.Tab.1.right" timestamp="1575999847735">
+      <screen x="-2560" y="23" width="2560" height="1417" />
+    </state>
+    <state width="2518" height="501" key="GridCell.Tab.1.right/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575999847735" />
+    <state width="2518" height="501" key="GridCell.Tab.2.bottom" timestamp="1575999847736">
+      <screen x="-2560" y="23" width="2560" height="1417" />
+    </state>
+    <state width="2518" height="501" key="GridCell.Tab.2.bottom/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575999847736" />
+    <state width="2518" height="501" key="GridCell.Tab.2.center" timestamp="1575999847735">
+      <screen x="-2560" y="23" width="2560" height="1417" />
+    </state>
+    <state width="2518" height="501" key="GridCell.Tab.2.center/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575999847735" />
+    <state width="2518" height="501" key="GridCell.Tab.2.left" timestamp="1575999847735">
+      <screen x="-2560" y="23" width="2560" height="1417" />
+    </state>
+    <state width="2518" height="501" key="GridCell.Tab.2.left/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575999847735" />
+    <state width="2518" height="501" key="GridCell.Tab.2.right" timestamp="1575999847736">
+      <screen x="-2560" y="23" width="2560" height="1417" />
+    </state>
+    <state width="2518" height="501" key="GridCell.Tab.2.right/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575999847736" />
+    <state x="-1734" y="370" key="SettingsEditor" timestamp="1575998462662">
+      <screen x="-2560" y="23" width="2560" height="1417" />
+    </state>
+    <state x="-1734" y="370" key="SettingsEditor/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575998462662" />
+    <state x="-1270" y="620" width="390" height="268" key="XPathView.InputDialog.DIMENSION_SERVICE_KEY.SIMPLE" timestamp="1575998331608">
+      <screen x="-2560" y="23" width="2560" height="1417" />
+    </state>
+    <state x="-1270" y="620" width="390" height="268" key="XPathView.InputDialog.DIMENSION_SERVICE_KEY.SIMPLE/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575998331608" />
     <state x="-1417" y="501" key="com.intellij.database.view.ui.DbObjectDialog" timestamp="1575914771646">
       <screen x="-2560" y="23" width="2560" height="1417" />
     </state>
     <state x="-1417" y="501" key="com.intellij.database.view.ui.DbObjectDialog/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575914771646" />
-    <state x="-1603" y="564" key="com.intellij.ide.util.TipDialog" timestamp="1575752754451">
+    <state x="-1603" y="564" key="com.intellij.ide.util.TipDialog" timestamp="1575928218918">
       <screen x="-2560" y="23" width="2560" height="1417" />
     </state>
-    <state x="-1603" y="564" key="com.intellij.ide.util.TipDialog/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575752754451" />
-    <state x="-1615" y="348" width="670" height="676" key="search.everywhere.popup" timestamp="1575744497676">
+    <state x="-1603" y="564" key="com.intellij.ide.util.TipDialog/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575928218918" />
+    <state x="-1615" y="348" width="670" height="676" key="search.everywhere.popup" timestamp="1575993133364">
       <screen x="-2560" y="23" width="2560" height="1417" />
     </state>
-    <state x="-1615" y="348" width="670" height="676" key="search.everywhere.popup/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575744497676" />
+    <state x="-1615" y="348" width="670" height="676" key="search.everywhere.popup/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575993133364" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -331,5 +401,9 @@
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
+  </component>
+  <component name="XPathView.XPathProjectComponent">
+    <history />
+    <find-history />
   </component>
 </project>
