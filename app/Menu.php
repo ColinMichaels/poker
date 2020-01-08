@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Menu extends Model
 {
-    public function items(){
+    public function items
         return $this->belongsToMany( MenuItem::class);
     }
 }

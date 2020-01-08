@@ -12,7 +12,7 @@ import Spotify from "./plugins/spotify/SpotifyPlugin";
 
 window.Vue = Vue;
 window.Bus = new Vue();
-Vue.config.productionTip = false
+Vue.config.productionTip = false;
 Vue.mixin({methods: {route: window.route}});
 Vue.use(InertiaApp);
 Vue.use(Audio);
@@ -20,12 +20,7 @@ Vue.use(Modal);
 Vue.use(PortalVue);
 Vue.use(VueMeta);
 Vue.use(Game, {key: process.env.MIX_GAME_KEY});
-Vue.use(Spotify,
-    {
-        client_id: process.env.MIX_SPOTIFY_CLIENT_ID,
-        client_secret: process.env.MIX_SPOTIFY_CLIENT_SECRET,
-        callback_url: process.env.MIX_SPOTIFY_CALLBACK_URL
-    });
+Vue.use(Spotify);
 
 let app = document.getElementById('app');
 

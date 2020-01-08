@@ -1,7 +1,7 @@
 @import url(https://fonts.googleapis.com/css?family=Nunito);@charset "UTF-8";
 
 /*!
- * Font Awesome Free 5.11.2 by @fontawesome - https://fontawesome.com
+ * Font Awesome Free 5.12.0 by @fontawesome - https://fontawesome.com
  * License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License)
  */
 
@@ -565,6 +565,10 @@ readers do not read off random characters that represent icons */
   content: "\F7E5";
 }
 
+.fa-bahai:before {
+  content: "\F666";
+}
+
 .fa-balance-scale:before {
   content: "\F24E";
 }
@@ -985,6 +989,10 @@ readers do not read off random characters that represent icons */
   content: "\F5E4";
 }
 
+.fa-caravan:before {
+  content: "\F8FF";
+}
+
 .fa-caret-down:before {
   content: "\F0D7";
 }
@@ -1395,6 +1403,10 @@ readers do not read off random characters that represent icons */
 
 .fa-compress:before {
   content: "\F066";
+}
+
+.fa-compress-alt:before {
+  content: "\F422";
 }
 
 .fa-compress-arrows-alt:before {
@@ -1929,6 +1941,10 @@ readers do not read off random characters that represent icons */
   content: "\F065";
 }
 
+.fa-expand-alt:before {
+  content: "\F424";
+}
+
 .fa-expand-arrows-alt:before {
   content: "\F31E";
 }
@@ -2147,6 +2163,10 @@ readers do not read off random characters that represent icons */
 
 .fa-firefox:before {
   content: "\F269";
+}
+
+.fa-firefox-browser:before {
+  content: "\F907";
 }
 
 .fa-first-aid:before {
@@ -2721,10 +2741,6 @@ readers do not read off random characters that represent icons */
   content: "\F6E8";
 }
 
-.fa-haykal:before {
-  content: "\F666";
-}
-
 .fa-hdd:before {
   content: "\F0A0";
 }
@@ -2903,6 +2919,10 @@ readers do not read off random characters that represent icons */
 
 .fa-id-card-alt:before {
   content: "\F47F";
+}
+
+.fa-ideal:before {
+  content: "\F913";
 }
 
 .fa-igloo:before {
@@ -3425,6 +3445,10 @@ readers do not read off random characters that represent icons */
   content: "\F753";
 }
 
+.fa-microblog:before {
+  content: "\F91A";
+}
+
 .fa-microchip:before {
   content: "\F2DB";
 }
@@ -3875,6 +3899,10 @@ readers do not read off random characters that represent icons */
 
 .fa-pied-piper-pp:before {
   content: "\F1A7";
+}
+
+.fa-pied-piper-square:before {
+  content: "\F91E";
 }
 
 .fa-piggy-bank:before {
@@ -5173,6 +5201,10 @@ readers do not read off random characters that represent icons */
   content: "\F637";
 }
 
+.fa-trailer:before {
+  content: "\F941";
+}
+
 .fa-train:before {
   content: "\F238";
 }
@@ -5315,6 +5347,10 @@ readers do not read off random characters that represent icons */
 
 .fa-uniregistry:before {
   content: "\F404";
+}
+
+.fa-unity:before {
+  content: "\F949";
 }
 
 .fa-universal-access:before {
@@ -5826,7 +5862,7 @@ readers do not read off random characters that represent icons */
 }
 
 /*!
- * Font Awesome Free 5.11.2 by @fontawesome - https://fontawesome.com
+ * Font Awesome Free 5.12.0 by @fontawesome - https://fontawesome.com
  * License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License)
  */
 
@@ -5850,7 +5886,7 @@ readers do not read off random characters that represent icons */
 }
 
 /*!
- * Font Awesome Free 5.11.2 by @fontawesome - https://fontawesome.com
+ * Font Awesome Free 5.12.0 by @fontawesome - https://fontawesome.com
  * License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License)
  */
 
@@ -5875,7 +5911,7 @@ readers do not read off random characters that represent icons */
 }
 
 /*!
- * Font Awesome Free 5.11.2 by @fontawesome - https://fontawesome.com
+ * Font Awesome Free 5.12.0 by @fontawesome - https://fontawesome.com
  * License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License)
  */
 
@@ -20192,7 +20228,7 @@ video {
 @-webkit-keyframes fadeInUp{
   from{
     opacity: 0;
-    transform: translate3d(0, -100%, 0);
+    transform: translate3d(0, 100%, 0);
   }
 
   to{
@@ -20204,7 +20240,7 @@ video {
 @keyframes fadeInUp{
   from{
     opacity: 0;
-    transform: translate3d(0, -100%, 0);
+    transform: translate3d(0, 100%, 0);
   }
 
   to{

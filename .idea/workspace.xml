@@ -2,15 +2,16 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1eee6476-c5d8-4dc1-b068-da2be4a7c407" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/public/js/35.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/js/34.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/34.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Menu.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Menu.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/js/5.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/5.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/js/7.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/7.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/app.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/mix-manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/mix-manifest.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/Poker/Card.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/Poker/Card.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/plugins/game/GameComponent.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/plugins/game/GameComponent.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/plugins/game/GamePlugin.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/plugins/game/GamePlugin.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -188,7 +189,7 @@
     </key>
   </component>
   <component name="RunManager" selected="JavaScript Debug.GameComponent.vue">
-    <configuration name="GameComponent.vue" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/Poker/resources/js/plugins/game/GameComponent.vue" useBuiltInWebServerPort="true">
+    <configuration name="GameComponent.vue" type="JavascriptDebugType" nameIsGenerated="true" uri="http://localhost:63342/Poker/resources/js/plugins/game/GameComponent.vue" useBuiltInWebServerPort="true">
       <method v="2" />
     </configuration>
     <configuration name="phpspec.yml" type="PhpSpecConfigurationType" factoryName="PHPSpec">
@@ -200,11 +201,6 @@
       <PhpTestRunnerSettings method="" scope="ConfigurationFile" />
       <method v="2" />
     </configuration>
-    <recent_temporary>
-      <list>
-        <item itemvalue="JavaScript Debug.GameComponent.vue" />
-      </list>
-    </recent_temporary>
   </component>
   <component name="ServiceViewManager">
     <option name="viewStates">
@@ -272,6 +268,16 @@
       <workItem from="1575915459031" duration="148000" />
       <workItem from="1575928219281" duration="3091000" />
       <workItem from="1575998264455" duration="258000" />
+      <workItem from="1576167882679" duration="12000" />
+      <workItem from="1576168252848" duration="7000" />
+      <workItem from="1576778194629" duration="1120000" />
+      <workItem from="1577197761932" duration="24000" />
+      <workItem from="1577197791013" duration="1816000" />
+      <workItem from="1577911937659" duration="44000" />
+      <workItem from="1577912005166" duration="1438000" />
+      <workItem from="1578331751916" duration="148000" />
+      <workItem from="1578331910838" duration="246000" />
+      <workItem from="1578515312078" duration="235000" />
     </task>
     <servers />
   </component>
@@ -299,10 +305,15 @@
       <screen x="-2560" y="23" width="2560" height="1417" />
     </state>
     <state x="-1570" y="316" key="#PHP/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575997751162" />
-    <state x="-1592" y="466" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1575752733563">
+    <state x="385" y="277" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1577990966765">
+      <screen x="0" y="23" width="1920" height="1177" />
+    </state>
+    <state x="385" y="277" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.23.1920.1177@0.23.1920.1177" timestamp="1577990966765" />
+    <state x="-1592" y="466" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1578331773312">
       <screen x="-2560" y="23" width="2560" height="1417" />
     </state>
-    <state x="-1592" y="466" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575752733563" />
+    <state x="-1592" y="466" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1578331773312" />
+    <state x="726" y="391" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.23.1920.1177@0.23.1920.1177" timestamp="1577911959224" />
     <state x="-1553" y="403" key="#phpspec.yml" timestamp="1575997777019">
       <screen x="-2560" y="23" width="2560" height="1417" />
     </state>
@@ -367,14 +378,20 @@
       <screen x="-2560" y="23" width="2560" height="1417" />
     </state>
     <state x="-1417" y="501" key="com.intellij.database.view.ui.DbObjectDialog/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575914771646" />
-    <state x="-1603" y="564" key="com.intellij.ide.util.TipDialog" timestamp="1575928218918">
+    <state x="-1603" y="564" key="com.intellij.ide.util.TipDialog" timestamp="1578515345423">
       <screen x="-2560" y="23" width="2560" height="1417" />
     </state>
-    <state x="-1603" y="564" key="com.intellij.ide.util.TipDialog/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575928218918" />
-    <state x="-1615" y="348" width="670" height="676" key="search.everywhere.popup" timestamp="1575993133364">
-      <screen x="-2560" y="23" width="2560" height="1417" />
+    <state x="-1603" y="564" key="com.intellij.ide.util.TipDialog/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1578515345423" />
+    <state x="718" y="472" key="com.intellij.ide.util.TipDialog/0.23.1920.1177@0.23.1920.1177" timestamp="1577918764660" />
+    <state x="646" y="252" key="refactoring.ChangeSignatureDialog" timestamp="1577990951422">
+      <screen x="0" y="23" width="1920" height="1177" />
     </state>
-    <state x="-1615" y="348" width="670" height="676" key="search.everywhere.popup/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575993133364" />
+    <state x="646" y="252" key="refactoring.ChangeSignatureDialog/0.23.1920.1177@0.23.1920.1177" timestamp="1577990951422" />
+    <state x="709" y="293" width="670" height="562" key="search.everywhere.popup" timestamp="1577990957697">
+      <screen x="0" y="23" width="1920" height="1177" />
+    </state>
+    <state x="-1615" y="348" width="670" height="676" key="search.everywhere.popup/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1576168255727" />
+    <state x="709" y="293" width="670" height="562" key="search.everywhere.popup/0.23.1920.1177@0.23.1920.1177" timestamp="1577990957697" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

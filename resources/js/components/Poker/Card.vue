@@ -1,6 +1,6 @@
 <template>
     <div class="card-container" :class="{flipped: !flipped}" @click="clicked">
-        <div class="card">
+        <div class="card" :class="{ is_current : is_current }">
             <div class="card-front" >
                 <img :src="card_image_front" alt="card_front"/>
             </div>
@@ -22,6 +22,10 @@
             is_flipped: {
                 type: Boolean,
                 default: false
+            },
+            is_current:{
+                type: Boolean,
+                default:false
             },
             is_frozen:{
                type: Boolean,

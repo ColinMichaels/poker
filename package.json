@@ -11,9 +11,12 @@
     },
     "devDependencies": {
         "@fortawesome/fontawesome-free": "^5.12.0",
-        "axios": "^0.19.0",
+        "@inertiajs/inertia": "^0.1.7",
+        "@inertiajs/inertia-vue": "^0.1.2",
         "autosize": "^4.0.2",
+        "axios": "^0.19.1",
         "cross-env": "^6.0",
+        "howler": "^2.1.3",
         "laravel-mix": "^5.0.1",
         "laravel-mix-purgecss": "^4.1",
         "laravel-mix-tailwind": "^0.1.0",
@@ -23,15 +26,12 @@
         "resolve-url-loader": "^3.1.1",
         "sass": "^1.24.3",
         "sass-loader": "^7.1.0",
-        "tailwindcss": "^1.1",
-        "vue": "^2.6.11",
-        "vue-template-compiler": "^2.6.11",
-        "@inertiajs/inertia": "^0.1.7",
-        "@inertiajs/inertia-vue": "^0.1.2",
-        "howler": "^2.1.3",
         "smoothscroll-polyfill": "^0.4.4",
+        "tailwindcss": "^1.1.4",
         "tailwindcss-animatecss": "^0.2.6",
-        "vue-meta": "^2.3.1"
+        "vue": "^2.6.11",
+        "vue-meta": "^2.3.1",
+        "vue-template-compiler": "^2.6.11"
     },
     "dependencies": {
         "dotenv": "^8.2.0",

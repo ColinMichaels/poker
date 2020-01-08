@@ -149,7 +149,7 @@ let GamePlugin = {
         return names[split.value] + " of " + suit_names[split.suit];
     },
     splitCardName(card) {
-        let value = card.match(/^[a-zA-Z]{1}|[0-9]{1,2}/g);
+        let value = card.match(/^[a-zA-Z]|[0-9]{1,2}/g);
         let suit = card.match(/[A-Z| a-z]$/g);
         return {value, suit};
     },
@@ -185,8 +185,6 @@ let GamePlugin = {
         let handTranslated = handTranslator(hand);
 
         return rankPokerHand(handTranslated.values, handTranslated.suits);
-
-
     },
     store() {
         return {

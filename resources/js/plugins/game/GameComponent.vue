@@ -2,8 +2,6 @@
     <div :id="name">
 
         <div v-show="is_running">
-            <h3 class="text-white text-3xl font-black mb-20">{{this.name.toUpperCase()}} <span class="text-sm ml-3">Find the card in the deck in the least amount of rounds.</span></h3>
-
             <div class="game flex flex-wrap  justify-around">
                 <div id="dealer" class="w-1/2 mb-4 sm:w-1/12">
                     <avatar name="matrix-trinity" bgcolor="bg-gray-800"/>
@@ -12,13 +10,14 @@
                 <div class="flex flex-no-wrap m-8">
                     <div v-for="player in num_players" class="flex flex-wrap">
                         <button class="btn py-2 px-4 bg-gray-200 text-black" @click="rankPlayerHand(table_hands[player - 1])">Rank Hand</button>
-                        <div v-for="card in table_hands[player - 1]" class="flex flex-wrap">
+                        <div v-for="(card, index) in table_hands[player - 1]" class="flex flex-wrap">
                             <card
                                 :ref="card"
                                 :name="card"
                                 :key="card"
                                 :is_flipped="true"
                                 v-on:card-clicked="flipCard"
+                                :is_current="index === 1"
                             />
                         </div>
 
@@ -28,8 +27,8 @@
                 </div>
                 <div class="btn-container">
                     <button class="btn py-2 px-4 bg-white text-black" @click="deal">Deal</button>
-                    <button class="btn py-2 px-4 bg-white text-black" @click="flip">Flip</button>
-                    <button class="btn py-2 px-4 bg-white text-black" @click="shuffle">Shuffle</button>
+                    <button class="btn py-2 px-4 bg-white text-black" @click="flip">Flip All</button>
+                    <button class="btn py-2 px-4 bg-white text-black" @click="shuffle">Shuffle Deck</button>
                     <button class="btn py-2 px-4 bg-white text-black" @click="startGame">New Game</button>
                 </div>
             </div>
@@ -89,6 +88,8 @@
     import Chips from "@/components/Poker/Chips";
     import AvatarSlider from "@/components/shared/AvatarSlider";
     import Avatar from "@/components/shared/Avatar";
+    import Modal from "../../components/shared/Modal";
+    import ModalComponent from "../modal/ModalComponent";
 
     const defaultData = ()=> ({
         is_running: false,
@@ -133,7 +134,6 @@
                 Object.assign(this.$data, defaultData());
                 this.deck = _.shuffle(this.deck);
 
-
                 for(let i = 0; i< this.num_players; i++){
                     let hand = [];
                     for(let x = 0; x < this.num_cards; x++){
@@ -169,6 +169,7 @@
                 Game.broadcast('deck.deal');
             },
             shuffle() {
+                this.deck = _.shuffle(this.deck);
                 Game.broadcast('deck.shuffle');
             },
             flip() {
@@ -189,9 +190,7 @@
 
             },
             updatePlayerWallet(amount) {
-
                 let method = (amount > 0) ? 'add' : 'sub';
-
                     axios.patch('/wallet/' + 0, {
                         method: method,
                         amount: Math.abs(amount)
@@ -217,7 +216,7 @@
                 alert(thisHand.evaluatedHand);
             }
         },
-        computed:{
+        watch:{
 
         },
         mounted() {
@@ -227,11 +226,8 @@
             Game.listen('card.clicked', this.getCard);
             Game.listen('card.start',   this.setCardToFind);
             //this.getPlayerWallet();
-
             // let handTest2 = Game.rankHand(["10S", "10D", "10H", "JD", "AS"]);
             // console.info(handTest2);
-
-
         }
     }
 </script>
