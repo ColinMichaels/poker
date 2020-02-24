@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bc3abf96d5703d74d68995f183d30f45",
+    "content-hash": "9dbaccc497766723df3a3393f7e03227",
     "packages": [
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -615,25 +615,25 @@
         },
         {
             "name": "jwilsson/spotify-web-api-php",
-            "version": "2.12.0",
+            "version": "3.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jwilsson/spotify-web-api-php.git",
-                "reference": "8b4f8c4de73be9357675627ff2ee63a4d6e55eb7"
+                "reference": "8c891b73c9d5310767e5aa384c0b4ce82609ef5d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jwilsson/spotify-web-api-php/zipball/8b4f8c4de73be9357675627ff2ee63a4d6e55eb7",
-                "reference": "8b4f8c4de73be9357675627ff2ee63a4d6e55eb7",
+                "url": "https://api.github.com/repos/jwilsson/spotify-web-api-php/zipball/8c891b73c9d5310767e5aa384c0b4ce82609ef5d",
+                "reference": "8c891b73c9d5310767e5aa384c0b4ce82609ef5d",
                 "shasum": ""
             },
             "require": {
                 "ext-curl": "*",
-                "php": "^5.6 || ^7.0"
+                "php": "^7.0"
             },
             "require-dev": {
                 "php-coveralls/php-coveralls": "^2.0",
-                "phpunit/phpunit": "^5.7 || ^6.0",
+                "phpunit/phpunit": "^6.0",
                 "squizlabs/php_codesniffer": "^3.0"
             },
             "type": "library",
@@ -657,7 +657,7 @@
             "keywords": [
                 "spotify"
             ],
-            "time": "2019-11-01T21:32:01+00:00"
+            "time": "2020-02-21T19:47:19+00:00"
         },
         {
             "name": "laravel/framework",
