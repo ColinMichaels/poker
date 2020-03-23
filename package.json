@@ -35,7 +35,7 @@
     },
     "dependencies": {
         "dotenv": "^8.2.0",
-        "gsap": "^3.0.4",
+        "gsap": "^3.2.6",
         "hooper": "^0.3.4",
         "in-viewport": "^3.6.0"
     }
