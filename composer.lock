@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "99d41fb63c6e3117783b49b1d9ea581d",
+    "content-hash": "7e802a8305d87d1a24f026ac431f13fd",
     "packages": [
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -4166,16 +4166,16 @@
         },
         {
             "name": "laravel-frontend-presets/tailwindcss",
-            "version": "2.2.2",
+            "version": "3.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel-frontend-presets/tailwindcss.git",
-                "reference": "4807d0e3862f77097ec5c5137a5f566441b5b3da"
+                "reference": "ea82c54ad94a222a8c0990c05fe700a8f37f9667"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel-frontend-presets/tailwindcss/zipball/4807d0e3862f77097ec5c5137a5f566441b5b3da",
-                "reference": "4807d0e3862f77097ec5c5137a5f566441b5b3da",
+                "url": "https://api.github.com/repos/laravel-frontend-presets/tailwindcss/zipball/ea82c54ad94a222a8c0990c05fe700a8f37f9667",
+                "reference": "ea82c54ad94a222a8c0990c05fe700a8f37f9667",
                 "shasum": ""
             },
             "require": {
@@ -4204,7 +4204,7 @@
                 "preset",
                 "tailwindcss"
             ],
-            "time": "2019-12-15T10:30:06+00:00"
+            "time": "2020-02-24T10:30:57+00:00"
         },
         {
             "name": "maximebf/debugbar",
