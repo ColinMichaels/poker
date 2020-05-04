@@ -27,7 +27,7 @@
         "sass": "^1.24.3",
         "sass-loader": "^7.1.0",
         "smoothscroll-polyfill": "^0.4.4",
-        "tailwindcss": "^1.1.4",
+        "tailwindcss": "^1.4.4",
         "tailwindcss-animatecss": "^0.2.6",
         "vue": "^2.6.11",
         "vue-meta": "^2.3.1",
