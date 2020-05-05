@@ -3898,16 +3898,16 @@
         },
         {
             "name": "fetzi/phpspec-watcher",
-            "version": "2.0.0",
+            "version": "2.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fetzi/phpspec-watcher.git",
-                "reference": "2eae263e98f4dda422e8700c95c6ae23dbf1c366"
+                "reference": "39474d7221bc887bad0cd24fb2b5f8aa9b0604be"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fetzi/phpspec-watcher/zipball/2eae263e98f4dda422e8700c95c6ae23dbf1c366",
-                "reference": "2eae263e98f4dda422e8700c95c6ae23dbf1c366",
+                "url": "https://api.github.com/repos/fetzi/phpspec-watcher/zipball/39474d7221bc887bad0cd24fb2b5f8aa9b0604be",
+                "reference": "39474d7221bc887bad0cd24fb2b5f8aa9b0604be",
                 "shasum": ""
             },
             "require": {
@@ -3947,7 +3947,7 @@
             ],
             "description": "phpspec-watcher is a cli tool for the automatic execution of phpspec tests when code changes",
             "homepage": "https://github.com/fetzi/phpspec-watcher",
-            "time": "2019-12-05T12:33:29+00:00"
+            "time": "2020-04-13T15:20:59+00:00"
         },
         {
             "name": "filp/whoops",
@@ -4110,25 +4110,26 @@
         },
         {
             "name": "jolicode/jolinotif",
-            "version": "v2.0.2",
+            "version": "v2.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jolicode/JoliNotif.git",
-                "reference": "0b5f786c5f181b3916df616ca191892713257662"
+                "reference": "b1a7ccfeb13f1daa12a5188531863b739e388e13"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jolicode/JoliNotif/zipball/0b5f786c5f181b3916df616ca191892713257662",
-                "reference": "0b5f786c5f181b3916df616ca191892713257662",
+                "url": "https://api.github.com/repos/jolicode/JoliNotif/zipball/b1a7ccfeb13f1daa12a5188531863b739e388e13",
+                "reference": "b1a7ccfeb13f1daa12a5188531863b739e388e13",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.0",
-                "symfony/process": "~3.3|~4.0"
+                "symfony/process": "^3.3|^4.0|^5.0"
             },
             "require-dev": {
-                "friendsofphp/php-cs-fixer": "~2.0",
-                "symfony/phpunit-bridge": "^3.3"
+                "friendsofphp/php-cs-fixer": "^2.0",
+                "symfony/finder": "^3.3|^4.0|^5.0",
+                "symfony/phpunit-bridge": "^3.4.26|^4.0|^5.0"
             },
             "bin": [
                 "jolinotif"
@@ -4136,7 +4137,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.0.x-dev"
+                    "dev-master": "2.1.x-dev"
                 }
             },
             "autoload": {
@@ -4162,7 +4163,7 @@
                 "notification",
                 "windows"
             ],
-            "time": "2019-02-26T18:10:50+00:00"
+            "time": "2020-01-10T15:37:00+00:00"
         },
         {
             "name": "laravel-frontend-presets/tailwindcss",
@@ -4440,16 +4441,16 @@
         },
         {
             "name": "react/stream",
-            "version": "v1.1.0",
+            "version": "v1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/stream.git",
-                "reference": "50426855f7a77ddf43b9266c22320df5bf6c6ce6"
+                "reference": "7c02b510ee3f582c810aeccd3a197b9c2f52ff1a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/stream/zipball/50426855f7a77ddf43b9266c22320df5bf6c6ce6",
-                "reference": "50426855f7a77ddf43b9266c22320df5bf6c6ce6",
+                "url": "https://api.github.com/repos/reactphp/stream/zipball/7c02b510ee3f582c810aeccd3a197b9c2f52ff1a",
+                "reference": "7c02b510ee3f582c810aeccd3a197b9c2f52ff1a",
                 "shasum": ""
             },
             "require": {
@@ -4459,7 +4460,7 @@
             },
             "require-dev": {
                 "clue/stream-filter": "~1.2",
-                "phpunit/phpunit": "^6.4 || ^5.7 || ^4.8.35"
+                "phpunit/phpunit": "^7.0 || ^6.4 || ^5.7 || ^4.8.35"
             },
             "type": "library",
             "autoload": {
@@ -4482,7 +4483,7 @@
                 "stream",
                 "writable"
             ],
-            "time": "2019-01-01T16:15:09+00:00"
+            "time": "2020-05-04T10:17:57+00:00"
         },
         {
             "name": "scrivo/highlight.php",
@@ -4554,16 +4555,16 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "v4.4.2",
+            "version": "v4.4.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "a08832b974dd5fafe3085a66d41fe4c84bb2628c"
+                "reference": "b385dce1c0e9f839b384af90188638819433e252"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/a08832b974dd5fafe3085a66d41fe4c84bb2628c",
-                "reference": "a08832b974dd5fafe3085a66d41fe4c84bb2628c",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/b385dce1c0e9f839b384af90188638819433e252",
+                "reference": "b385dce1c0e9f839b384af90188638819433e252",
                 "shasum": ""
             },
             "require": {
@@ -4609,7 +4610,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2019-12-10T10:33:21+00:00"
+            "time": "2020-04-28T17:55:16+00:00"
         }
     ],
     "aliases": [],
