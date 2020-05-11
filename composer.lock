@@ -3283,23 +3283,22 @@
         },
         {
             "name": "tightenco/ziggy",
-            "version": "v0.9.2",
+            "version": "0.9.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tightenco/ziggy.git",
-                "reference": "8ec9980b9062395f6aab46469d49e3541e505b3b"
+                "reference": "1cfa5fe2e3c54baa87249cb0506b1afd7753f2b9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tightenco/ziggy/zipball/8ec9980b9062395f6aab46469d49e3541e505b3b",
-                "reference": "8ec9980b9062395f6aab46469d49e3541e505b3b",
+                "url": "https://api.github.com/repos/tightenco/ziggy/zipball/1cfa5fe2e3c54baa87249cb0506b1afd7753f2b9",
+                "reference": "1cfa5fe2e3c54baa87249cb0506b1afd7753f2b9",
                 "shasum": ""
             },
             "require": {
                 "laravel/framework": ">=5.4@dev"
             },
             "require-dev": {
-                "mikey179/vfsstream": "^1.6",
                 "orchestra/testbench": "^5.0"
             },
             "type": "library",
@@ -3325,12 +3324,19 @@
                     "email": "daniel@tighten.co"
                 },
                 {
-                    "name": "Matt Stauffer",
-                    "email": "matt@tighten.co"
+                    "name": "Jake Bathman",
+                    "email": "jake@tighten.co"
                 }
             ],
             "description": "Generates a Blade directive exporting all of your named Laravel routes. Also provides a nice route() helper function in JavaScript.",
-            "time": "2020-05-01T19:57:20+00:00"
+            "homepage": "https://github.com/tightenco/ziggy",
+            "keywords": [
+                "Ziggy",
+                "javascript",
+                "laravel",
+                "routes"
+            ],
+            "time": "2020-05-08T19:53:09+00:00"
         },
         {
             "name": "tijsverkoyen/css-to-inline-styles",
