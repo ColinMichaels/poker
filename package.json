@@ -30,7 +30,7 @@
         "tailwindcss": "^1.4.4",
         "tailwindcss-animatecss": "^0.2.6",
         "vue": "^2.6.11",
-        "vue-meta": "^2.3.1",
+        "vue-meta": "^2.3.4",
         "vue-template-compiler": "^2.6.11"
     },
     "dependencies": {
