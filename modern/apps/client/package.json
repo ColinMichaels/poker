@@ -1,0 +1,16 @@
+{
+  "name": "@poker/client",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -p tsconfig.json --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@poker/game-contracts": "workspace:*",
+    "@poker/poker-engine": "workspace:*"
+  }
+}

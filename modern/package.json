@@ -1,0 +1,23 @@
+{
+  "name": "poker-modern-workspace",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Modern Babylon.js poker workspace scaffold",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "generate:assets": "npm run generate --workspace @poker/asset-manifest",
+    "generate:assets:normalize": "npm run generate:normalize --workspace @poker/asset-manifest",
+    "validate:fixtures": "npm run validate:fixtures --workspace @poker/poker-engine"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3",
+    "vite": "^6.1.0",
+    "vitest": "^3.0.5"
+  }
+}
