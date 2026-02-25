@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "node ./src/index.ts"
+    "test": "node --experimental-strip-types ./src/index.ts"
   },
   "dependencies": {
     "@poker/game-contracts": "workspace:*",

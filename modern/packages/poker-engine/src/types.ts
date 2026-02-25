@@ -22,6 +22,7 @@ export type HandCategory =
 
 export interface EvaluatedHand {
   category: HandCategory;
+  strength: number;
   tiebreak: number[];
   label: string;
 }

@@ -1,4 +1,4 @@
-import type { Card } from './types';
+import type { Card } from './types.ts';
 
 export type TablePhase =
   | 'LOBBY'
@@ -16,28 +16,46 @@ export type TablePhase =
   | 'PAYOUT'
   | 'HAND_COMPLETE';
 
-export interface SeatState {
-  seatId: number;
-  playerId: string;
-  stack: number;
-  folded: boolean;
-  holeCards: Card[];
-}
-
-export interface TexasHoldemState {
-  handId: string;
-  phase: TablePhase;
-  dealerSeatId: number;
-  actingSeatId: number;
-  pot: number;
-  board: Card[];
-  seats: SeatState[];
-  burnCards: Card[];
-}
-
 export interface EngineConfig {
   smallBlind: number;
   bigBlind: number;
   minBuyIn: number;
   maxBuyIn: number;
 }
+
+export interface SeatDefinition {
+  seatId: number;
+  playerId: string;
+  stack: number;
+}
+
+export interface SeatState {
+  seatId: number;
+  playerId: string;
+  stack: number;
+  folded: boolean;
+  allIn: boolean;
+  holeCards: Card[];
+  currentBet: number;
+  totalCommitted: number;
+}
+
+export interface TexasHoldemState {
+  handId: string;
+  phase: TablePhase;
+  config: EngineConfig;
+  dealerSeatId: number;
+  buttonSeatId: number;
+  smallBlindSeatId: number;
+  bigBlindSeatId: number;
+  actingSeatId: number;
+  currentBet: number;
+  pot: number;
+  board: Card[];
+  burnCards: Card[];
+  deck: Card[];
+  seats: SeatState[];
+  lastAggressorSeatId: number | null;
+  rngSeed: number;
+}
+

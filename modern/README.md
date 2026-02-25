@@ -17,6 +17,7 @@ From `modern/`:
 - `npm run generate:assets` - generate asset manifest only
 - `npm run generate:assets:normalize` - generate manifest and write normalized assets to `apps/client/public/assets`
 - `npm run validate:fixtures` - validate Texas Hold'em fixtures
+- `npm run test --workspace @poker/poker-engine` - run evaluator/showdown/reducer tests
 
 ## Notes
 

@@ -8,7 +8,8 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "node ./scripts/validate-fixtures.mjs",
-    "validate:fixtures": "node ./scripts/validate-fixtures.mjs"
+    "test": "npm run validate:fixtures && npm run test:engine",
+    "validate:fixtures": "node ./scripts/validate-fixtures.mjs",
+    "test:engine": "node --experimental-strip-types ./scripts/run-fixture-tests.mjs"
   }
 }
