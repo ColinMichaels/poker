@@ -12,6 +12,7 @@ declare module 'node:http' {
 
   export interface Server {
     listen(port: number, host: string, callback?: () => void): void;
+    close(callback?: (error?: Error) => void): void;
   }
 
   export function createServer(
@@ -55,4 +56,6 @@ declare module 'node:crypto' {
 
 declare const process: {
   env: Record<string, string | undefined>;
+  once(event: 'SIGINT' | 'SIGTERM', listener: () => void): void;
+  exit(code?: number): never;
 };

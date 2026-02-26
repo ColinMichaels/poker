@@ -192,6 +192,14 @@ These are not extraction failures, but they are blockers to deleting the legacy 
   - `.nvmrc`
   - `scripts/doctor-modern-env.mjs`
 
+## Completed in PR U
+
+- Added graceful shutdown handling to modern server runtime:
+  - listens for `SIGINT`/`SIGTERM`
+  - persists runtime state before close
+  - closes HTTP server with forced-exit timeout fallback
+- Updated deployment runbook with graceful shutdown behavior.
+
 ## Known Intentional Asset Exceptions
 
 - Non-canonical card extras remain excluded from canonical face set:
@@ -264,6 +272,7 @@ Exit criteria:
 18. PR R: Extracted startup config parsing + dedicated regression tests.
 19. PR S: Root Node/npm environment doctor and engine alignment.
 20. PR T: Modern CI trigger coverage for root toolchain guardrails.
+21. PR U: Graceful shutdown and final-persist handling for modern server.
 
 ## Cutover Go/No-Go Checklist
 

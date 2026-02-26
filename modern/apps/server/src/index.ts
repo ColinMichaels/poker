@@ -588,6 +588,38 @@ const server = createServer((request, response) => {
   );
 });
 
+let shuttingDown = false;
+function beginShutdown(signal: 'SIGINT' | 'SIGTERM'): void {
+  if (shuttingDown) {
+    return;
+  }
+
+  shuttingDown = true;
+  console.info(`Received ${signal}; persisting runtime state and shutting down.`);
+  persistRuntimeState();
+
+  const forceExitTimer = setTimeout(() => {
+    console.error('Shutdown timeout reached; forcing process exit.');
+    process.exit(1);
+  }, 10_000);
+  forceExitTimer.unref();
+
+  server.close((error) => {
+    clearTimeout(forceExitTimer);
+    if (error) {
+      console.error(`Server shutdown encountered an error: ${error.message}`);
+      process.exit(1);
+      return;
+    }
+
+    console.info('Server shutdown complete.');
+    process.exit(0);
+  });
+}
+
+process.once('SIGINT', () => beginShutdown('SIGINT'));
+process.once('SIGTERM', () => beginShutdown('SIGTERM'));
+
 server.listen(port, host, () => {
   const address = `http://${host}:${port}`;
   console.info(`Poker server listening at ${address}`);

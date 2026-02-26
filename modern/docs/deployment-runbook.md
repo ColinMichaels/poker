@@ -48,6 +48,7 @@ Auth/wallet sanity checks:
 ## Deployment Notes
 
 - Current runtime persists table/auth/wallet state to local JSON for restart continuity.
+- Server handles `SIGINT`/`SIGTERM` with graceful shutdown and attempts final runtime-state persistence before exit.
 - Current auth/session uses signed, expiring bearer tokens and salted scrypt password hashes.
 - In production (`NODE_ENV=production`), demo users are disabled by default. Set `POKER_AUTH_BOOTSTRAP_USERS_FILE` for first boot or explicitly set `POKER_AUTH_ALLOW_DEMO_USERS=1` for temporary environments.
 - In production (`NODE_ENV=production`), legacy wallet compatibility routes are disabled by default. Use `POKER_ENABLE_LEGACY_WALLET_ROUTES=1` only for temporary migration compatibility windows.

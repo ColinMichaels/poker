@@ -462,3 +462,18 @@ Sources:
 Sources:
 
 - `.github/workflows/modern-ci.yml`
+
+## PR U Progress: Graceful Shutdown Runtime Handling
+
+- Added signal-based shutdown handling to server entrypoint:
+  - `SIGINT`
+  - `SIGTERM`
+- Shutdown flow now:
+  - persists runtime state snapshot
+  - closes HTTP server gracefully
+  - enforces timeout fallback to avoid hanging process
+
+Sources:
+
+- `apps/server/src/index.ts`
+- `docs/deployment-runbook.md`
