@@ -7,22 +7,23 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1eee6476-c5d8-4dc1-b068-da2be4a7c407" name="Default Changelist" comment="chore: harden mobile dock behavior and improve motion/accessibility">
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/src/multi-table-logic.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/tests/multi-table-logic.test.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/docs/client-animation-roadmap.md" afterDir="false" />
+    <list default="true" id="1eee6476-c5d8-4dc1-b068-da2be4a7c407" name="Default Changelist" comment="refactor(client): streamline mobile action dock UX and update play view layout">
+      <change afterPath="$PROJECT_DIR$/modern/apps/server/src/auth-authorization.test.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/modern/apps/server/src/auth-authorization.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/apps/client/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/apps/client/src/content/howto-content.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/src/content/howto-content.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/apps/client/src/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/src/main.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/apps/client/src/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/src/styles.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/apps/client/src/table-controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/src/table-controller.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/server/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/server/bootstrap-users.example.json" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/bootstrap-users.example.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/server/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/server/src/auth-wallet-service.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/auth-wallet-service.test.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/server/src/auth-wallet-service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/auth-wallet-service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/server/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/server/src/startup-config.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/startup-config.test.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/server/src/startup-config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/startup-config.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/docs/client-animation-roadmap.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/docs/client-animation-roadmap.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/docs/deployment-runbook.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/docs/deployment-runbook.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/docs/legacy-decommission-plan.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/docs/legacy-decommission-plan.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/docs/phase-2-engine-progress.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/docs/phase-2-engine-progress.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/modern/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/scripts/generate-howto-content.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/modern/scripts/generate-howto-content.mjs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/readme.md" beforeDir="false" afterPath="$PROJECT_DIR$/readme.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/packages/game-contracts/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/packages/game-contracts/src/index.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -228,10 +229,10 @@
 }]]></component>
   <component name="RecapSpentCounter">
     <option name="endsOfQuotaMs" value="1773266417423" />
-    <option name="spentUsd" value="0.06980165" />
+    <option name="spentUsd" value="0.07445466" />
   </component>
   <component name="RecapUselessUpdatesCounter">
-    <option name="suspendCountdown" value="2" />
+    <option name="suspendCountdown" value="1" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -453,7 +454,15 @@
       <option name="project" value="LOCAL" />
       <updated>1772103037824</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="feat: add multi-table regression tests and map test suite into CI">
+      <option name="closed" value="true" />
+      <created>1772119569092</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1772119569092</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -481,7 +490,9 @@
     <MESSAGE value="feat: add auth bootstrap and demo user controls&#10;&#10;Add `POKER_AUTH_BOOTSTRAP_USERS_FILE` for JSON-based seed user initialization and `POKER_AUTH_ALLOW_DEMO_USERS` to control demo user access. Update docs, tests, and examples for auth bootstrap and production guardrails." />
     <MESSAGE value="chore: document mobile-first engine progress and client updates" />
     <MESSAGE value="chore: harden mobile dock behavior and improve motion/accessibility" />
-    <option name="LAST_COMMIT_MESSAGE" value="chore: harden mobile dock behavior and improve motion/accessibility" />
+    <MESSAGE value="feat: add multi-table regression tests and map test suite into CI" />
+    <MESSAGE value="refactor(client): streamline mobile action dock UX and update play view layout" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(client): streamline mobile action dock UX and update play view layout" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

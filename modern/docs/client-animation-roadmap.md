@@ -39,6 +39,7 @@ Purpose: improve gameplay clarity with motion that communicates game state, not 
   - short-lived confirmation pulse on confirmed multi-table actions
 - Phase 5 has initial hardening coverage:
   - client regression tests now protect multi-table legal-action mapping and pending-turn controls
+  - integration-style tests now cover submit-time legality/turn checks and amount clamping behavior
 
 Remaining roadmap phases below are still pending implementation.
 
