@@ -42,6 +42,8 @@ function testLoadsDevelopmentDefaults(): void {
   assertEqual(config.externalAuthEnabled, false, 'Expected external auth disabled by default.');
   assertEqual(config.externalAuthIssuer, 'external-idp', 'Expected default external auth issuer.');
   assertEqual(config.externalAuthSharedSecret, undefined, 'Expected no external auth secret by default.');
+  assertEqual(config.externalAuthSharedSecretPrevious, undefined, 'Expected no previous external auth secret by default.');
+  assertEqual(config.externalAuthVerificationSecrets.length, 0, 'Expected no external auth verification secrets by default.');
   assertEqual(config.authBootstrapUsers, undefined, 'Expected no bootstrap users by default.');
 }
 
@@ -79,6 +81,7 @@ function testLoadsExplicitOverrides(): void {
     POKER_EXTERNAL_AUTH_ENABLED: '1',
     POKER_EXTERNAL_AUTH_ISSUER: 'oidc-demo',
     POKER_EXTERNAL_AUTH_SHARED_SECRET: 'external-secret-123456',
+    POKER_EXTERNAL_AUTH_SHARED_SECRET_PREVIOUS: 'external-secret-prev-123456',
   });
 
   assertEqual(config.port, 9100, 'Expected PORT override.');
@@ -93,6 +96,22 @@ function testLoadsExplicitOverrides(): void {
   assertEqual(config.externalAuthEnabled, true, 'Expected explicit external auth enablement.');
   assertEqual(config.externalAuthIssuer, 'oidc-demo', 'Expected external auth issuer override.');
   assertEqual(config.externalAuthSharedSecret, 'external-secret-123456', 'Expected external auth secret override.');
+  assertEqual(
+    config.externalAuthSharedSecretPrevious,
+    'external-secret-prev-123456',
+    'Expected previous external auth secret override.',
+  );
+  assertEqual(config.externalAuthVerificationSecrets.length, 2, 'Expected both external auth verification secrets.');
+  assertEqual(
+    config.externalAuthVerificationSecrets[0],
+    'external-secret-123456',
+    'Expected primary external auth secret to be first.',
+  );
+  assertEqual(
+    config.externalAuthVerificationSecrets[1],
+    'external-secret-prev-123456',
+    'Expected previous external auth secret to be included.',
+  );
 }
 
 function testLoadsBootstrapUsersFromArrayAndWrapper(): void {
@@ -202,6 +221,35 @@ function testRejectsInvalidBootstrapUsersAndEnvValues(): void {
         }),
       /must be at least 16 characters/,
       'Expected short external auth shared secret values to fail.',
+    );
+
+    assertThrows(
+      () =>
+        loadStartupConfig({
+          POKER_EXTERNAL_AUTH_SHARED_SECRET_PREVIOUS: 'external-prev-123456',
+        }),
+      /requires POKER_EXTERNAL_AUTH_SHARED_SECRET/i,
+      'Expected previous external auth secret without primary secret to fail.',
+    );
+
+    assertThrows(
+      () =>
+        loadStartupConfig({
+          POKER_EXTERNAL_AUTH_SHARED_SECRET: 'external-secret-123456',
+          POKER_EXTERNAL_AUTH_SHARED_SECRET_PREVIOUS: 'short-prev',
+        }),
+      /POKER_EXTERNAL_AUTH_SHARED_SECRET_PREVIOUS must be at least 16 characters/i,
+      'Expected short previous external auth secret values to fail.',
+    );
+
+    assertThrows(
+      () =>
+        loadStartupConfig({
+          POKER_EXTERNAL_AUTH_SHARED_SECRET: 'external-secret-123456',
+          POKER_EXTERNAL_AUTH_SHARED_SECRET_PREVIOUS: 'external-secret-123456',
+        }),
+      /must differ from POKER_EXTERNAL_AUTH_SHARED_SECRET/i,
+      'Expected duplicate primary/previous external auth secrets to fail.',
     );
 
     assertThrows(

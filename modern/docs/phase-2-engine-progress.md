@@ -1217,3 +1217,47 @@ Sources:
 - `apps/server/README.md`
 - `docs/developer-setup.md`
 - `docs/deployment-runbook.md`
+
+## PR BM Progress: External Auth Secret Rotation Hardening
+
+- Extended external assertion verification to accept multiple valid secrets:
+  - active secret plus optional previous secret for zero-downtime key rotation
+- Added startup config fields and validation for rotation fallback:
+  - `POKER_EXTERNAL_AUTH_SHARED_SECRET_PREVIOUS`
+  - requires primary external auth secret when provided
+  - minimum-length and primary/previous mismatch enforcement
+- Updated server runtime diagnostics/logging:
+  - `/health` now exposes `runtime.externalAuthSecretRotationEnabled`
+  - startup logs include rotation-active visibility when previous secret is configured
+- Updated env template/check script and server/deployment docs with explicit rotation rollout steps.
+- Added tests for rotated-secret verification fallback and startup-config rotation validation.
+
+Sources:
+
+- `apps/server/src/external-auth.ts`
+- `apps/server/src/external-auth.test.ts`
+- `apps/server/src/startup-config.ts`
+- `apps/server/src/startup-config.test.ts`
+- `apps/server/src/index.ts`
+- `apps/server/.env.example`
+- `scripts/check-server-env-template.mjs`
+- `apps/server/README.md`
+- `docs/developer-setup.md`
+- `docs/deployment-runbook.md`
+
+## PR BN Progress: Route-Level External Auth + Health Runtime Tests
+
+- Added direct route-handler regression tests for server HTTP endpoints:
+  - `GET /health` validates external auth diagnostics and rotation flag behavior
+  - `POST /api/auth/external/login` validates login success using previous rotation secret
+  - `POST /api/auth/external/login` validates disabled external auth error path
+- Updated server runtime boot path to support direct handler tests:
+  - request handler exported from server module
+  - `POKER_SERVER_NO_LISTEN=1` test guard disables live socket listen during route tests
+- Integrated route-level regression checks into canonical `@poker/server` `test` script.
+
+Sources:
+
+- `apps/server/src/http-routes.test.ts`
+- `apps/server/src/index.ts`
+- `apps/server/package.json`

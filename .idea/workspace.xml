@@ -7,16 +7,22 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1eee6476-c5d8-4dc1-b068-da2be4a7c407" name="Default Changelist" comment="refactor(client): streamline mobile action dock UX and update play view layout">
-      <change afterPath="$PROJECT_DIR$/modern/apps/server/src/external-auth.test.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/server/src/external-auth.ts" afterDir="false" />
+    <list default="true" id="1eee6476-c5d8-4dc1-b068-da2be4a7c407" name="Default Changelist" comment="feat(server): add external auth assertion support with integration for signed identity exchange&#10;&#10;- Implements HMAC-based external auth assertions.&#10;- Introduces `/api/auth/external/login` for external identity logins.&#10;- Adds external identity linking and reuse in `AuthWalletService`.&#10;- Updates runtime config and documentation to support external auth setup.">
+      <change afterPath="$PROJECT_DIR$/modern/apps/server/scripts/http-routes.test.mjs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/apps/server/.env.example" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/.env.example" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/server/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/apps/server/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/apps/server/src/auth-wallet-service.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/auth-wallet-service.test.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/apps/server/src/auth-wallet-service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/auth-wallet-service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/server/src/external-auth.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/external-auth.test.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/server/src/external-auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/external-auth.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/server/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/index.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/apps/server/src/startup-config.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/startup-config.test.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/apps/server/src/startup-config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/startup-config.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/docs/deployment-runbook.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/docs/deployment-runbook.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/docs/developer-setup.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/docs/developer-setup.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/docs/legacy-decommission-plan.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/docs/legacy-decommission-plan.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/docs/phase-2-engine-progress.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/docs/phase-2-engine-progress.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/scripts/check-server-env-template.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/modern/scripts/check-server-env-template.mjs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -463,7 +469,15 @@
       <option name="project" value="LOCAL" />
       <updated>1772127544822</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="feat(server): add external auth assertion support with integration for signed identity exchange&#10;&#10;- Implements HMAC-based external auth assertions.&#10;- Introduces `/api/auth/external/login` for external identity logins.&#10;- Adds external identity linking and reuse in `AuthWalletService`.&#10;- Updates runtime config and documentation to support external auth setup.">
+      <option name="closed" value="true" />
+      <created>1772128300382</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1772128300382</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -493,7 +507,8 @@
     <MESSAGE value="chore: harden mobile dock behavior and improve motion/accessibility" />
     <MESSAGE value="feat: add multi-table regression tests and map test suite into CI" />
     <MESSAGE value="refactor(client): streamline mobile action dock UX and update play view layout" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(client): streamline mobile action dock UX and update play view layout" />
+    <MESSAGE value="feat(server): add external auth assertion support with integration for signed identity exchange&#10;&#10;- Implements HMAC-based external auth assertions.&#10;- Introduces `/api/auth/external/login` for external identity logins.&#10;- Adds external identity linking and reuse in `AuthWalletService`.&#10;- Updates runtime config and documentation to support external auth setup." />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(server): add external auth assertion support with integration for signed identity exchange&#10;&#10;- Implements HMAC-based external auth assertions.&#10;- Introduces `/api/auth/external/login` for external identity logins.&#10;- Adds external identity linking and reuse in `AuthWalletService`.&#10;- Updates runtime config and documentation to support external auth setup." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

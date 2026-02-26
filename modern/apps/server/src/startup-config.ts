@@ -176,6 +176,8 @@ export interface StartupConfig {
   externalAuthEnabled: boolean;
   externalAuthIssuer: string;
   externalAuthSharedSecret: string | undefined;
+  externalAuthSharedSecretPrevious: string | undefined;
+  externalAuthVerificationSecrets: string[];
 }
 
 export function loadStartupConfig(env: Record<string, string | undefined>): StartupConfig {
@@ -186,6 +188,7 @@ export function loadStartupConfig(env: Record<string, string | undefined>): Star
   const externalAuthEnabled = parseExternalAuthEnabled(env.POKER_EXTERNAL_AUTH_ENABLED);
   const externalAuthIssuer = env.POKER_EXTERNAL_AUTH_ISSUER?.trim() || DEFAULT_EXTERNAL_AUTH_ISSUER;
   const externalAuthSharedSecret = env.POKER_EXTERNAL_AUTH_SHARED_SECRET?.trim() || undefined;
+  const externalAuthSharedSecretPrevious = env.POKER_EXTERNAL_AUTH_SHARED_SECRET_PREVIOUS?.trim() || undefined;
 
   if (isProduction && !authTokenSecret) {
     throw new Error('POKER_AUTH_TOKEN_SECRET is required when NODE_ENV=production.');
@@ -198,6 +201,26 @@ export function loadStartupConfig(env: Record<string, string | undefined>): Star
   if (externalAuthSharedSecret && externalAuthSharedSecret.length < 16) {
     throw new Error('POKER_EXTERNAL_AUTH_SHARED_SECRET must be at least 16 characters when provided.');
   }
+
+  if (externalAuthSharedSecretPrevious && !externalAuthSharedSecret) {
+    throw new Error('POKER_EXTERNAL_AUTH_SHARED_SECRET_PREVIOUS requires POKER_EXTERNAL_AUTH_SHARED_SECRET.');
+  }
+
+  if (externalAuthSharedSecretPrevious && externalAuthSharedSecretPrevious.length < 16) {
+    throw new Error('POKER_EXTERNAL_AUTH_SHARED_SECRET_PREVIOUS must be at least 16 characters when provided.');
+  }
+
+  if (externalAuthSharedSecretPrevious && externalAuthSharedSecretPrevious === externalAuthSharedSecret) {
+    throw new Error('POKER_EXTERNAL_AUTH_SHARED_SECRET_PREVIOUS must differ from POKER_EXTERNAL_AUTH_SHARED_SECRET.');
+  }
+
+  const externalAuthVerificationSecrets = externalAuthSharedSecret
+    ? Array.from(
+      new Set([externalAuthSharedSecret, externalAuthSharedSecretPrevious].filter((secret): secret is string =>
+        typeof secret === 'string' && secret.length > 0
+      )),
+    )
+    : [];
 
   return {
     isProduction,
@@ -215,5 +238,7 @@ export function loadStartupConfig(env: Record<string, string | undefined>): Star
     externalAuthEnabled,
     externalAuthIssuer,
     externalAuthSharedSecret,
+    externalAuthSharedSecretPrevious,
+    externalAuthVerificationSecrets,
   };
 }

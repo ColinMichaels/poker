@@ -605,6 +605,29 @@ These are not extraction failures, but they are blockers to deleting the legacy 
 - Added runtime diagnostics for external auth in `/health` and startup logs.
 - Added regression coverage for external assertion verification and external identity login flows.
 
+## Completed in PR BM
+
+- Added external auth secret-rotation verification support:
+  - assertions now verify against active secret and optional previous secret
+- Added rotation-safe env configuration controls:
+  - `POKER_EXTERNAL_AUTH_SHARED_SECRET_PREVIOUS`
+  - validation guardrails (minimum length, requires primary secret, must differ from primary)
+- Added rotation runtime diagnostics:
+  - `/health` includes `runtime.externalAuthSecretRotationEnabled`
+  - startup logs show when previous verification secret is active
+- Updated server and deployment docs with rotation procedure and no-downtime rollout sequence.
+- Added regression tests for multi-secret verification and startup-config rotation validation.
+
+## Completed in PR BN
+
+- Added route-level server regression coverage for external auth routes without opening network sockets:
+  - `GET /health` verifies external auth runtime diagnostics including rotation flag
+  - `POST /api/auth/external/login` verifies previous-secret rotation fallback succeeds
+  - `POST /api/auth/external/login` verifies disabled-mode response (`EXTERNAL_AUTH_DISABLED`)
+- Exported shared server request handler for direct route test harness execution.
+- Added explicit test-only listen guard:
+  - `POKER_SERVER_NO_LISTEN=1` disables HTTP listen during direct handler tests.
+
 ## Known Intentional Asset Exceptions
 
 - Non-canonical card extras remain excluded from canonical face set:
@@ -721,6 +744,8 @@ Exit criteria:
 62. PR BJ: Winner-focused play-table UX and live win-chance mechanics.
 63. PR BK: Role-based auth audit visibility boundaries and contract role support.
 64. PR BL: External identity signed-assertion login integration.
+65. PR BM: External auth secret-rotation verification hardening.
+66. PR BN: Route-level external auth + health runtime diagnostics regression tests.
 
 ## Cutover Go/No-Go Checklist
 

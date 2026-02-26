@@ -36,7 +36,7 @@ function testVerifiesValidAssertion(): void {
   );
 
   const payload = verifyExternalAuthAssertion(assertion, {
-    sharedSecret: 'shared-secret-1234567890',
+    sharedSecrets: ['shared-secret-1234567890'],
     expectedIssuer: 'oidc-demo',
     nowMs: now,
   });
@@ -61,7 +61,7 @@ function testRejectsInvalidSignature(): void {
   assertThrows(
     () =>
       verifyExternalAuthAssertion(assertion, {
-        sharedSecret: 'wrong-secret-123456',
+        sharedSecrets: ['wrong-secret-123456'],
         expectedIssuer: 'oidc-demo',
       }),
     /signature is invalid/i,
@@ -84,7 +84,7 @@ function testRejectsExpiredAndInvalidIssuerAssertions(): void {
   assertThrows(
     () =>
       verifyExternalAuthAssertion(assertion, {
-        sharedSecret: 'shared-secret-1234567890',
+        sharedSecrets: ['shared-secret-1234567890'],
         expectedIssuer: 'oidc-demo',
         nowMs: now,
       }),
@@ -105,7 +105,7 @@ function testRejectsExpiredAndInvalidIssuerAssertions(): void {
   assertThrows(
     () =>
       verifyExternalAuthAssertion(wrongIssuerAssertion, {
-        sharedSecret: 'shared-secret-1234567890',
+        sharedSecrets: ['shared-secret-1234567890'],
         expectedIssuer: 'oidc-demo',
         nowMs: now,
       }),
@@ -114,12 +114,33 @@ function testRejectsExpiredAndInvalidIssuerAssertions(): void {
   );
 }
 
+function testAcceptsPreviousVerificationSecretDuringRotation(): void {
+  const now = 1_700_000_000_000;
+  const assertion = createExternalAuthAssertion(
+    {
+      iss: 'oidc-demo',
+      sub: 'subject-rotate',
+      email: 'rotate@example.com',
+      exp: now + 60_000,
+    },
+    'previous-secret-1234567890',
+  );
+
+  const payload = verifyExternalAuthAssertion(assertion, {
+    sharedSecrets: ['current-secret-1234567890', 'previous-secret-1234567890'],
+    expectedIssuer: 'oidc-demo',
+    nowMs: now,
+  });
+
+  assertEqual(payload.email, 'rotate@example.com', 'Expected previous secret verification fallback to succeed.');
+}
+
 function runAll(): void {
   testVerifiesValidAssertion();
   testRejectsInvalidSignature();
   testRejectsExpiredAndInvalidIssuerAssertions();
+  testAcceptsPreviousVerificationSecretDuringRotation();
   console.info('External auth tests passed (signed assertion verification).');
 }
 
 runAll();
-

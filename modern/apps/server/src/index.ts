@@ -307,7 +307,7 @@ function requireAuthenticatedContext(request: IncomingMessage, authWalletService
   };
 }
 
-async function handleRequest(
+export async function handleRequest(
   request: IncomingMessage,
   response: ServerResponse,
   tableService: TableService,
@@ -318,7 +318,7 @@ async function handleRequest(
     allowLegacyWalletRoutes: boolean;
     externalAuthEnabled: boolean;
     externalAuthIssuer: string;
-    externalAuthSharedSecret: string | undefined;
+    externalAuthVerificationSecrets: readonly string[];
   },
   allowLegacyWalletRoutes: boolean,
   persistRuntimeState: () => void,
@@ -349,6 +349,7 @@ async function handleRequest(
           legacyWalletRoutesEnabled: runtimeInfo.allowLegacyWalletRoutes,
           externalAuthEnabled: runtimeInfo.externalAuthEnabled,
           externalAuthIssuer: runtimeInfo.externalAuthIssuer,
+          externalAuthSecretRotationEnabled: runtimeInfo.externalAuthVerificationSecrets.length > 1,
         },
       });
       return;
@@ -368,14 +369,14 @@ async function handleRequest(
         throw new HttpError(503, 'EXTERNAL_AUTH_DISABLED', 'External auth is not enabled.');
       }
 
-      if (!runtimeInfo.externalAuthSharedSecret) {
+      if (runtimeInfo.externalAuthVerificationSecrets.length === 0) {
         throw new HttpError(500, 'SERVER_MISCONFIGURED', 'External auth shared secret is not configured.');
       }
 
       const body = await readJsonBody(request);
       const { assertion } = parseExternalAuthLoginRequest(body);
       const payload = verifyExternalAuthAssertion(assertion, {
-        sharedSecret: runtimeInfo.externalAuthSharedSecret,
+        sharedSecrets: runtimeInfo.externalAuthVerificationSecrets,
         expectedIssuer: runtimeInfo.externalAuthIssuer,
       });
       const loginResponse = authWalletService.loginWithExternalIdentity({
@@ -574,6 +575,8 @@ const {
   externalAuthEnabled,
   externalAuthIssuer,
   externalAuthSharedSecret,
+  externalAuthSharedSecretPrevious,
+  externalAuthVerificationSecrets,
 } = loadStartupConfig(process.env);
 const runtimeStateStore = persistenceEnabled ? new RuntimeStateStore(stateFilePath) : null;
 
@@ -657,72 +660,80 @@ const server = createServer((request, response) => {
       allowLegacyWalletRoutes,
       externalAuthEnabled,
       externalAuthIssuer,
-      externalAuthSharedSecret,
+      externalAuthVerificationSecrets,
     },
     allowLegacyWalletRoutes,
     persistRuntimeState,
   );
 });
 
-let shuttingDown = false;
-function beginShutdown(signal: 'SIGINT' | 'SIGTERM'): void {
-  if (shuttingDown) {
-    return;
-  }
-
-  shuttingDown = true;
-  console.info(`Received ${signal}; persisting runtime state and shutting down.`);
-  persistRuntimeState();
-
-  const forceExitTimer = setTimeout(() => {
-    console.error('Shutdown timeout reached; forcing process exit.');
-    process.exit(1);
-  }, 10_000);
-
-  server.close((error) => {
-    clearTimeout(forceExitTimer);
-    if (error) {
-      console.error(`Server shutdown encountered an error: ${error.message}`);
-      process.exit(1);
+if (process.env.POKER_SERVER_NO_LISTEN !== '1') {
+  let shuttingDown = false;
+  function beginShutdown(signal: 'SIGINT' | 'SIGTERM'): void {
+    if (shuttingDown) {
       return;
     }
 
-    console.info('Server shutdown complete.');
-    process.exit(0);
+    shuttingDown = true;
+    console.info(`Received ${signal}; persisting runtime state and shutting down.`);
+    persistRuntimeState();
+
+    const forceExitTimer = setTimeout(() => {
+      console.error('Shutdown timeout reached; forcing process exit.');
+      process.exit(1);
+    }, 10_000);
+
+    server.close((error) => {
+      clearTimeout(forceExitTimer);
+      if (error) {
+        console.error(`Server shutdown encountered an error: ${error.message}`);
+        process.exit(1);
+        return;
+      }
+
+      console.info('Server shutdown complete.');
+      process.exit(0);
+    });
+  }
+
+  process.once('SIGINT', () => beginShutdown('SIGINT'));
+  process.once('SIGTERM', () => beginShutdown('SIGTERM'));
+
+  server.listen(port, host, () => {
+    const address = `http://${host}:${port}`;
+    console.info(`Poker server listening at ${address}`);
+    console.info('Endpoints: /health, /api/auth/*, /api/users/me, /api/wallet*, /api/table/*');
+    if (runtimeStateStore) {
+      console.info(`Runtime persistence: enabled (${runtimeStateStore.getFilePath()})`);
+    } else {
+      console.info('Runtime persistence: disabled');
+    }
+    if (!authTokenSecret) {
+      console.warn('Auth token secret: using development default. Set POKER_AUTH_TOKEN_SECRET for non-dev environments.');
+    }
+    console.info(`Auth demo users: ${authAllowDemoUsers ? 'enabled' : 'disabled'}`);
+    console.info(`Legacy wallet routes: ${allowLegacyWalletRoutes ? 'enabled' : 'disabled'}`);
+    console.info(
+      `External auth: ${externalAuthEnabled ? `enabled (issuer: ${externalAuthIssuer})` : 'disabled'}`,
+    );
+    if (externalAuthEnabled && externalAuthVerificationSecrets.length > 1) {
+      console.info('External auth secret rotation: previous verification secret is active.');
+    }
+    if (isProduction && authAllowDemoUsers) {
+      console.warn('Production mode warning: demo users are enabled.');
+    }
+    if (isProduction && allowLegacyWalletRoutes) {
+      console.warn('Production mode warning: legacy wallet compatibility routes are enabled.');
+    }
+    if (authBootstrapUsersFile) {
+      if (persistedRuntimeState) {
+        console.info('Auth bootstrap users: file configured but ignored because persisted auth state was restored.');
+      } else {
+        console.info(`Auth bootstrap users: loaded from ${authBootstrapUsersFile}`);
+      }
+    }
+    if (externalAuthSharedSecretPrevious && !externalAuthEnabled) {
+      console.info('External auth previous secret is configured but external auth is currently disabled.');
+    }
   });
 }
-
-process.once('SIGINT', () => beginShutdown('SIGINT'));
-process.once('SIGTERM', () => beginShutdown('SIGTERM'));
-
-server.listen(port, host, () => {
-  const address = `http://${host}:${port}`;
-  console.info(`Poker server listening at ${address}`);
-  console.info('Endpoints: /health, /api/auth/*, /api/users/me, /api/wallet*, /api/table/*');
-  if (runtimeStateStore) {
-    console.info(`Runtime persistence: enabled (${runtimeStateStore.getFilePath()})`);
-  } else {
-    console.info('Runtime persistence: disabled');
-  }
-  if (!authTokenSecret) {
-    console.warn('Auth token secret: using development default. Set POKER_AUTH_TOKEN_SECRET for non-dev environments.');
-  }
-  console.info(`Auth demo users: ${authAllowDemoUsers ? 'enabled' : 'disabled'}`);
-  console.info(`Legacy wallet routes: ${allowLegacyWalletRoutes ? 'enabled' : 'disabled'}`);
-  console.info(
-    `External auth: ${externalAuthEnabled ? `enabled (issuer: ${externalAuthIssuer})` : 'disabled'}`,
-  );
-  if (isProduction && authAllowDemoUsers) {
-    console.warn('Production mode warning: demo users are enabled.');
-  }
-  if (isProduction && allowLegacyWalletRoutes) {
-    console.warn('Production mode warning: legacy wallet compatibility routes are enabled.');
-  }
-  if (authBootstrapUsersFile) {
-    if (persistedRuntimeState) {
-      console.info('Auth bootstrap users: file configured but ignored because persisted auth state was restored.');
-    } else {
-      console.info(`Auth bootstrap users: loaded from ${authBootstrapUsersFile}`);
-    }
-  }
-});

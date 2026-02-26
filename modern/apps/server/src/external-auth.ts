@@ -14,7 +14,7 @@ export interface ExternalAuthAssertionPayload {
 }
 
 export interface ExternalAuthVerificationOptions {
-  sharedSecret: string;
+  sharedSecrets: readonly string[];
   expectedIssuer: string;
   nowMs?: number;
 }
@@ -98,6 +98,31 @@ function signPayload(encodedPayload: string, sharedSecret: string): string {
   return toBase64UrlFromBase64(createHmac('sha256', sharedSecret).update(encodedPayload).digest('base64'));
 }
 
+function normalizeVerificationSecrets(rawSecrets: readonly string[]): string[] {
+  const normalized = Array.from(new Set(rawSecrets.map((secret) => secret.trim()).filter(Boolean)));
+  if (normalized.length === 0) {
+    throw new Error('External auth verification secret is not configured.');
+  }
+
+  return normalized;
+}
+
+function hasValidSignature(
+  encodedPayload: string,
+  receivedSignature: string,
+  sharedSecrets: readonly string[],
+): boolean {
+  let isValid = false;
+  for (const sharedSecret of sharedSecrets) {
+    const expectedSignature = signPayload(encodedPayload, sharedSecret);
+    if (constantTimeEqual(receivedSignature, expectedSignature)) {
+      isValid = true;
+    }
+  }
+
+  return isValid;
+}
+
 export function createExternalAuthAssertion(
   payload: ExternalAuthAssertionPayload,
   sharedSecret: string,
@@ -126,8 +151,8 @@ export function verifyExternalAuthAssertion(
     throw new Error('External auth assertion is malformed.');
   }
 
-  const expectedSignature = signPayload(encodedPayload, options.sharedSecret);
-  if (!constantTimeEqual(receivedSignature, expectedSignature)) {
+  const verificationSecrets = normalizeVerificationSecrets(options.sharedSecrets);
+  if (!hasValidSignature(encodedPayload, receivedSignature, verificationSecrets)) {
     throw new Error('External auth assertion signature is invalid.');
   }
 

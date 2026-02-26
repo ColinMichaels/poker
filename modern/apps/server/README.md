@@ -36,6 +36,7 @@ Environment overrides:
 - `POKER_EXTERNAL_AUTH_ENABLED` (`1`/`0`, default `0`)
 - `POKER_EXTERNAL_AUTH_ISSUER` (expected issuer for signed assertions, default `external-idp`)
 - `POKER_EXTERNAL_AUTH_SHARED_SECRET` (HMAC verification secret for signed assertions; required when external auth is enabled)
+- `POKER_EXTERNAL_AUTH_SHARED_SECRET_PREVIOUS` (optional previous verification secret for key rotation)
 - `POKER_AUTH_ALLOW_DEMO_USERS` (`1`/`0`, default `1` unless `NODE_ENV=production`)
 - `POKER_AUTH_BOOTSTRAP_USERS_FILE` (path to JSON file with bootstrap auth users)
 - `POKER_ENABLE_LEGACY_WALLET_ROUTES` (`1`/`0`, default `1` unless `NODE_ENV=production`)
@@ -55,6 +56,7 @@ Runtime persistence:
   - `runtime.legacyWalletRoutesEnabled`
   - `runtime.externalAuthEnabled`
   - `runtime.externalAuthIssuer`
+  - `runtime.externalAuthSecretRotationEnabled`
 
 Auth/session behavior:
 
@@ -107,10 +109,16 @@ External auth login:
   - required: `iss`, `sub`, `email`, `exp`
   - optional: `firstName`, `lastName`, `role`
 - The server verifies:
-  - HMAC signature with `POKER_EXTERNAL_AUTH_SHARED_SECRET`
+  - HMAC signature with `POKER_EXTERNAL_AUTH_SHARED_SECRET` (or `POKER_EXTERNAL_AUTH_SHARED_SECRET_PREVIOUS` during rotation)
   - issuer match with `POKER_EXTERNAL_AUTH_ISSUER`
   - expiration (`exp`) against current server time
 - On success, the server links/reuses user identity and returns the same session shape as `/api/auth/login`.
+
+External auth secret rotation:
+
+1. Deploy server with new active secret in `POKER_EXTERNAL_AUTH_SHARED_SECRET` and old secret in `POKER_EXTERNAL_AUTH_SHARED_SECRET_PREVIOUS`.
+2. Update external identity signer to issue assertions with the new active secret.
+3. After rollout, remove `POKER_EXTERNAL_AUTH_SHARED_SECRET_PREVIOUS`.
 
 Bootstrap users file:
 
