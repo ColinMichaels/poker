@@ -326,6 +326,205 @@ These are not extraction failures, but they are blockers to deleting the legacy 
   - safe-area bottom inset support for mobile dock spacing
   - reduced-motion media-query support to minimize animation/transition intensity
 
+## Completed in PR AM
+
+- Hardened action amount input UX in play view:
+  - target-bet draft amount is now preserved across render cycles instead of resetting to min on each update
+  - target-bet draft resets cleanly on hand transitions and seat remounts
+- Added action amount input semantics for mobile numeric entry:
+  - `inputmode="numeric"` and number-pattern hinting for quicker keypad access
+- Improved interaction accessibility state signaling:
+  - added pressed-state semantics on view tabs, lobby table/seat selectors, and How To guide tabs
+  - added richer action/preset button aria labels for amount-aware controls
+
+## Completed in PR AN
+
+- Added a new mobile-first multi-table gameplay UI screen in the modern client:
+  - open-table rail for quick table switching
+  - live table stage with board preview + seat ring status chips
+  - in-context activity feed for recent actions
+- Added thumb-reachable mobile action bar behavior:
+  - fixed bottom action bar with large-touch action targets
+  - raise amount controls with range + numeric input + step buttons
+- Added desktop (`>=1024px`) layout behavior for the new screen:
+  - action bar moves to a sticky side rail
+  - stage/feed composition expands for wider viewports
+- Added basic desktop keyboard accessibility for multi-table actions:
+  - action shortcuts (`F/K/C/R/A`)
+  - arrow-key action selection
+  - Enter to confirm selected action
+
+## Completed in PR AO
+
+- Improved local gameplay randomness in the modern client table controller:
+  - replaced sequential hand seeds (`seed + 1`) with runtime entropy-based 32-bit seeds
+  - randomized initial dealer seat during local table bootstrap
+  - added per-hand seeded bot RNG stream so bot choices vary naturally with each hand
+- Improved seat-role mapping during local table bootstrap:
+  - selected user seat now maps to `you` at creation time (instead of fixed Seat 1 identity)
+- Added a dedicated client animation roadmap doc:
+  - phased plan for card dealing, chip movement, action urgency, and performance/accessibility hardening
+  - file: `modern/docs/client-animation-roadmap.md`
+
+## Completed in PR AP
+
+- Implemented Phase 1 animation-system groundwork in modern client UI:
+  - added centralized event-to-motion cue mapping (`HAND_STARTED`, `BOARD_DEALT`, `PLAYER_ACTION`, `TURN_CHANGED`, `HAND_COMPLETE`)
+  - applied cue-class projection for both play-table and multi-table screens from one mapper
+- Added reusable motion tokens to client styles:
+  - `--motion-fast`, `--motion-mid`, `--motion-slow`
+  - `--easing-emphasis`, `--easing-soft`
+- Added motion cue styling hooks:
+  - shell-level start/complete cue styling
+  - multi-table feed/action cue pulses
+  - unified timing updates for key existing gameplay transitions
+
+## Completed in PR AQ
+
+- Implemented Phase 2 board/card dealing motion in the modern play-table view:
+  - board-deal animation plan now keys off actual latest deal events (`DEAL_FLOP`, `DEAL_TURN`, `DEAL_RIVER`)
+  - flop deals now use staggered per-card timing (~70ms intervals)
+  - turn/river deals now add single-card street emphasis styling
+- Added board/card motion classes and keyframes:
+  - `is-flop-deal`, `is-street-deal`
+  - card-level deal delay via `--deal-delay`
+  - street emphasis pulse (`street-pop`)
+
+## Completed in PR AR
+
+- Added event-burst animation consumption in modern client render flow so animation-only cues are driven by newly-arrived domain events rather than replaying on every re-render.
+- Added chip/pot transfer animation planning in play view:
+  - contributions to pot for `BLIND_POSTED`, `PLAYER_CALLED`, `PLAYER_BET`, `PLAYER_RAISED`, and `PLAYER_ALL_IN`
+  - payouts from pot for `HAND_WON_UNCONTESTED` and `SHOWDOWN_RESOLVED`
+- Added felt overlay chip-transfer trails and staged timing for transfer readability.
+- Added multi-table chip-flow feed cue and contextual activity line integration for transfer events.
+
+## Completed in PR AS
+
+- Restored legacy-style How To card examples in modern client docs flow:
+  - extracted card rows from legacy How To Vue `rounds` slot markup
+  - preserved per-card visibility semantics from legacy `is_flipped` usage (hidden back vs face-up front)
+- Extended generated How To contract to include per-guide `cardExamples`.
+- Updated modern How To screen composition to render card example rows using normalized SVG card assets.
+- Added responsive styling for How To example rows so card strips remain readable on mobile and desktop.
+
+## Completed in PR AT
+
+- Added flip-card interaction parity for modern How To examples:
+  - per-card tap/click toggle between front and back faces
+  - default face orientation respects legacy `is_flipped` semantics captured during extraction
+- Added keyboard-accessible interactive card controls and visible focus treatment for desktop users.
+- Added modern 3D flip-card visual treatment for How To examples using existing normalized card SVG assets.
+
+## Completed in PR AU
+
+- Extended legacy How To extraction to preserve in-row visual sequence tokens for examples:
+  - card tokens
+  - explicit `+` separator tokens
+- Improved extracted example labeling by normalizing/de-duplicating legacy deck/list labels (`Flop`, `Turn`, `River`, `Hole Cards`, `Door Card`).
+- Updated modern How To rendering to display separators between interactive flip cards so round examples match legacy visual composition more closely.
+
+## Completed in PR AV
+
+- Added deck-container metadata extraction for legacy How To examples:
+  - per-example parent list-item grouping id
+  - legacy deck class names
+- Updated modern How To example rendering to preserve multi-deck group composition from legacy rounds by grouping examples per parent list item.
+- Added deck-pattern styling hooks so grouped examples better reflect legacy street/pocket/stud visual blocks.
+
+## Completed in PR AW
+
+- Removed cross-example de-duplication in How To card-example extraction so repeated legacy deck rows are preserved in source order.
+- Restored full repeated-example parity for Seven Card Stud round visuals (all legacy `div.cards` rows now flow into modern generated `cardExamples`).
+- Retained prior grouping/sequence metadata (`groupId`, `deckClass`, separator-aware `items`) while expanding output completeness.
+
+## Completed in PR AX
+
+- Added supplemental hand examples for game types with no legacy card-example markup:
+  - Lowball
+  - Mississippi Stud
+  - Razz
+  - Jacks or Better
+  - Draw High
+- Kept extraction behavior legacy-first: supplemental examples are only used when a guide has zero extracted card rows from legacy `rounds` content.
+- Added generation-time card code validation for supplemental examples to prevent invalid card references from entering generated How To data.
+
+## Completed in PR AY
+
+- Upgraded local client gameplay bots with hand-aware action mechanics:
+  - preflop strength scoring from hole-card structure (pairs/suited/connectivity/high-card pressure)
+  - postflop strength scoring from evaluated best hand + draw-potential context
+- Added deterministic per-bot behavior profiles (tightness/aggression/bluff/gamble) for more varied but reproducible table personalities.
+- Added pot-pressure and pot-odds-aware action thresholds to improve fold/call/raise realism across streets.
+- Updated bet/raise sizing selection to scale with evaluated strength and bot profile tendencies.
+
+## Completed in PR AZ
+
+- Added board-texture-aware local bot mechanics:
+  - wetness scoring from suit concentration/rank connectivity/high-card texture
+  - paired-board awareness
+- Integrated board texture signals into action thresholds:
+  - aggression/value pressure increases for strong hands on wet textures
+  - weaker hands fold/call less often under wet-board pressure
+  - bluff pressure shifts toward drier textures
+- Added preflop short-stack push/fold logic based on stack depth in big blinds and strength thresholds.
+- Updated bet/raise sizing logic to include board texture intensity as an input.
+
+## Completed in PR BA
+
+- Added position-aware local bot mechanics:
+  - relative seat-position scoring from button order among active contesting seats
+  - tighter early-position and wider late-position action tendencies
+- Added preflop raise-pressure mechanics:
+  - explicit open-raise and 3-bet pressure detection
+  - pressure-aware adjustments to fold/call/raise thresholds
+- Added heads-up adaptation for aggression and defend behavior when one opponent remains.
+- Applied position/pressure factors to short-stack push/fold gates and sizing curves.
+
+## Completed in PR BB
+
+- Added opponent-memory local bot mechanics:
+  - rolling per-seat recent action tracking (`FOLD`, `CHECK`, `CALL`, `BET`, `RAISE`, `ALL_IN`)
+  - memory-window capping to preserve recent-table-image signal
+- Added memory-driven strategy influence:
+  - opponent fold-rate pressure for bluff/value balancing
+  - opponent aggression pressure/counter-pressure adjustments
+  - self-style continuity so bot lines are less erratic hand-to-hand
+- Applied memory influence across fold/call/raise/all-in thresholds and sizing gates.
+
+## Completed in PR BC
+
+- Added multi-table pending-decision micro-state:
+  - per-table pending decision counts in the open-table rail
+  - explicit `Acting now` urgency state for tables requiring immediate action
+- Added action-confirmation interaction feedback in multi-table controls:
+  - short-lived confirmation pulse on selected action controls
+  - action-bar urgency emphasis while table is pending/acting
+- Updated multi-table activity messaging to reflect live pending queue status.
+
+## Completed in PR BD
+
+- Wired multi-table UI to live per-table engine runtime state:
+  - per-table pending/acting signals now derive from real controller state instead of mock counters
+  - rail urgency and queue summaries now reflect actual legal-turn ownership
+- Wired multi-table action bar to live legal-action DTOs:
+  - action availability/disable states now follow current table legality
+  - selected `RAISE` intent now falls back to `BET` when that is the legal target-bet action
+  - target amount bounds now use live min/max from engine-projected action options
+- Added live stage/feed integration:
+  - board preview, seat statuses, pot display, and latest event note now come from per-table runtime models/logs
+- Added auto-next-hand scheduling for multi-table background controllers after hand completion.
+
+## Completed in PR BE
+
+- Added client regression test coverage for multi-table legal-action/runtime behavior:
+  - raise-intent mapping with `BET` fallback
+  - available-action derivation for disabled-state handling
+  - selected-action normalization when legality changes
+  - pending-decision derivation from live phase/acting-seat state
+- Extracted shared multi-table legality helpers into a dedicated client module and wired `main.ts` to consume it.
+- Updated canonical modern CI script to include client tests (`npm run test:client`).
+
 ## Known Intentional Asset Exceptions
 
 - Non-canonical card extras remain excluded from canonical face set:
@@ -416,6 +615,25 @@ Exit criteria:
 36. PR AJ: Mobile bottom-sheet action tray interaction.
 37. PR AK: Touch-swipe gesture controls for mobile action tray.
 38. PR AL: Mobile tray auto-open/resize hardening + reduced-motion/safe-area support.
+39. PR AM: Action amount draft persistence + accessibility semantics for selection and action controls.
+40. PR AN: Mobile-first multi-table screen with thumb action bar and desktop keyboard shortcuts.
+41. PR AO: Runtime-entropy hand randomization + seeded bot randomness + client animation roadmap.
+42. PR AP: Centralized event-to-motion cue mapping and Phase 1 animation tokens/hook wiring.
+43. PR AQ: Event-driven staged board dealing animation with flop stagger and turn/river emphasis.
+44. PR AR: Event-burst chip/pot transfer animation layer and multi-table chip-flow cues.
+45. PR AS: How To card-example extraction and flip-card visual parity restoration.
+46. PR AT: How To interactive flip-card behavior and keyboard-accessible parity.
+47. PR AU: How To visual-sequence extraction for separators and normalized deck labels.
+48. PR AV: How To deck-container grouping extraction and grouped rendering parity.
+49. PR AW: How To repeated-example preservation by removing cross-row de-duplication.
+50. PR AX: Supplemental hand examples for game types without legacy card markup.
+51. PR AY: Hand-aware local bot decision mechanics (strength, pressure, and sizing profiles).
+52. PR AZ: Board-texture-aware and short-stack push/fold bot mechanics.
+53. PR BA: Position-aware and raise-pressure-aware local bot decision mechanics.
+54. PR BB: Opponent-memory-aware local bot adaptation mechanics.
+55. PR BC: Multi-table pending-decision urgency and action-confirmation feedback.
+56. PR BD: Multi-table live runtime wiring for pending state and legal actions.
+57. PR BE: Client regression tests for multi-table legality and pending-state controls.
 
 ## Cutover Go/No-Go Checklist
 

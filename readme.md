@@ -19,8 +19,9 @@ From repository root:
 5. `npm install`
 6. `npm run typecheck`
 7. `npm run build`
-8. `npm run test:engine`
-9. `npm run test:server`
+8. `npm run test:client`
+9. `npm run test:engine`
+10. `npm run test:server`
 
 Note: installs are engine-enforced (`.npmrc` with `engine-strict=true`), so use Node 22-24 and npm 10+.
 
@@ -28,7 +29,7 @@ Or use root shortcuts:
 
 - `npm run dev` (modern client)
 - `npm run dev:server`
-- `npm run ci` (doctor + modern typecheck/build/engine/server tests)
+- `npm run ci` (doctor + modern typecheck/build/client/engine/server tests)
 - `npm run audit:legacy-references` (inventory `legacy/` path references outside archive)
 - `npm run readiness:legacy-cutover` (legacy-removal static readiness checks)
 - `npm run typecheck`

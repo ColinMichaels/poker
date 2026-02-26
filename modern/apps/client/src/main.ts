@@ -2,6 +2,14 @@ import type { ActionOptionDTO, PokerAction, SeatActionStateDTO, SeatState, Table
 import './styles.css';
 import { HOW_TO_GUIDES } from './content/howto-content';
 import { LocalTableController, type TableViewModel } from './table-controller';
+import {
+  getAvailableMultiTableActionIdsFromActionState,
+  getPendingDecisionCountFromState,
+  getRaiseBoundsFromActionState,
+  normalizeSelectedMultiTableAction,
+  resolveMultiTableActionOptionForIntent,
+  type MultiTableActionId,
+} from './multi-table-logic';
 
 const root = document.getElementById('app');
 
@@ -22,12 +30,62 @@ const seatRadarPositionById: Record<number, string> = {
   3: 'seat-pos-top',
   4: 'seat-pos-right',
 };
+
+interface SeatCoordinate {
+  xPercent: number;
+  yPercent: number;
+}
+
+const seatCoordinateById: Record<number, SeatCoordinate> = {
+  1: { xPercent: 50, yPercent: 85 },
+  2: { xPercent: 12, yPercent: 50 },
+  3: { xPercent: 50, yPercent: 15 },
+  4: { xPercent: 88, yPercent: 50 },
+};
+
+const POT_COORDINATE: SeatCoordinate = { xPercent: 50, yPercent: 50 };
 interface LobbyTableCard {
   id: string;
   name: string;
   stakesLabel: string;
   occupancyLabel: string;
   paceLabel: string;
+}
+
+interface MultiTableCard {
+  id: string;
+  name: string;
+  stakesLabel: string;
+  occupancyLabel: string;
+  avgPot: number;
+  minRaise: number;
+  maxRaise: number;
+  callAmount: number;
+}
+
+interface MultiTableSeat {
+  seatId: number;
+  playerLabel: string;
+  stack: number;
+  status: string;
+  positionClass: string;
+  isUser?: boolean;
+}
+
+interface MultiTableActionOption {
+  id: MultiTableActionId;
+  label: string;
+  shortcut: string;
+  tone: 'neutral' | 'aggressive' | 'caution' | 'danger';
+}
+
+interface MultiTableUiState {
+  selectedTableId: string;
+  selectedActionId: MultiTableActionId;
+  targetBetAmount: number;
+  activityNote: string;
+  lastSubmittedActionId: MultiTableActionId | null;
+  lastSubmittedAtMs: number | null;
 }
 
 const LOBBY_TABLES: readonly LobbyTableCard[] = [
@@ -54,21 +112,92 @@ const LOBBY_TABLES: readonly LobbyTableCard[] = [
   },
 ];
 
+const MULTI_TABLE_CARDS: readonly MultiTableCard[] = [
+  {
+    id: 'atlas-01',
+    name: 'Atlas 01',
+    stakesLabel: '10 / 20',
+    occupancyLabel: '5/6 seated',
+    avgPot: 360,
+    minRaise: 40,
+    maxRaise: 900,
+    callAmount: 20,
+  },
+  {
+    id: 'blaze-04',
+    name: 'Blaze 04',
+    stakesLabel: '25 / 50',
+    occupancyLabel: '6/6 seated',
+    avgPot: 940,
+    minRaise: 100,
+    maxRaise: 2_500,
+    callAmount: 50,
+  },
+  {
+    id: 'drift-09',
+    name: 'Drift 09',
+    stakesLabel: '5 / 10',
+    occupancyLabel: '4/6 seated',
+    avgPot: 240,
+    minRaise: 20,
+    maxRaise: 560,
+    callAmount: 10,
+  },
+];
+
+const MULTI_TABLE_SEATS: readonly MultiTableSeat[] = [
+  { seatId: 1, playerLabel: 'You', stack: 1_240, status: 'Acting', positionClass: 'multi-seat-pos-bottom', isUser: true },
+  { seatId: 2, playerLabel: 'Rook', stack: 910, status: 'In Pot', positionClass: 'multi-seat-pos-left' },
+  { seatId: 3, playerLabel: 'Ivy', stack: 1_580, status: 'In Pot', positionClass: 'multi-seat-pos-top' },
+  { seatId: 4, playerLabel: 'Flux', stack: 720, status: 'Folded', positionClass: 'multi-seat-pos-right' },
+];
+
+const MULTI_TABLE_ACTIONS: readonly MultiTableActionOption[] = [
+  { id: 'FOLD', label: 'Fold', shortcut: 'F', tone: 'caution' },
+  { id: 'CHECK', label: 'Check', shortcut: 'K', tone: 'neutral' },
+  { id: 'CALL', label: 'Call', shortcut: 'C', tone: 'neutral' },
+  { id: 'RAISE', label: 'Raise', shortcut: 'R', tone: 'aggressive' },
+  { id: 'ALL_IN', label: 'All In', shortcut: 'A', tone: 'danger' },
+];
+
+const MULTI_TABLE_DESKTOP_MEDIA_QUERY = '(min-width: 1024px)';
+let multiTableState: MultiTableUiState = {
+  selectedTableId: MULTI_TABLE_CARDS[0]?.id ?? '',
+  selectedActionId: 'CALL',
+  targetBetAmount: MULTI_TABLE_CARDS[0]?.minRaise ?? 0,
+  activityNote: 'Seat 1 to act. Use action shortcuts on desktop (F/K/C/R/A + Enter).',
+  lastSubmittedActionId: null,
+  lastSubmittedAtMs: null,
+};
+
 let controller: LocalTableController | null = null;
 let removeControllerListener: (() => void) | null = null;
-let activeView: 'lobby' | 'play' | 'howto' = 'lobby';
+let activeView: 'lobby' | 'play' | 'howto' | 'multitable' = 'lobby';
 let selectedGuideId = HOW_TO_GUIDES[0]?.id ?? '';
 let selectedLobbyTableId = LOBBY_TABLES[0]?.id ?? '';
 let selectedLobbySeatId = 1;
 let previousPlaySnapshot: PlaySnapshot | null = null;
 let mobileActionDockExpanded = false;
 let lastRenderedModel: TableViewModel | null = null;
-let lastRenderedView: 'lobby' | 'play' | 'howto' | null = null;
+let lastRenderedView: 'lobby' | 'play' | 'howto' | 'multitable' | null = null;
 let resizeRenderQueued = false;
+let draftTargetBetAmount: number | null = null;
+let lastProcessedEventLogId: number | null = null;
+let hasCompletedInitialRender = false;
+const howToCardFaceUpOverrides = new Map<string, boolean>();
 const MOBILE_DOCK_SWIPE_DISTANCE = 46;
 const MOBILE_DOCK_SWIPE_DISTANCE_FAST = 20;
 const MOBILE_DOCK_FAST_GESTURE_MS = 220;
+const BOARD_DEAL_STAGGER_MS = 70;
+const CHIP_FLOW_STAGGER_MS = 90;
 const DESKTOP_DOCK_MEDIA_QUERY = '(min-width: 720px)';
+const MULTI_ACTION_CONFIRM_MS = 440;
+const MULTI_TABLE_USER_SEAT_ID = 1;
+const MULTI_TABLE_AUTO_NEXT_HAND_DELAY_MS = 850;
+let multiActionConfirmTimerId: number | null = null;
+const multiTableControllerById = new Map<string, LocalTableController>();
+const multiTableModelByTableId = new Map<string, TableViewModel>();
+const multiTableAutoNextHandTimerById = new Map<string, number>();
 
 interface PlaySnapshot {
   handId: string;
@@ -88,6 +217,87 @@ interface PlayTransitionState {
   boardCount: number;
 }
 
+type MotionCue = 'IDLE' | 'HAND_STARTED' | 'BOARD_DEALT' | 'PLAYER_ACTION' | 'TURN_CHANGED' | 'HAND_COMPLETE';
+
+interface MotionClassSet {
+  shellClass: string;
+  playFeltClass: string;
+  playBoardClass: string;
+  playTurnPanelClass: string;
+  playControlsClass: string;
+  multiShellClass: string;
+  multiFeedClass: string;
+  multiActionClass: string;
+}
+
+interface BoardDealAnimationPlan {
+  boardClass: string;
+  dealtSlotIndices: readonly number[];
+  streetEmphasisIndices: readonly number[];
+}
+
+interface EventLogSnapshot {
+  logId: number;
+  type: string;
+  payload: unknown;
+}
+
+type ChipFlowDirection = 'TO_POT' | 'FROM_POT';
+
+interface ChipFlowTransfer {
+  seatId: number;
+  amount: number;
+  direction: ChipFlowDirection;
+  delayMs: number;
+}
+
+interface ChipFlowAnimationPlan {
+  feltClass: string;
+  transfers: readonly ChipFlowTransfer[];
+  activityText: string | null;
+}
+
+function initializeMultiTableControllers(): void {
+  for (const table of MULTI_TABLE_CARDS) {
+    const tableController = new LocalTableController({ userSeatId: MULTI_TABLE_USER_SEAT_ID });
+    multiTableControllerById.set(table.id, tableController);
+
+    tableController.subscribe((model) => {
+      multiTableModelByTableId.set(table.id, model);
+      scheduleMultiTableAutoNextHand(table.id, model);
+      if (table.id === multiTableState.selectedTableId) {
+        setMultiTableBetAmount(multiTableState.targetBetAmount);
+      }
+      if (activeView === 'multitable' && lastRenderedModel) {
+        render(appRoot, lastRenderedModel);
+      }
+    });
+  }
+}
+
+function scheduleMultiTableAutoNextHand(tableId: string, model: TableViewModel): void {
+  const existingTimerId = multiTableAutoNextHandTimerById.get(tableId);
+  if (model.state.phase !== 'HAND_COMPLETE') {
+    if (typeof existingTimerId === 'number') {
+      window.clearTimeout(existingTimerId);
+      multiTableAutoNextHandTimerById.delete(tableId);
+    }
+    return;
+  }
+
+  if (typeof existingTimerId === 'number') {
+    return;
+  }
+
+  const timerId = window.setTimeout(() => {
+    multiTableAutoNextHandTimerById.delete(tableId);
+    const controllerForTable = multiTableControllerById.get(tableId);
+    controllerForTable?.startNextHand();
+  }, MULTI_TABLE_AUTO_NEXT_HAND_DELAY_MS);
+  multiTableAutoNextHandTimerById.set(tableId, timerId);
+}
+
+initializeMultiTableControllers();
 mountControllerForSeat(selectedLobbySeatId);
 window.addEventListener('resize', () => {
   if (!lastRenderedModel || resizeRenderQueued) {
@@ -103,9 +313,63 @@ window.addEventListener('resize', () => {
     render(appRoot, lastRenderedModel);
   });
 });
+window.addEventListener('keydown', (event) => {
+  if (!lastRenderedModel || activeView !== 'multitable' || !isMultiTableDesktopViewport()) {
+    return;
+  }
+  if (event.metaKey || event.ctrlKey || event.altKey) {
+    return;
+  }
+
+  const target = event.target;
+  if (
+    target instanceof HTMLInputElement ||
+    target instanceof HTMLTextAreaElement ||
+    target instanceof HTMLSelectElement ||
+    (target instanceof HTMLElement && target.isContentEditable)
+  ) {
+    return;
+  }
+
+  const key = event.key.toLowerCase();
+  if (key === 'arrowleft') {
+    event.preventDefault();
+    cycleMultiTableActionSelection(-1);
+    render(appRoot, lastRenderedModel);
+    return;
+  }
+  if (key === 'arrowright') {
+    event.preventDefault();
+    cycleMultiTableActionSelection(1);
+    render(appRoot, lastRenderedModel);
+    return;
+  }
+  if (key === 'enter') {
+    event.preventDefault();
+    applyMultiTableAction();
+    render(appRoot, lastRenderedModel);
+    return;
+  }
+
+  const action = MULTI_TABLE_ACTIONS.find((candidate) => candidate.shortcut.toLowerCase() === key);
+  if (!action) {
+    return;
+  }
+
+  const actionOption = resolveMultiTableActionOption(multiTableState.selectedTableId, action.id);
+  if (!actionOption?.allowed) {
+    return;
+  }
+
+  event.preventDefault();
+  multiTableState.selectedActionId = action.id;
+  render(appRoot, lastRenderedModel);
+});
 
 function mountControllerForSeat(userSeatId: number): void {
   previousPlaySnapshot = null;
+  draftTargetBetAmount = null;
+  lastProcessedEventLogId = null;
   removeControllerListener?.();
   controller = new LocalTableController({ userSeatId });
   removeControllerListener = controller.subscribe((model) => {
@@ -122,6 +386,17 @@ function render(container: HTMLElement, model: TableViewModel): void {
   const amountOption = allowedActions.find((option) => option.amountSemantics === 'TARGET_BET') ?? null;
   const defaultAmount = amountOption?.minAmount ?? 0;
   const transitionState = buildPlayTransitionState(model, isUserTurn);
+  const freshEvents = consumeFreshEventLogs(model);
+  const latestEventType = freshEvents.at(-1)?.type ?? null;
+  const shouldAnimateEventLog = freshEvents.length > 0;
+  const motionCue = resolveMotionCue(model, transitionState, latestEventType);
+  const boardDealPlan = buildBoardDealAnimationPlan(transitionState, latestEventType);
+  const chipFlowPlan = buildChipFlowAnimationPlan(model, freshEvents);
+  const motionClasses = buildMotionClassSet(motionCue);
+  if (transitionState.handAdvanced) {
+    draftTargetBetAmount = null;
+  }
+  const targetBetInputAmount = resolveTargetBetInputAmount(amountOption, defaultAmount);
   const enteringPlayView = activeView === 'play' && lastRenderedView !== 'play';
   lastRenderedView = activeView;
   const isDesktopViewport = isDesktopDockViewport();
@@ -133,15 +408,26 @@ function render(container: HTMLElement, model: TableViewModel): void {
     mobileActionDockExpanded = true;
   }
   const dockExpanded = isDesktopViewport || mobileActionDockExpanded;
+  if (activeView === 'multitable') {
+    normalizeMultiTableActionSelection();
+    setMultiTableBetAmount(multiTableState.targetBetAmount);
+  }
   const statusText =
     activeView === 'play'
       ? buildStatusText(model, isUserTurn)
       : activeView === 'lobby'
         ? 'Select a table and seat to begin a hand.'
+        : activeView === 'multitable'
+          ? 'Monitor multiple active tables and execute your next move from one thumb-reach action bar.'
       : 'Legacy HowTo content is now available in the modern client.';
 
+  const shellClasses = ['table-shell', motionClasses.shellClass].filter((value) => value.length > 0);
+  if (!hasCompletedInitialRender) {
+    shellClasses.push('is-initial-enter');
+  }
+
   container.innerHTML = [
-    '<div class="table-shell">',
+    `  <div class="${shellClasses.join(' ')}">`,
     '  <header class="table-header">',
     '    <div>',
     `      <p class="eyebrow">Modernization Prototype</p>`,
@@ -149,21 +435,38 @@ function render(container: HTMLElement, model: TableViewModel): void {
     `      <p class="status-line">${escapeHtml(statusText)}</p>`,
     '    </div>',
     '    <div class="header-actions">',
-    `      <button class="${activeView === 'lobby' ? 'view-tab is-active' : 'view-tab'}" data-role="view-lobby">Lobby</button>`,
-    `      <button class="${activeView === 'play' ? 'view-tab is-active' : 'view-tab'}" data-role="view-play">Play Table</button>`,
-    `      <button class="${activeView === 'howto' ? 'view-tab is-active' : 'view-tab'}" data-role="view-howto">How To</button>`,
+    `      <button class="${activeView === 'lobby' ? 'view-tab is-active' : 'view-tab'}" data-role="view-lobby" aria-pressed="${activeView === 'lobby' ? 'true' : 'false'}">Lobby</button>`,
+    `      <button class="${activeView === 'play' ? 'view-tab is-active' : 'view-tab'}" data-role="view-play" aria-pressed="${activeView === 'play' ? 'true' : 'false'}">Play Table</button>`,
+    `      <button class="${activeView === 'multitable' ? 'view-tab is-active' : 'view-tab'}" data-role="view-multitable" aria-pressed="${activeView === 'multitable' ? 'true' : 'false'}">Multi Table</button>`,
+    `      <button class="${activeView === 'howto' ? 'view-tab is-active' : 'view-tab'}" data-role="view-howto" aria-pressed="${activeView === 'howto' ? 'true' : 'false'}">How To</button>`,
     activeView === 'play'
       ? `      <button class="cta" data-role="next-hand">${model.state.phase === 'HAND_COMPLETE' ? 'Deal Next Hand' : 'Reset Hand'}</button>`
       : '',
     '    </div>',
     '  </header>',
     activeView === 'play'
-      ? renderPlayView(model, allowedActions, isUserTurn, amountOption, defaultAmount, transitionState, isDesktopViewport, dockExpanded)
+      ? renderPlayView(
+          model,
+          allowedActions,
+          isUserTurn,
+          amountOption,
+          targetBetInputAmount,
+          transitionState,
+          boardDealPlan,
+          chipFlowPlan,
+          motionClasses,
+          isDesktopViewport,
+          dockExpanded,
+          shouldAnimateEventLog,
+        )
       : activeView === 'lobby'
         ? renderLobbyView(model)
-      : renderHowToView(),
+        : activeView === 'multitable'
+          ? renderMultiTableView(motionClasses, chipFlowPlan)
+          : renderHowToView(),
     '</div>',
   ].join('\n');
+  hasCompletedInitialRender = true;
 
   const lobbyViewButton = container.querySelector<HTMLButtonElement>('[data-role="view-lobby"]');
   lobbyViewButton?.addEventListener('click', () => {
@@ -218,13 +521,19 @@ function render(container: HTMLElement, model: TableViewModel): void {
     render(container, model);
   });
 
+  const multiTableViewButton = container.querySelector<HTMLButtonElement>('[data-role="view-multitable"]');
+  multiTableViewButton?.addEventListener('click', () => {
+    activeView = 'multitable';
+    render(container, model);
+  });
+
   const howToViewButton = container.querySelector<HTMLButtonElement>('[data-role="view-howto"]');
   howToViewButton?.addEventListener('click', () => {
     activeView = 'howto';
     render(container, model);
   });
 
-  const guideButtons = container.querySelectorAll<HTMLButtonElement>('[data-guide-id]');
+  const guideButtons = container.querySelectorAll<HTMLButtonElement>('[data-role="howto-guide-tab"]');
   guideButtons.forEach((button) => {
     button.addEventListener('click', () => {
       const nextId = button.dataset.guideId;
@@ -235,6 +544,96 @@ function render(container: HTMLElement, model: TableViewModel): void {
       render(container, model);
     });
   });
+
+  if (activeView === 'howto') {
+    const cardToggleButtons = container.querySelectorAll<HTMLButtonElement>('[data-role="howto-card-toggle"]');
+    cardToggleButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const guideId = button.dataset.guideId;
+        const exampleIndex = Number(button.dataset.exampleIndex);
+        const cardIndex = Number(button.dataset.cardIndex);
+        const defaultFaceUp = button.dataset.defaultFaceUp === 'true';
+        if (!guideId || !Number.isInteger(exampleIndex) || !Number.isInteger(cardIndex)) {
+          return;
+        }
+
+        const currentFaceUp = resolveHowToCardFaceUp(guideId, exampleIndex, cardIndex, defaultFaceUp);
+        const nextFaceUp = !currentFaceUp;
+        setHowToCardFaceUpOverride(guideId, exampleIndex, cardIndex, defaultFaceUp, nextFaceUp);
+        applyHowToCardButtonFace(button, nextFaceUp);
+      });
+    });
+  }
+
+  if (activeView === 'multitable') {
+    const multiTableButtons = container.querySelectorAll<HTMLButtonElement>('[data-role="multi-table-select"]');
+    multiTableButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const tableId = button.dataset.tableId;
+        if (!tableId) {
+          return;
+        }
+
+        const table = MULTI_TABLE_CARDS.find((candidate) => candidate.id === tableId);
+        if (!table) {
+          return;
+        }
+
+        multiTableState.selectedTableId = tableId;
+        normalizeMultiTableActionSelection();
+        setMultiTableBetAmount(multiTableState.targetBetAmount);
+        render(container, model);
+      });
+    });
+
+    const actionButtons = container.querySelectorAll<HTMLButtonElement>('[data-role="multi-action-select"]');
+    actionButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const actionId = button.dataset.actionId as MultiTableActionId | undefined;
+        if (!actionId) {
+          return;
+        }
+        const actionOption = resolveMultiTableActionOption(multiTableState.selectedTableId, actionId);
+        if (!actionOption?.allowed) {
+          return;
+        }
+        multiTableState.selectedActionId = actionId;
+        render(container, model);
+      });
+    });
+
+    const amountInput = container.querySelector<HTMLInputElement>('[data-role="multi-bet-input"]');
+    amountInput?.addEventListener('input', () => {
+      const nextValue = Number(amountInput.value);
+      setMultiTableBetAmount(nextValue);
+      render(container, model);
+    });
+
+    const amountRange = container.querySelector<HTMLInputElement>('[data-role="multi-bet-range"]');
+    amountRange?.addEventListener('input', () => {
+      const nextValue = Number(amountRange.value);
+      setMultiTableBetAmount(nextValue);
+      render(container, model);
+    });
+
+    const stepButtons = container.querySelectorAll<HTMLButtonElement>('[data-role="multi-bet-step"]');
+    stepButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const delta = Number(button.dataset.amountDelta);
+        if (!Number.isFinite(delta)) {
+          return;
+        }
+        setMultiTableBetAmount(multiTableState.targetBetAmount + delta);
+        render(container, model);
+      });
+    });
+
+    const submitButton = container.querySelector<HTMLButtonElement>('[data-role="multi-action-submit"]');
+    submitButton?.addEventListener('click', () => {
+      applyMultiTableAction();
+      render(container, model);
+    });
+  }
 
   if (activeView === 'play') {
     const dockToggleButton = container.querySelector<HTMLButtonElement>('[data-role="dock-toggle"]');
@@ -304,6 +703,20 @@ function render(container: HTMLElement, model: TableViewModel): void {
     });
 
     const amountInput = container.querySelector<HTMLInputElement>('[data-role="action-amount"]');
+    amountInput?.addEventListener('input', () => {
+      const nextRawValue = amountInput.value.trim();
+      if (nextRawValue.length === 0) {
+        draftTargetBetAmount = null;
+        return;
+      }
+
+      const parsedAmount = Number(nextRawValue);
+      if (!Number.isFinite(parsedAmount)) {
+        return;
+      }
+      draftTargetBetAmount = Math.round(parsedAmount);
+    });
+
     const presetButtons = container.querySelectorAll<HTMLButtonElement>('[data-set-amount]');
     presetButtons.forEach((button) => {
       button.addEventListener('click', () => {
@@ -316,7 +729,9 @@ function render(container: HTMLElement, model: TableViewModel): void {
           return;
         }
 
-        amountInput.value = String(Math.round(amount));
+        const roundedAmount = Math.round(amount);
+        draftTargetBetAmount = roundedAmount;
+        amountInput.value = String(roundedAmount);
         amountInput.focus();
       });
     });
@@ -336,16 +751,17 @@ function render(container: HTMLElement, model: TableViewModel): void {
 
         let amount: number | undefined;
         if (option.amountSemantics === 'TARGET_BET') {
-          const parsedAmount = Number(amountInput?.value ?? option.minAmount ?? 0);
+          const parsedAmount = Number(amountInput?.value ?? targetBetInputAmount);
           const min = option.minAmount ?? parsedAmount;
           const max = option.maxAmount ?? parsedAmount;
-          const clampedAmount = Math.max(min, Math.min(max, Math.round(parsedAmount)));
+          const clampedAmount = clampWholeNumberAmount(parsedAmount, min, max);
 
           if (!Number.isFinite(clampedAmount)) {
             return;
           }
 
           amount = clampedAmount;
+          draftTargetBetAmount = clampedAmount;
           if (amountInput) {
             amountInput.value = String(clampedAmount);
           }
@@ -375,32 +791,41 @@ function renderPlayView(
   allowedActions: readonly ActionOptionDTO[],
   isUserTurn: boolean,
   amountOption: ActionOptionDTO | null,
-  defaultAmount: number,
+  targetBetInputAmount: number,
   transitionState: PlayTransitionState,
+  boardDealPlan: BoardDealAnimationPlan,
+  chipFlowPlan: ChipFlowAnimationPlan,
+  motionClasses: MotionClassSet,
   isDesktopViewport: boolean,
   dockExpanded: boolean,
+  shouldAnimateEventLog: boolean,
 ): string {
   const dockContentId = 'action-dock-content';
-  const quickAmounts = buildQuickAmountPresets(amountOption, defaultAmount, model.state.pot);
+  const quickAmounts = buildQuickAmountPresets(amountOption, targetBetInputAmount, model.state.pot);
   const actingSeatLabel = model.state.actingSeatId > 0 ? `Seat ${model.state.actingSeatId}` : 'No active seat';
   const metricsClass = transitionState.handAdvanced ? 'table-metrics is-refresh' : 'table-metrics';
   const feltClasses = ['felt-table'];
-  if (transitionState.handAdvanced) {
-    feltClasses.push('is-new-hand');
+  if (motionClasses.playFeltClass.length > 0) {
+    feltClasses.push(motionClasses.playFeltClass);
   }
   if (transitionState.phaseChanged) {
     feltClasses.push('is-phase-shift');
   }
-  if (transitionState.boardAdvanced) {
-    feltClasses.push('is-board-advance');
+  if (chipFlowPlan.feltClass.length > 0) {
+    feltClasses.push(chipFlowPlan.feltClass);
   }
-  const turnPanelClasses = transitionState.actingSeatChanged ? 'turn-panel is-shift' : 'turn-panel';
+  if (motionClasses.playBoardClass.length > 0) {
+    feltClasses.push(motionClasses.playBoardClass);
+  }
+  const turnPanelClasses = ['turn-panel', motionClasses.playTurnPanelClass]
+    .filter((value) => value.length > 0)
+    .join(' ');
   const controlsPanelClasses = [
     'controls-panel',
     isUserTurn ? 'is-live' : 'is-waiting',
     isDesktopViewport ? 'is-desktop-dock' : 'is-mobile-dock',
     dockExpanded ? 'is-dock-open' : 'is-dock-collapsed',
-    transitionState.userTurnChanged ? 'is-flash' : '',
+    motionClasses.playControlsClass,
   ]
     .filter((value) => value.length > 0)
     .join(' ');
@@ -412,6 +837,13 @@ function renderPlayView(
     : dockExpanded
       ? `Waiting • ${allowedActions.length} actions ready`
       : 'Swipe up for actions';
+  const boardClasses = ['board-cards'];
+  if (motionClasses.playBoardClass.length > 0) {
+    boardClasses.push(motionClasses.playBoardClass);
+  }
+  if (boardDealPlan.boardClass.length > 0) {
+    boardClasses.push(boardDealPlan.boardClass);
+  }
 
   return [
     `  <section class="${metricsClass}">`,
@@ -429,7 +861,8 @@ function renderPlayView(
     `            ${escapeHtml(chips(model.state.pot))}`,
     '          </strong></p>',
     `          <div class="seat-radar">${renderSeatRadar(model, transitionState)}</div>`,
-    `          <div class="${transitionState.boardAdvanced ? 'board-cards is-board-advance' : 'board-cards'}">${renderBoardCards(model, transitionState)}</div>`,
+    `          ${renderChipFlowLayer(chipFlowPlan)}`,
+    `          <div class="${boardClasses.join(' ')}">${renderBoardCards(model, transitionState, boardDealPlan)}</div>`,
     '          <p class="stage-note">Community board</p>',
     '        </article>',
     `        <aside class="${turnPanelClasses}">`,
@@ -461,7 +894,7 @@ function renderPlayView(
       ? [
           '        <div class="amount-control">',
           '          <label for="action-amount">Target Bet</label>',
-          `          <div class="amount-input-wrap"><input id="action-amount" data-role="action-amount" type="number" min="${amountOption.minAmount ?? 0}" max="${amountOption.maxAmount ?? amountOption.minAmount ?? 0}" step="1" value="${defaultAmount}" /></div>`,
+          `          <div class="amount-input-wrap"><input id="action-amount" data-role="action-amount" type="number" inputmode="numeric" pattern="[0-9]*" aria-label="Target bet amount" min="${amountOption.minAmount ?? 0}" max="${amountOption.maxAmount ?? amountOption.minAmount ?? 0}" step="1" value="${targetBetInputAmount}" /></div>`,
           quickAmounts.length > 0 ? `          <div class="quick-amounts">${renderQuickAmountButtons(quickAmounts)}</div>` : '',
           '        </div>',
         ].join('\n')
@@ -470,7 +903,7 @@ function renderPlayView(
     `        ${renderPayouts(model)}`,
     '        </div>',
     '      </section>',
-    '      <section class="event-log">',
+    `      <section class="${shouldAnimateEventLog ? 'event-log is-animate' : 'event-log'}">`,
     '        <h2>Event Log</h2>',
     `        <ul>${renderLogs(model)}</ul>`,
     '      </section>',
@@ -494,7 +927,7 @@ function renderLobbyView(model: TableViewModel): string {
     ...LOBBY_TABLES.map((table) => {
       const classes = table.id === selectedTable?.id ? 'lobby-table-card is-selected' : 'lobby-table-card';
       return [
-        `        <button class="${classes}" data-table-id="${table.id}" type="button">`,
+        `        <button class="${classes}" data-table-id="${table.id}" type="button" aria-pressed="${table.id === selectedTable?.id ? 'true' : 'false'}">`,
         `          <strong>${escapeHtml(table.name)}</strong>`,
         `          <p>Blinds ${escapeHtml(table.stakesLabel)} · ${escapeHtml(table.paceLabel)}</p>`,
         `          <span>${escapeHtml(table.occupancyLabel)}</span>`,
@@ -512,7 +945,7 @@ function renderLobbyView(model: TableViewModel): string {
       const seatLabel = seat.seatId === selectedLobbySeatId ? 'Your Seat' : `Seat ${seat.seatId}`;
 
       return [
-        `        <button class="${classes}" data-seat-id="${seat.seatId}" type="button">`,
+        `        <button class="${classes}" data-seat-id="${seat.seatId}" type="button" aria-pressed="${seat.seatId === selectedLobbySeatId ? 'true' : 'false'}">`,
         `          <span>${escapeHtml(seatLabel)}</span>`,
         `          <strong>${escapeHtml(chips(seat.stack))}</strong>`,
         `          <small>${escapeHtml(seat.playerId)}</small>`,
@@ -522,6 +955,208 @@ function renderLobbyView(model: TableViewModel): string {
     '      </div>',
     `      <button class="cta lobby-enter" data-role="enter-table" type="button">Enter As Seat ${selectedLobbySeatId}</button>`,
     '    </section>',
+    '  </section>',
+  ].join('\n');
+}
+
+function renderMultiTableView(motionClasses: MotionClassSet, chipFlowPlan: ChipFlowAnimationPlan): string {
+  const selectedTable = getSelectedMultiTableCard();
+  const selectedAction = getSelectedMultiTableAction();
+  const selectedTableModel = getMultiTableModel(selectedTable.id);
+  const selectedUserSeatAction = getMultiTableUserSeatActionState(selectedTable.id);
+  const selectedActionOption = resolveMultiTableActionOption(selectedTable.id, selectedAction.id);
+  const selectedRaiseOption = resolveMultiTableActionOption(selectedTable.id, 'RAISE');
+  const selectedCallOption = resolveMultiTableActionOption(selectedTable.id, 'CALL');
+  const requiresBetAmount =
+    selectedAction.id === 'RAISE' &&
+    Boolean(selectedRaiseOption?.allowed) &&
+    selectedRaiseOption?.amountSemantics === 'TARGET_BET';
+  const selectedTablePendingDecisions = getTablePendingDecisionCount(selectedTable.id);
+  const selectedTableIsUserActing = isTableUserActing(selectedTable.id);
+  const canSubmitSelectedAction = Boolean(selectedActionOption?.allowed) && selectedTableIsUserActing;
+  const totalPendingDecisions = countTotalPendingDecisions();
+  const latestEventText = buildLatestMultiTableEventText(selectedTable.id);
+  const selectedTablePhaseText = selectedTableModel ? formatPhaseLabel(selectedTableModel.state.phase) : 'State unavailable';
+  const pendingQueueLabel =
+    totalPendingDecisions > 0
+      ? `${totalPendingDecisions} pending decision${totalPendingDecisions === 1 ? '' : 's'} across open tables.`
+      : 'No pending decisions across tracked tables.';
+  const turnStateLabel =
+    selectedTableIsUserActing || selectedTablePendingDecisions > 0
+      ? `On the clock at ${selectedTable.name}`
+      : `Monitoring ${selectedTable.name}`;
+  const feedClasses = ['multi-table-feed', motionClasses.multiFeedClass];
+  if (chipFlowPlan.transfers.length > 0) {
+    feedClasses.push('is-cue-chip-flow');
+  }
+  if (selectedTableIsUserActing || selectedTablePendingDecisions > 0) {
+    feedClasses.push('is-pending');
+  }
+  const actionBarClasses = ['multi-table-action-bar', motionClasses.multiActionClass];
+  if (selectedTableIsUserActing || selectedTablePendingDecisions > 0) {
+    actionBarClasses.push('is-user-turn');
+  }
+  if (hasRecentMultiActionConfirmation()) {
+    actionBarClasses.push('is-action-confirm');
+  }
+  const selectedCallAmount = selectedCallOption?.minAmount ?? selectedUserSeatAction?.toCall ?? selectedTable.callAmount;
+  const raiseLabel = selectedRaiseOption?.action === 'BET' ? 'Bet' : 'Raise';
+  const primaryLabel = canSubmitSelectedAction
+    ? selectedAction.id === 'RAISE'
+      ? `Confirm ${raiseLabel} to ${chips(multiTableState.targetBetAmount)}`
+      : selectedAction.id === 'CALL'
+        ? `Confirm Call ${chips(selectedCallAmount)}`
+        : `Confirm ${formatActionLabel(selectedAction.id)}`
+    : selectedTableIsUserActing
+      ? 'Action Unavailable'
+      : 'Waiting For Turn';
+  const primaryActionClasses = ['multi-primary-action'];
+  if (hasRecentMultiActionConfirmation(selectedAction.id)) {
+    primaryActionClasses.push('is-confirmed');
+  }
+  const boardCards = buildMultiTableBoardCards(selectedTable.id);
+  const multiTableSeats = buildMultiTableSeatStates(selectedTable.id);
+  const selectedTablePot = selectedTableModel?.state.pot ?? selectedTable.avgPot;
+
+  return [
+    // Mobile-first composition: main gameplay content scrolls above a fixed bottom action bar for thumb reach.
+    `  <section class="${['multi-table-shell', motionClasses.multiShellClass].filter((value) => value.length > 0).join(' ')}" aria-label="Multi-table control screen">`,
+    '    <div class="multi-table-main">',
+    '      <section class="multi-table-rail">',
+    '        <header>',
+    '          <h2>Open Tables</h2>',
+    '          <p>Jump between active tables without leaving your current hand context.</p>',
+    '        </header>',
+    '        <div class="multi-table-rail-list" role="tablist" aria-label="Active tables">',
+    ...MULTI_TABLE_CARDS.map((table) => {
+      const selected = table.id === selectedTable.id;
+      const tableModel = getMultiTableModel(table.id);
+      const pendingDecisions = getTablePendingDecisionCount(table.id);
+      const tableIsUserActing = isTableUserActing(table.id);
+      const tablePot = tableModel?.state.pot ?? table.avgPot;
+      const tablePendingLabel =
+        tableIsUserActing
+          ? 'Acting now'
+          : pendingDecisions > 0
+            ? `${pendingDecisions} pending`
+            : 'No pending';
+      const tableClasses = ['multi-table-pill'];
+      if (selected) {
+        tableClasses.push('is-selected');
+      }
+      if (pendingDecisions > 0 || tableIsUserActing) {
+        tableClasses.push('is-pending');
+      }
+      if (tableIsUserActing) {
+        tableClasses.push('is-user-turn');
+      }
+      return [
+        `          <button class="${tableClasses.join(' ')}" data-role="multi-table-select" data-table-id="${table.id}" aria-selected="${selected ? 'true' : 'false'}" role="tab">`,
+        `            <strong>${escapeHtml(table.name)}</strong>`,
+        `            <span>${escapeHtml(table.stakesLabel)} · ${escapeHtml(table.occupancyLabel)}</span>`,
+        `            <small>Pot ${escapeHtml(chips(tablePot))}</small>`,
+        `            <p class="multi-pill-status">${escapeHtml(tablePendingLabel)}</p>`,
+        '          </button>',
+      ].join('\n');
+    }),
+    '        </div>',
+    '      </section>',
+    '      <section class="multi-table-stage">',
+    '        <article class="multi-table-felt">',
+    `          <p class="phase-pill">Table ${escapeHtml(selectedTable.name)} · ${escapeHtml(selectedTablePhaseText)}</p>`,
+    `          <p class="felt-badge"><span>Live Pot</span><strong>${escapeHtml(chips(selectedTablePot))}</strong></p>`,
+    `          <div class="multi-board-cards">${boardCards}</div>`,
+    '          <p class="stage-note">Live Board Preview</p>',
+    '          <div class="multi-seat-ring">',
+    ...multiTableSeats.map((seat) => {
+      const seatClasses = ['multi-seat-chip', seat.positionClass];
+      if (seat.isUser) {
+        seatClasses.push('is-user');
+      }
+      if (seat.status === 'Acting') {
+        seatClasses.push('is-acting');
+      }
+
+      return [
+        `            <article class="${seatClasses.join(' ')}">`,
+        `              <p class="multi-seat-name">${escapeHtml(seat.playerLabel)}</p>`,
+        `              <p class="multi-seat-stack">${escapeHtml(chips(seat.stack))}</p>`,
+        `              <p class="multi-seat-status">${escapeHtml(seat.status)}</p>`,
+        '            </article>',
+      ].join('\n');
+    }),
+    '          </div>',
+    '        </article>',
+    `        <article class="${feedClasses.filter((value) => value.length > 0).join(' ')}">`,
+    '          <h3>Table Activity</h3>',
+    `          <p>${escapeHtml(multiTableState.activityNote)}</p>`,
+    '          <ul>',
+    chipFlowPlan.activityText ? `            <li>${escapeHtml(chipFlowPlan.activityText)}</li>` : '',
+    latestEventText ? `            <li>${escapeHtml(latestEventText)}</li>` : '',
+    `            <li>Phase: ${escapeHtml(selectedTablePhaseText)}.</li>`,
+    `            <li>${escapeHtml(
+      selectedTableIsUserActing
+        ? 'You are currently acting at this table.'
+        : selectedTablePendingDecisions > 0
+          ? `${selectedTablePendingDecisions} pending decision${selectedTablePendingDecisions === 1 ? '' : 's'} on this table.`
+          : 'No pending decision on this table.',
+    )}</li>`,
+    `            <li>${escapeHtml(pendingQueueLabel)}</li>`,
+    '          </ul>',
+    '        </article>',
+    '      </section>',
+    '    </div>',
+    // Desktop keeps this dock in a sticky side rail while mobile keeps it fixed near thumb reach.
+    `    <aside class="${actionBarClasses.filter((value) => value.length > 0).join(' ')}" aria-label="Table action bar">`,
+    '      <div class="multi-action-head">',
+    '        <h2>Action Bar</h2>',
+    '        <p>Use touch on mobile or keyboard shortcuts on desktop.</p>',
+    `        <p class="multi-action-turn-state" aria-live="polite">${escapeHtml(turnStateLabel)}</p>`,
+    '      </div>',
+    '      <div class="multi-action-list" role="toolbar" aria-label="Poker actions">',
+    ...MULTI_TABLE_ACTIONS.map((option) => {
+      const isSelected = option.id === selectedAction.id;
+      const mappedOption = resolveMultiTableActionOption(selectedTable.id, option.id);
+      const isAvailable = Boolean(mappedOption?.allowed);
+      const optionLabel = option.id === 'RAISE' && mappedOption?.action === 'BET' ? 'Bet' : option.label;
+      const shortcutLabel =
+        option.id === 'CALL' && isAvailable && (mappedOption?.minAmount ?? 0) > 0
+          ? `${chips(mappedOption?.minAmount ?? 0)} · ${option.shortcut}`
+          : option.shortcut;
+      const optionClasses = ['multi-action-btn', `tone-${option.tone}`];
+      if (isSelected) {
+        optionClasses.push('is-selected');
+      }
+      if (hasRecentMultiActionConfirmation(option.id)) {
+        optionClasses.push('is-confirmed');
+      }
+      if (!isAvailable) {
+        optionClasses.push('is-disabled');
+      }
+      return [
+        `        <button class="${optionClasses.join(' ')}" data-role="multi-action-select" data-action-id="${option.id}" aria-pressed="${isSelected ? 'true' : 'false'}" aria-disabled="${isAvailable ? 'false' : 'true'}" ${isAvailable ? '' : 'disabled'}>`,
+        `          <span>${escapeHtml(optionLabel)}</span>`,
+        `          <small>${escapeHtml(shortcutLabel)}</small>`,
+        '        </button>',
+      ].join('\n');
+    }),
+    '      </div>',
+    requiresBetAmount
+      ? [
+          '      <div class="multi-bet-control">',
+          '        <label for="multi-bet-input">Target Bet</label>',
+          `        <div class="multi-bet-fields"><input id="multi-bet-input" data-role="multi-bet-input" type="number" inputmode="numeric" min="${selectedRaiseOption?.minAmount ?? selectedTable.minRaise}" max="${selectedRaiseOption?.maxAmount ?? selectedTable.maxRaise}" step="10" value="${multiTableState.targetBetAmount}" /><input data-role="multi-bet-range" type="range" min="${selectedRaiseOption?.minAmount ?? selectedTable.minRaise}" max="${selectedRaiseOption?.maxAmount ?? selectedTable.maxRaise}" step="10" value="${multiTableState.targetBetAmount}" /></div>`,
+          '        <div class="multi-bet-steps">',
+          '          <button type="button" data-role="multi-bet-step" data-amount-delta="-20">-20</button>',
+          '          <button type="button" data-role="multi-bet-step" data-amount-delta="20">+20</button>',
+          '          <button type="button" data-role="multi-bet-step" data-amount-delta="100">+100</button>',
+          '        </div>',
+          '      </div>',
+        ].join('\n')
+      : '',
+    `      <button class="${primaryActionClasses.join(' ')}" data-role="multi-action-submit" ${canSubmitSelectedAction ? '' : 'disabled'}>${escapeHtml(primaryLabel)}</button>`,
+    '      <p class="multi-action-help">Desktop: Arrow keys switch actions, Enter confirms.</p>',
+    '    </aside>',
     '  </section>',
   ].join('\n');
 }
@@ -587,13 +1222,21 @@ function renderHowToView(): string {
     '  <div class="howto-nav">',
     ...HOW_TO_GUIDES.map((guide) => {
       const classes = guide.id === selectedGuide.id ? 'howto-tab is-active' : 'howto-tab';
-      return `    <button class="${classes}" data-guide-id="${guide.id}">${escapeHtml(guide.name)}</button>`;
+      return `    <button class="${classes}" data-role="howto-guide-tab" data-guide-id="${guide.id}" aria-pressed="${guide.id === selectedGuide.id ? 'true' : 'false'}">${escapeHtml(guide.name)}</button>`;
     }),
     '  </div>',
     '  <article class="howto-card">',
     `    <p class="eyebrow">Guide Source: ${escapeHtml(selectedGuide.sourceFile)}</p>`,
     `    <h2>${escapeHtml(selectedGuide.title)}</h2>`,
     `    <p>${escapeHtml(selectedGuide.description)}</p>`,
+    selectedGuide.cardExamples.length > 0
+      ? [
+          '    <section>',
+          '      <h3>Hand Examples</h3>',
+          `      ${renderHowToCardExamples(selectedGuide.id, selectedGuide.cardExamples)}`,
+          '    </section>',
+        ].join('\n')
+      : '',
     '    <section>',
     '      <h3>Rounds</h3>',
     selectedGuide.rounds.length > 0
@@ -611,13 +1254,231 @@ function renderHowToView(): string {
   ].join('\n');
 }
 
-function renderBoardCards(model: TableViewModel, transitionState: PlayTransitionState): string {
+function renderHowToCardExamples(
+  guideId: string,
+  examples: readonly {
+    groupId: string;
+    deckClass: string;
+    label: string;
+    items: readonly {
+      kind: 'card' | 'separator';
+      code?: string;
+      hidden?: boolean;
+      text?: string;
+    }[];
+    cards: readonly {
+      code: string;
+      hidden: boolean;
+    }[];
+  }[],
+): string {
+  const groupedExamples = groupHowToExamplesByDeckContainer(examples);
+
+  return [
+    '      <div class="howto-examples">',
+    ...groupedExamples.map((group) => {
+      const groupClasses = ['howto-example-group'];
+      if (group.entries.length > 1) {
+        groupClasses.push('is-multi');
+      }
+
+      return [
+        `        <section class="${groupClasses.join(' ')}">`,
+        ...group.entries.map((entry) => renderHowToExampleRow(guideId, entry.exampleIndex, entry.example)),
+        '        </section>',
+      ].join('\n');
+    }),
+    '      </div>',
+  ].join('\n');
+}
+
+function groupHowToExamplesByDeckContainer(
+  examples: readonly {
+    groupId: string;
+    deckClass: string;
+    label: string;
+    items: readonly {
+      kind: 'card' | 'separator';
+      code?: string;
+      hidden?: boolean;
+      text?: string;
+    }[];
+    cards: readonly {
+      code: string;
+      hidden: boolean;
+    }[];
+  }[],
+): Array<{
+  groupId: string;
+  entries: Array<{
+    exampleIndex: number;
+    example: (typeof examples)[number];
+  }>;
+}> {
+  const grouped: Array<{
+    groupId: string;
+    entries: Array<{
+      exampleIndex: number;
+      example: (typeof examples)[number];
+    }>;
+  }> = [];
+
+  for (let index = 0; index < examples.length; index += 1) {
+    const example = examples[index];
+    const groupId = example.groupId.length > 0 ? example.groupId : `single-${index}`;
+    const lastGroup = grouped[grouped.length - 1];
+    if (lastGroup && lastGroup.groupId === groupId) {
+      lastGroup.entries.push({ exampleIndex: index, example });
+      continue;
+    }
+
+    grouped.push({
+      groupId,
+      entries: [{ exampleIndex: index, example }],
+    });
+  }
+
+  return grouped;
+}
+
+function renderHowToExampleRow(
+  guideId: string,
+  exampleIndex: number,
+  example: {
+    deckClass: string;
+    label: string;
+    items: readonly {
+      kind: 'card' | 'separator';
+      code?: string;
+      hidden?: boolean;
+      text?: string;
+    }[];
+    cards: readonly {
+      code: string;
+      hidden: boolean;
+    }[];
+  },
+): string {
+  const rowClasses = ['howto-example-row'];
+  if (example.deckClass.includes('texas-holdem-street')) {
+    rowClasses.push('is-compact-street');
+  }
+  if (example.deckClass.includes('seven-card-stud-hole')) {
+    rowClasses.push('is-stud-deck');
+  }
+  if (example.deckClass.includes('omaha-pocket')) {
+    rowClasses.push('is-omaha-pocket');
+  }
+
+  const sequence = example.items.length > 0
+    ? example.items
+    : example.cards.map((card) => ({
+        kind: 'card' as const,
+        code: card.code,
+        hidden: card.hidden,
+      }));
+  let cardIndex = 0;
+  const renderedSequence = sequence
+    .map((item) => {
+      if (item.kind === 'separator') {
+        return renderHowToExampleSeparator(item.text ?? '+');
+      }
+
+      if (typeof item.code !== 'string' || typeof item.hidden !== 'boolean') {
+        return '';
+      }
+
+      const renderedCard = renderHowToExampleCard(guideId, exampleIndex, cardIndex, item.code, item.hidden);
+      cardIndex += 1;
+      return renderedCard;
+    })
+    .join('');
+
+  return [
+    `          <article class="${rowClasses.join(' ')}">`,
+    example.label.length > 0 ? `            <p class="howto-example-label">${escapeHtml(example.label)}</p>` : '',
+    `            <div class="howto-example-cards">${renderedSequence}</div>`,
+    '          </article>',
+  ].join('\n');
+}
+
+function renderHowToExampleSeparator(text: string): string {
+  return `<span class="howto-example-separator" aria-hidden="true">${escapeHtml(text)}</span>`;
+}
+
+function renderHowToExampleCard(
+  guideId: string,
+  exampleIndex: number,
+  cardIndex: number,
+  cardCode: string,
+  hidden: boolean,
+): string {
+  const defaultFaceUp = !hidden;
+  const isFaceUp = resolveHowToCardFaceUp(guideId, exampleIndex, cardIndex, defaultFaceUp);
+  const buttonClasses = ['howto-flip-card'];
+  if (!isFaceUp) {
+    buttonClasses.push('is-face-down');
+  }
+
+  const ariaLabel = `Toggle example card ${cardCode}`;
+
+  return [
+    `<button type="button" class="${buttonClasses.join(' ')}" data-role="howto-card-toggle" data-guide-id="${guideId}" data-example-index="${exampleIndex}" data-card-index="${cardIndex}" data-default-face-up="${defaultFaceUp ? 'true' : 'false'}" aria-label="${escapeHtml(ariaLabel)}" aria-pressed="${isFaceUp ? 'true' : 'false'}">`,
+    '  <span class="howto-flip-card-inner">',
+    `    <img class="howto-flip-face howto-flip-face-front" src="/assets/cards/${cardCode}.svg" alt="${escapeHtml(cardCode)}" loading="lazy" />`,
+    '    <img class="howto-flip-face howto-flip-face-back" src="/assets/cards/Card_back_01.svg" alt="Card back" loading="lazy" />',
+    '  </span>',
+    '</button>',
+  ].join('');
+}
+
+function buildHowToCardKey(guideId: string, exampleIndex: number, cardIndex: number): string {
+  return `${guideId}:${exampleIndex}:${cardIndex}`;
+}
+
+function resolveHowToCardFaceUp(guideId: string, exampleIndex: number, cardIndex: number, defaultFaceUp: boolean): boolean {
+  const key = buildHowToCardKey(guideId, exampleIndex, cardIndex);
+  const override = howToCardFaceUpOverrides.get(key);
+  return typeof override === 'boolean' ? override : defaultFaceUp;
+}
+
+function setHowToCardFaceUpOverride(
+  guideId: string,
+  exampleIndex: number,
+  cardIndex: number,
+  defaultFaceUp: boolean,
+  nextFaceUp: boolean,
+): void {
+  const key = buildHowToCardKey(guideId, exampleIndex, cardIndex);
+  if (nextFaceUp === defaultFaceUp) {
+    howToCardFaceUpOverrides.delete(key);
+    return;
+  }
+
+  howToCardFaceUpOverrides.set(key, nextFaceUp);
+}
+
+function applyHowToCardButtonFace(button: HTMLButtonElement, isFaceUp: boolean): void {
+  button.classList.toggle('is-face-down', !isFaceUp);
+  button.setAttribute('aria-pressed', isFaceUp ? 'true' : 'false');
+}
+
+function renderBoardCards(
+  model: TableViewModel,
+  transitionState: PlayTransitionState,
+  boardDealPlan: BoardDealAnimationPlan,
+): string {
   const slots: string[] = [];
   for (let i = 0; i < 5; i += 1) {
     const cardCode = model.state.board[i]?.code;
-    const isNewlyDealt =
+    const fallbackDeal =
       transitionState.boardAdvanced && i >= transitionState.previousBoardCount && i < transitionState.boardCount;
-    slots.push(renderCard(cardCode ?? null, false, isNewlyDealt));
+    const isPlannedDealt = boardDealPlan.dealtSlotIndices.includes(i);
+    const isNewlyDealt = isPlannedDealt || fallbackDeal;
+    const dealIndex = boardDealPlan.dealtSlotIndices.indexOf(i);
+    const dealDelayMs = dealIndex >= 0 ? dealIndex * BOARD_DEAL_STAGGER_MS : 0;
+    const isStreetEmphasis = boardDealPlan.streetEmphasisIndices.includes(i);
+    slots.push(renderCard(cardCode ?? null, false, isNewlyDealt, dealDelayMs, isStreetEmphasis));
   }
   return slots.join('');
 }
@@ -683,7 +1544,13 @@ function renderSeatCard(
   ].join('\n');
 }
 
-function renderCard(cardCode: string | null, hidden: boolean, isNewlyDealt = false): string {
+function renderCard(
+  cardCode: string | null,
+  hidden: boolean,
+  isNewlyDealt = false,
+  dealDelayMs = 0,
+  isStreetEmphasis = false,
+): string {
   if (!cardCode && !hidden) {
     return '<div class="card-slot empty"></div>';
   }
@@ -694,7 +1561,11 @@ function renderCard(cardCode: string | null, hidden: boolean, isNewlyDealt = fal
   if (isNewlyDealt) {
     classes.push('is-dealt');
   }
-  return `<img class="${classes.join(' ')}" src="${src}" alt="${alt}" />`;
+  if (isStreetEmphasis) {
+    classes.push('is-street-emphasis');
+  }
+  const delayStyle = isNewlyDealt && dealDelayMs > 0 ? ` style="--deal-delay:${dealDelayMs}ms"` : '';
+  return `<img class="${classes.join(' ')}" src="${src}" alt="${alt}"${delayStyle} />`;
 }
 
 function renderActionButtons(options: readonly ActionOptionDTO[], isUserTurn: boolean): string {
@@ -713,11 +1584,13 @@ function renderActionButtons(options: readonly ActionOptionDTO[], isUserTurn: bo
       option.amountSemantics === 'TARGET_BET'
         ? `${option.minAmount ?? 0}-${option.maxAmount ?? option.minAmount ?? 0}`
         : '';
+    const buttonLabel = formatActionButtonLabel(action, option);
+    const actionAriaLabel = bettingRange.length > 0 ? `${buttonLabel} (${bettingRange})` : buttonLabel;
 
     buttons.push(
       [
-        `<button class="action-btn action-${actionTone(action)}" data-action="${action}" ${isUserTurn ? '' : 'disabled'}>`,
-        `  <span>${formatActionButtonLabel(action, option)}</span>`,
+        `<button class="action-btn action-${actionTone(action)}" data-action="${action}" aria-label="${escapeHtml(actionAriaLabel)}" ${isUserTurn ? '' : 'disabled'}>`,
+        `  <span>${buttonLabel}</span>`,
         bettingRange.length > 0 ? `  <small>${bettingRange}</small>` : '',
         '</button>',
       ].join(''),
@@ -733,8 +1606,317 @@ function renderActionButtons(options: readonly ActionOptionDTO[], isUserTurn: bo
 
 function renderQuickAmountButtons(amounts: readonly number[]): string {
   return amounts
-    .map((amount) => `<button type="button" data-set-amount="${amount}">${amount.toLocaleString()}</button>`)
+    .map(
+      (amount) =>
+        `<button type="button" data-set-amount="${amount}" aria-label="Set target bet to ${amount.toLocaleString()} chips">${amount.toLocaleString()}</button>`,
+    )
     .join('');
+}
+
+function resolveTargetBetInputAmount(option: ActionOptionDTO | null, fallbackAmount: number): number {
+  if (!option || option.amountSemantics !== 'TARGET_BET') {
+    return fallbackAmount;
+  }
+
+  const min = option.minAmount ?? fallbackAmount;
+  const max = option.maxAmount ?? min;
+  const draftAmount = draftTargetBetAmount ?? fallbackAmount;
+  return clampWholeNumberAmount(draftAmount, min, max);
+}
+
+function clampWholeNumberAmount(value: number, min: number, max: number): number {
+  if (!Number.isFinite(value)) {
+    return min;
+  }
+
+  const rounded = Math.round(value);
+  return Math.max(min, Math.min(max, rounded));
+}
+
+function getSelectedMultiTableCard(): MultiTableCard {
+  return MULTI_TABLE_CARDS.find((table) => table.id === multiTableState.selectedTableId) ?? MULTI_TABLE_CARDS[0];
+}
+
+function getSelectedMultiTableAction(): MultiTableActionOption {
+  return MULTI_TABLE_ACTIONS.find((option) => option.id === multiTableState.selectedActionId) ?? MULTI_TABLE_ACTIONS[0];
+}
+
+function getMultiTableModel(tableId: string): TableViewModel | null {
+  return multiTableModelByTableId.get(tableId) ?? null;
+}
+
+function getMultiTableUserSeatActionState(tableId: string): SeatActionStateDTO | null {
+  const model = getMultiTableModel(tableId);
+  if (!model) {
+    return null;
+  }
+  return model.actionState.seats.find((seat) => seat.seatId === model.userSeatId) ?? null;
+}
+
+function resolveMultiTableActionOption(tableId: string, actionId: MultiTableActionId): ActionOptionDTO | null {
+  const actionState = getMultiTableUserSeatActionState(tableId);
+  return resolveMultiTableActionOptionForIntent(actionState, actionId);
+}
+
+function getAvailableMultiTableActionIds(tableId: string): MultiTableActionId[] {
+  return getAvailableMultiTableActionIdsFromActionState(getMultiTableUserSeatActionState(tableId));
+}
+
+function normalizeMultiTableActionSelection(): void {
+  const actionState = getMultiTableUserSeatActionState(multiTableState.selectedTableId);
+  multiTableState.selectedActionId = normalizeSelectedMultiTableAction(actionState, multiTableState.selectedActionId);
+}
+
+function getMultiTableRaiseBounds(tableId: string): { min: number; max: number } {
+  const table = MULTI_TABLE_CARDS.find((candidate) => candidate.id === tableId);
+  const fallbackMin = table?.minRaise ?? 0;
+  const fallbackMax = table?.maxRaise ?? fallbackMin;
+  const actionState = getMultiTableUserSeatActionState(tableId);
+  return getRaiseBoundsFromActionState(actionState, fallbackMin, fallbackMax);
+}
+
+function setMultiTableBetAmount(amount: number): void {
+  const bounds = getMultiTableRaiseBounds(multiTableState.selectedTableId);
+  multiTableState.targetBetAmount = clampWholeNumberAmount(amount, bounds.min, bounds.max);
+}
+
+function getTablePendingDecisionCount(tableId: string): number {
+  const model = getMultiTableModel(tableId);
+  if (!model) {
+    return 0;
+  }
+
+  return getPendingDecisionCountFromState(model.state.phase, model.state.actingSeatId, model.userSeatId);
+}
+
+function isTableUserActing(tableId: string): boolean {
+  return getTablePendingDecisionCount(tableId) > 0;
+}
+
+function countTotalPendingDecisions(): number {
+  return MULTI_TABLE_CARDS.reduce((total, table) => total + getTablePendingDecisionCount(table.id), 0);
+}
+
+function buildMultiTableBoardCards(tableId: string): string {
+  const model = getMultiTableModel(tableId);
+  const boardCodes: Array<string | null> = [];
+  for (let index = 0; index < 5; index += 1) {
+    boardCodes.push(model?.state.board[index]?.code ?? null);
+  }
+
+  return boardCodes.map((cardCode) => renderCard(cardCode, false)).join('');
+}
+
+function getMultiTableSeatPositionClass(seatId: number): string {
+  switch (seatId) {
+    case 1:
+      return 'multi-seat-pos-bottom';
+    case 2:
+      return 'multi-seat-pos-left';
+    case 3:
+      return 'multi-seat-pos-top';
+    case 4:
+      return 'multi-seat-pos-right';
+    default:
+      return 'multi-seat-pos-top';
+  }
+}
+
+function buildMultiTableSeatStates(tableId: string): MultiTableSeat[] {
+  const model = getMultiTableModel(tableId);
+  if (!model) {
+    return [...MULTI_TABLE_SEATS];
+  }
+
+  return model.state.seats
+    .slice()
+    .sort((left, right) => left.seatId - right.seatId)
+    .map((seatState) => {
+      const actionState = model.actionState.seats.find((candidate) => candidate.seatId === seatState.seatId);
+      const status = actionState
+        ? actionState.folded
+          ? 'Folded'
+          : actionState.allIn
+            ? 'All In'
+            : actionState.isActingSeat
+              ? 'Acting'
+              : seatState.currentBet > 0
+                ? `Bet ${seatState.currentBet}`
+                : 'Waiting'
+        : 'Waiting';
+      const playerLabel = seatState.seatId === model.userSeatId ? 'You' : formatRadarName(seatState.playerId, seatState.seatId, model.userSeatId);
+
+      return {
+        seatId: seatState.seatId,
+        playerLabel,
+        stack: seatState.stack,
+        status,
+        positionClass: getMultiTableSeatPositionClass(seatState.seatId),
+        isUser: seatState.seatId === model.userSeatId,
+      };
+    });
+}
+
+function buildLatestMultiTableEventText(tableId: string): string | null {
+  const model = getMultiTableModel(tableId);
+  if (!model) {
+    return null;
+  }
+
+  const latestEventLog = [...model.logs].reverse().find((log) => log.kind === 'EVENT');
+  if (!latestEventLog) {
+    return null;
+  }
+
+  const parsed = parseEventLog(latestEventLog.id, latestEventLog.message);
+  if (!parsed) {
+    return null;
+  }
+
+  return formatMultiTableEventSummary(parsed);
+}
+
+function formatMultiTableEventSummary(event: EventLogSnapshot): string {
+  const payload = toRecord(event.payload);
+  const seatId = payload ? readInteger(payload, 'seatId') : null;
+
+  switch (event.type) {
+    case 'PLAYER_FOLDED':
+      return seatId ? `Seat ${seatId} folded.` : 'A seat folded.';
+    case 'PLAYER_CHECKED':
+      return seatId ? `Seat ${seatId} checked.` : 'A seat checked.';
+    case 'PLAYER_CALLED': {
+      const amount = payload ? readInteger(payload, 'amount') : null;
+      return seatId && amount ? `Seat ${seatId} called ${chips(amount)}.` : 'A seat called.';
+    }
+    case 'PLAYER_BET':
+    case 'PLAYER_RAISED':
+    case 'PLAYER_ALL_IN': {
+      const wager = payload ? readInteger(payload, 'wager') : null;
+      const actionText = event.type === 'PLAYER_BET' ? 'bet' : event.type === 'PLAYER_RAISED' ? 'raised' : 'moved all in for';
+      return seatId && wager ? `Seat ${seatId} ${actionText} ${chips(wager)}.` : `A seat ${actionText}.`;
+    }
+    case 'DEAL_FLOP':
+      return 'Flop dealt.';
+    case 'DEAL_TURN':
+      return 'Turn dealt.';
+    case 'DEAL_RIVER':
+      return 'River dealt.';
+    case 'SHOWDOWN_RESOLVED':
+      return 'Showdown resolved.';
+    case 'HAND_WON_UNCONTESTED':
+      return 'Pot awarded uncontested.';
+    default:
+      return `${formatTokenLabel(event.type)}.`;
+  }
+}
+
+function cycleMultiTableActionSelection(offset: number): void {
+  const availableActionIds = getAvailableMultiTableActionIds(multiTableState.selectedTableId);
+  const actionPool = availableActionIds.length > 0 ? availableActionIds : MULTI_TABLE_ACTIONS.map((option) => option.id);
+  const currentIndex = actionPool.findIndex((option) => option === multiTableState.selectedActionId);
+  const safeIndex = currentIndex < 0 ? 0 : currentIndex;
+  const nextIndex = (safeIndex + offset + actionPool.length) % actionPool.length;
+  multiTableState.selectedActionId = actionPool[nextIndex];
+}
+
+function applyMultiTableAction(): void {
+  const table = getSelectedMultiTableCard();
+  const selectedAction = getSelectedMultiTableAction();
+  const tableController = multiTableControllerById.get(table.id);
+  const actionOption = resolveMultiTableActionOption(table.id, selectedAction.id);
+  const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  if (!tableController) {
+    multiTableState.activityNote = `${timestamp} • ${table.name} controller is unavailable.`;
+    return;
+  }
+  if (!isTableUserActing(table.id)) {
+    multiTableState.activityNote = `${timestamp} • Waiting for your turn on ${table.name}.`;
+    return;
+  }
+  if (!actionOption || !actionOption.allowed) {
+    normalizeMultiTableActionSelection();
+    multiTableState.activityNote = `${timestamp} • ${formatActionLabel(selectedAction.id)} is not legal on ${table.name} right now.`;
+    return;
+  }
+
+  let amount: number | undefined;
+  if (actionOption.amountSemantics === 'TARGET_BET') {
+    const min = actionOption.minAmount ?? multiTableState.targetBetAmount;
+    const max = actionOption.maxAmount ?? min;
+    const clampedAmount = clampWholeNumberAmount(multiTableState.targetBetAmount, min, max);
+    multiTableState.targetBetAmount = clampedAmount;
+    amount = clampedAmount;
+  }
+
+  tableController.performUserAction({ action: actionOption.action, amount });
+  multiTableState.lastSubmittedActionId = selectedAction.id;
+  multiTableState.lastSubmittedAtMs = Date.now();
+  queueMultiActionConfirmationReset();
+
+  if (actionOption.action === 'RAISE') {
+    multiTableState.activityNote = `${timestamp} • You raised to ${chips(amount ?? 0)} on ${table.name}.`;
+    return;
+  }
+  if (actionOption.action === 'BET') {
+    multiTableState.activityNote = `${timestamp} • You bet ${chips(amount ?? 0)} on ${table.name}.`;
+    return;
+  }
+  if (actionOption.action === 'CALL') {
+    const callAmount = actionOption.minAmount ?? getMultiTableUserSeatActionState(table.id)?.toCall ?? 0;
+    multiTableState.activityNote = `${timestamp} • You called ${chips(callAmount)} on ${table.name}.`;
+    return;
+  }
+  if (actionOption.action === 'CHECK') {
+    multiTableState.activityNote = `${timestamp} • You checked on ${table.name}.`;
+    return;
+  }
+  if (actionOption.action === 'FOLD') {
+    multiTableState.activityNote = `${timestamp} • You folded on ${table.name}.`;
+    return;
+  }
+
+  if (actionOption.action === 'ALL_IN') {
+    const stackAmount = getMultiTableUserSeatActionState(table.id)?.stack ?? amount ?? multiTableState.targetBetAmount;
+    multiTableState.activityNote = `${timestamp} • You moved all in for ${chips(stackAmount)} on ${table.name}.`;
+    return;
+  }
+
+  multiTableState.activityNote = `${timestamp} • You acted on ${table.name}.`;
+}
+
+function hasRecentMultiActionConfirmation(actionId?: MultiTableActionId): boolean {
+  if (!multiTableState.lastSubmittedActionId || multiTableState.lastSubmittedAtMs === null) {
+    return false;
+  }
+
+  if (Date.now() - multiTableState.lastSubmittedAtMs > MULTI_ACTION_CONFIRM_MS) {
+    return false;
+  }
+
+  if (!actionId) {
+    return true;
+  }
+  return multiTableState.lastSubmittedActionId === actionId;
+}
+
+function queueMultiActionConfirmationReset(): void {
+  if (multiActionConfirmTimerId !== null) {
+    window.clearTimeout(multiActionConfirmTimerId);
+  }
+
+  multiActionConfirmTimerId = window.setTimeout(() => {
+    multiActionConfirmTimerId = null;
+    multiTableState.lastSubmittedActionId = null;
+    multiTableState.lastSubmittedAtMs = null;
+    if (activeView === 'multitable' && lastRenderedModel) {
+      render(appRoot, lastRenderedModel);
+    }
+  }, MULTI_ACTION_CONFIRM_MS);
+}
+
+function isMultiTableDesktopViewport(): boolean {
+  return window.matchMedia(MULTI_TABLE_DESKTOP_MEDIA_QUERY).matches;
 }
 
 function buildQuickAmountPresets(option: ActionOptionDTO | null, fallbackAmount: number, pot: number): number[] {
@@ -808,6 +1990,35 @@ function renderPayouts(model: TableViewModel): string {
   return `<p class="payouts"><strong>Payouts:</strong> ${escapeHtml(lines.join(' | '))}</p>`;
 }
 
+function renderChipFlowLayer(chipFlowPlan: ChipFlowAnimationPlan): string {
+  if (chipFlowPlan.transfers.length === 0) {
+    return '';
+  }
+
+  return [
+    '<div class="chip-flow-layer" aria-hidden="true">',
+    ...chipFlowPlan.transfers.map((transfer) => renderChipTransfer(transfer)),
+    '</div>',
+  ].join('\n');
+}
+
+function renderChipTransfer(transfer: ChipFlowTransfer): string {
+  const seatCoordinate = seatCoordinateById[transfer.seatId] ?? seatCoordinateById[1];
+  const movingToPot = transfer.direction === 'TO_POT';
+  const start = movingToPot ? seatCoordinate : POT_COORDINATE;
+  const end = movingToPot ? POT_COORDINATE : seatCoordinate;
+  const amountLabel = `${movingToPot ? '-' : '+'}${transfer.amount.toLocaleString()}`;
+  const style = [
+    `--chip-start-x: ${start.xPercent}%`,
+    `--chip-start-y: ${start.yPercent}%`,
+    `--chip-end-x: ${end.xPercent}%`,
+    `--chip-end-y: ${end.yPercent}%`,
+    `--chip-delay: ${transfer.delayMs}ms`,
+  ].join('; ');
+
+  return `<span class="chip-transfer ${movingToPot ? 'is-to-pot' : 'is-from-pot'}" style="${style}">${escapeHtml(amountLabel)}</span>`;
+}
+
 function renderLogs(model: TableViewModel): string {
   const logRows = [...model.logs].slice(-28).reverse();
   return logRows
@@ -816,6 +2027,388 @@ function renderLogs(model: TableViewModel): string {
         `<li class="log-${entry.kind.toLowerCase()}"><time>${entry.timestamp}</time><span>${escapeHtml(entry.kind)}:</span><code>${escapeHtml(entry.message)}</code></li>`,
     )
     .join('');
+}
+
+function resolveMotionCue(
+  model: TableViewModel,
+  transitionState: PlayTransitionState,
+  latestEventType: string | null,
+): MotionCue {
+  if (transitionState.handAdvanced) {
+    return 'HAND_STARTED';
+  }
+  if (model.state.phase === 'HAND_COMPLETE' && transitionState.phaseChanged) {
+    return 'HAND_COMPLETE';
+  }
+  if (transitionState.boardAdvanced) {
+    return 'BOARD_DEALT';
+  }
+
+  if (latestEventType?.startsWith('PLAYER_')) {
+    return 'PLAYER_ACTION';
+  }
+
+  if (transitionState.actingSeatChanged || transitionState.userTurnChanged) {
+    return 'TURN_CHANGED';
+  }
+
+  return 'IDLE';
+}
+
+function buildBoardDealAnimationPlan(
+  transitionState: PlayTransitionState,
+  latestEventType: string | null,
+): BoardDealAnimationPlan {
+  if (!transitionState.boardAdvanced) {
+    return {
+      boardClass: '',
+      dealtSlotIndices: [],
+      streetEmphasisIndices: [],
+    };
+  }
+
+  if (latestEventType === 'DEAL_FLOP') {
+    return {
+      boardClass: 'is-flop-deal',
+      dealtSlotIndices: [0, 1, 2],
+      streetEmphasisIndices: [],
+    };
+  }
+
+  if (latestEventType === 'DEAL_TURN') {
+    return {
+      boardClass: 'is-street-deal',
+      dealtSlotIndices: [3],
+      streetEmphasisIndices: [3],
+    };
+  }
+
+  if (latestEventType === 'DEAL_RIVER') {
+    return {
+      boardClass: 'is-street-deal',
+      dealtSlotIndices: [4],
+      streetEmphasisIndices: [4],
+    };
+  }
+
+  const dealtSlotIndices: number[] = [];
+  for (let index = transitionState.previousBoardCount; index < transitionState.boardCount; index += 1) {
+    if (index >= 0 && index < 5) {
+      dealtSlotIndices.push(index);
+    }
+  }
+
+  const streetEmphasisIndices = dealtSlotIndices.length === 1 ? [dealtSlotIndices[0]] : [];
+  return {
+    boardClass: dealtSlotIndices.length > 1 ? 'is-flop-deal' : dealtSlotIndices.length === 1 ? 'is-street-deal' : '',
+    dealtSlotIndices,
+    streetEmphasisIndices,
+  };
+}
+
+function consumeFreshEventLogs(model: TableViewModel): EventLogSnapshot[] {
+  const eventLogs = model.logs.filter((log) => log.kind === 'EVENT');
+  if (eventLogs.length === 0) {
+    lastProcessedEventLogId = null;
+    return [];
+  }
+
+  const latestEventLog = eventLogs[eventLogs.length - 1];
+  if (!latestEventLog) {
+    return [];
+  }
+
+  if (lastProcessedEventLogId === null) {
+    lastProcessedEventLogId = latestEventLog.id;
+    return [];
+  }
+
+  if (latestEventLog.id < lastProcessedEventLogId) {
+    lastProcessedEventLogId = latestEventLog.id;
+    return [];
+  }
+
+  const processedEventLogId = lastProcessedEventLogId;
+  const freshLogs = eventLogs.filter((log) => log.id > processedEventLogId);
+  lastProcessedEventLogId = latestEventLog.id;
+  return freshLogs
+    .map((log) => parseEventLog(log.id, log.message))
+    .filter((event): event is EventLogSnapshot => event !== null);
+}
+
+function parseEventLog(logId: number, message: string): EventLogSnapshot | null {
+  const firstSpace = message.indexOf(' ');
+  const eventType = (firstSpace >= 0 ? message.slice(0, firstSpace) : message).trim();
+  if (!/^[A-Z_]+$/.test(eventType)) {
+    return null;
+  }
+
+  const payloadText = firstSpace >= 0 ? message.slice(firstSpace + 1).trim() : '';
+  const payload = parseEventPayload(payloadText);
+  return {
+    logId,
+    type: eventType,
+    payload,
+  };
+}
+
+function parseEventPayload(payloadText: string): unknown {
+  if (payloadText.length === 0 || (!payloadText.startsWith('{') && !payloadText.startsWith('['))) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(payloadText);
+  } catch {
+    return null;
+  }
+}
+
+function buildChipFlowAnimationPlan(model: TableViewModel, freshEvents: readonly EventLogSnapshot[]): ChipFlowAnimationPlan {
+  const transfers: ChipFlowTransfer[] = [];
+
+  for (const event of freshEvents) {
+    switch (event.type) {
+      case 'BLIND_POSTED': {
+        const transfer = buildSeatAmountTransfer(event.payload, 'amount', 'TO_POT');
+        if (transfer) {
+          transfers.push(transfer);
+        }
+        break;
+      }
+      case 'PLAYER_CALLED': {
+        const transfer = buildSeatAmountTransfer(event.payload, 'amount', 'TO_POT');
+        if (transfer) {
+          transfers.push(transfer);
+        }
+        break;
+      }
+      case 'PLAYER_BET':
+      case 'PLAYER_RAISED':
+      case 'PLAYER_ALL_IN': {
+        const transfer = buildSeatAmountTransfer(event.payload, 'wager', 'TO_POT');
+        if (transfer) {
+          transfers.push(transfer);
+        }
+        break;
+      }
+      case 'HAND_WON_UNCONTESTED': {
+        const transfer = buildSeatAmountTransfer(event.payload, 'amount', 'FROM_POT');
+        if (transfer) {
+          transfers.push(transfer);
+        } else {
+          transfers.push(...buildPayoutTransfers(model.state.payouts));
+        }
+        break;
+      }
+      case 'SHOWDOWN_RESOLVED': {
+        const payoutTransfers = buildPayoutTransfers(model.state.payouts);
+        if (payoutTransfers.length > 0) {
+          transfers.push(...payoutTransfers);
+        } else {
+          transfers.push(...buildPayoutTransfersFromPayload(event.payload));
+        }
+        break;
+      }
+      default:
+        break;
+    }
+  }
+
+  const planTransfers = transfers
+    .filter((transfer) => transfer.amount > 0)
+    .map((transfer, index) => ({
+      ...transfer,
+      delayMs: index * CHIP_FLOW_STAGGER_MS,
+    }));
+
+  if (planTransfers.length === 0) {
+    return {
+      feltClass: '',
+      transfers: [],
+      activityText: null,
+    };
+  }
+
+  const includesPayout = planTransfers.some((transfer) => transfer.direction === 'FROM_POT');
+  const totalToPot = planTransfers
+    .filter((transfer) => transfer.direction === 'TO_POT')
+    .reduce((sum, transfer) => sum + transfer.amount, 0);
+  const totalFromPot = planTransfers
+    .filter((transfer) => transfer.direction === 'FROM_POT')
+    .reduce((sum, transfer) => sum + transfer.amount, 0);
+  return {
+    feltClass: includesPayout ? 'is-chip-flow-collect' : 'is-chip-flow-bet',
+    transfers: planTransfers,
+    activityText: includesPayout
+      ? `Pot settled: ${chips(totalFromPot)} returned to winning seats.`
+      : `Pot pressure: ${chips(totalToPot)} moved to center.`,
+  };
+}
+
+function buildSeatAmountTransfer(
+  payload: unknown,
+  amountKey: 'amount' | 'wager',
+  direction: ChipFlowDirection,
+): ChipFlowTransfer | null {
+  const payloadRecord = toRecord(payload);
+  if (!payloadRecord) {
+    return null;
+  }
+
+  const seatId = readInteger(payloadRecord, 'seatId');
+  const amount = readInteger(payloadRecord, amountKey);
+  if (!seatId || !amount || amount <= 0) {
+    return null;
+  }
+
+  return {
+    seatId,
+    amount,
+    direction,
+    delayMs: 0,
+  };
+}
+
+function buildPayoutTransfersFromPayload(payload: unknown): ChipFlowTransfer[] {
+  const payloadRecord = toRecord(payload);
+  if (!payloadRecord) {
+    return [];
+  }
+
+  const payouts = payloadRecord.payouts;
+  if (!Array.isArray(payouts)) {
+    return [];
+  }
+
+  return payouts
+    .map<ChipFlowTransfer | null>((payout) => {
+      const payoutRecord = toRecord(payout);
+      if (!payoutRecord) {
+        return null;
+      }
+
+      const seatId = readInteger(payoutRecord, 'seatId');
+      const amount = readInteger(payoutRecord, 'amount');
+      if (!seatId || !amount || amount <= 0) {
+        return null;
+      }
+
+      return {
+        seatId,
+        amount,
+        direction: 'FROM_POT' as const,
+        delayMs: 0,
+      };
+    })
+    .filter((transfer): transfer is ChipFlowTransfer => transfer !== null);
+}
+
+function buildPayoutTransfers(
+  payouts: readonly {
+    seatId: number;
+    amount: number;
+  }[],
+): ChipFlowTransfer[] {
+  return payouts
+    .filter((payout) => payout.amount > 0)
+    .map((payout) => ({
+      seatId: payout.seatId,
+      amount: payout.amount,
+      direction: 'FROM_POT' as const,
+      delayMs: 0,
+    }));
+}
+
+function toRecord(value: unknown): Record<string, unknown> | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null;
+  }
+  return value as Record<string, unknown>;
+}
+
+function readInteger(record: Record<string, unknown>, key: string): number | null {
+  const value = record[key];
+  if (typeof value !== 'number' || !Number.isInteger(value)) {
+    return null;
+  }
+  return value;
+}
+
+// Centralized event-to-motion map for both play-table and multi-table screens.
+function buildMotionClassSet(cue: MotionCue): MotionClassSet {
+  switch (cue) {
+    case 'HAND_STARTED':
+      return {
+        shellClass: 'is-cue-hand-started',
+        playFeltClass: 'is-new-hand',
+        playBoardClass: '',
+        playTurnPanelClass: '',
+        playControlsClass: '',
+        multiShellClass: 'is-cue-hand-started',
+        multiFeedClass: '',
+        multiActionClass: '',
+      };
+    case 'BOARD_DEALT':
+      return {
+        shellClass: '',
+        playFeltClass: '',
+        playBoardClass: 'is-board-advance',
+        playTurnPanelClass: '',
+        playControlsClass: '',
+        multiShellClass: '',
+        multiFeedClass: '',
+        multiActionClass: '',
+      };
+    case 'PLAYER_ACTION':
+      return {
+        shellClass: '',
+        playFeltClass: '',
+        playBoardClass: '',
+        playTurnPanelClass: '',
+        playControlsClass: 'is-flash',
+        multiShellClass: '',
+        multiFeedClass: 'is-cue-player-action',
+        multiActionClass: '',
+      };
+    case 'TURN_CHANGED':
+      return {
+        shellClass: '',
+        playFeltClass: '',
+        playBoardClass: '',
+        playTurnPanelClass: 'is-shift',
+        playControlsClass: 'is-flash',
+        multiShellClass: '',
+        multiFeedClass: '',
+        multiActionClass: 'is-cue-turn-changed',
+      };
+    case 'HAND_COMPLETE':
+      return {
+        shellClass: 'is-cue-hand-complete',
+        playFeltClass: '',
+        playBoardClass: '',
+        playTurnPanelClass: '',
+        playControlsClass: 'is-flash',
+        multiShellClass: 'is-cue-hand-complete',
+        multiFeedClass: '',
+        multiActionClass: '',
+      };
+    case 'IDLE':
+      return {
+        shellClass: '',
+        playFeltClass: '',
+        playBoardClass: '',
+        playTurnPanelClass: '',
+        playControlsClass: '',
+        multiShellClass: '',
+        multiFeedClass: '',
+        multiActionClass: '',
+      };
+    default: {
+      const _never: never = cue;
+      return _never;
+    }
+  }
 }
 
 function buildStatusText(model: TableViewModel, isUserTurn: boolean): string {
@@ -935,7 +2528,11 @@ function buildSeatBadges(model: TableViewModel, seatId: number): string {
 }
 
 function formatPhaseLabel(phase: TablePhase): string {
-  return phase
+  return formatTokenLabel(phase);
+}
+
+function formatTokenLabel(value: string): string {
+  return value
     .toLowerCase()
     .split('_')
     .map((word) => `${word.slice(0, 1).toUpperCase()}${word.slice(1)}`)

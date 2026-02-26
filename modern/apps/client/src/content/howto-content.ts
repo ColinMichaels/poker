@@ -5,6 +5,7 @@
  */
 
 export interface HowToGuide {
+  cardExamples: HowToCardExample[];
   id: string;
   name: string;
   title: string;
@@ -14,12 +15,306 @@ export interface HowToGuide {
   sourceFile: string;
 }
 
+export interface HowToCardExample {
+  groupId: string;
+  deckClass: string;
+  label: string;
+  items: HowToCardExampleItem[];
+  cards: HowToCardToken[];
+}
+
+export interface HowToCardExampleItem {
+  kind: 'card' | 'separator';
+  code?: string;
+  hidden?: boolean;
+  text?: string;
+}
+
+export interface HowToCardToken {
+  code: string;
+  hidden: boolean;
+}
+
 export const HOW_TO_GUIDES: HowToGuide[] = [
   {
     "id": "texas-holdem",
     "name": "Texas Holdem",
     "title": "Texas Holdem:",
     "description": "In hold'em, players receive two down cards as their personal hand (holecards), after which there is a round of betting. Three board cards are turned simultaneously (called the flop) and another round of betting occurs. The next two board cards are turned one at a time, with a round of betting after each card. The board cards are community cards, and a player can use any five-card combination from among the board and personal cards. A player can even use all of the board cards and no personal cards to form a hand (\"play the board\"). A dealer button is used. The usual structure is to use two blinds, but it is possible to play the game with one blind, multiple blinds, an ante, or combination of blinds plus an ante.",
+    "cardExamples": [
+      {
+        "label": "Pocket Cards",
+        "cards": [
+          {
+            "code": "AS",
+            "hidden": true
+          },
+          {
+            "code": "AC",
+            "hidden": true
+          }
+        ],
+        "items": [
+          {
+            "kind": "card",
+            "code": "AS",
+            "hidden": true
+          },
+          {
+            "kind": "card",
+            "code": "AC",
+            "hidden": true
+          }
+        ],
+        "groupId": "li-357",
+        "deckClass": "deck"
+      },
+      {
+        "label": "Flop",
+        "cards": [
+          {
+            "code": "4H",
+            "hidden": true
+          },
+          {
+            "code": "10C",
+            "hidden": true
+          },
+          {
+            "code": "7S",
+            "hidden": true
+          }
+        ],
+        "items": [
+          {
+            "kind": "card",
+            "code": "4H",
+            "hidden": true
+          },
+          {
+            "kind": "card",
+            "code": "10C",
+            "hidden": true
+          },
+          {
+            "kind": "card",
+            "code": "7S",
+            "hidden": true
+          }
+        ],
+        "groupId": "li-1041",
+        "deckClass": "deck"
+      },
+      {
+        "label": "Flop + Turn",
+        "cards": [
+          {
+            "code": "4H",
+            "hidden": false
+          },
+          {
+            "code": "10C",
+            "hidden": false
+          },
+          {
+            "code": "7S",
+            "hidden": false
+          },
+          {
+            "code": "KS",
+            "hidden": true
+          }
+        ],
+        "items": [
+          {
+            "kind": "card",
+            "code": "4H",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "10C",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "7S",
+            "hidden": false
+          },
+          {
+            "kind": "separator",
+            "text": "+"
+          },
+          {
+            "kind": "card",
+            "code": "KS",
+            "hidden": true
+          }
+        ],
+        "groupId": "li-2032",
+        "deckClass": "deck"
+      },
+      {
+        "label": "Flop + River",
+        "cards": [
+          {
+            "code": "4H",
+            "hidden": false
+          },
+          {
+            "code": "10C",
+            "hidden": false
+          },
+          {
+            "code": "7S",
+            "hidden": false
+          },
+          {
+            "code": "KS",
+            "hidden": false
+          },
+          {
+            "code": "AS",
+            "hidden": false
+          }
+        ],
+        "items": [
+          {
+            "kind": "card",
+            "code": "4H",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "10C",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "7S",
+            "hidden": false
+          },
+          {
+            "kind": "separator",
+            "text": "+"
+          },
+          {
+            "kind": "card",
+            "code": "KS",
+            "hidden": false
+          },
+          {
+            "kind": "separator",
+            "text": "+"
+          },
+          {
+            "kind": "card",
+            "code": "AS",
+            "hidden": false
+          }
+        ],
+        "groupId": "li-3179",
+        "deckClass": "deck"
+      },
+      {
+        "label": "Turn",
+        "cards": [
+          {
+            "code": "KS",
+            "hidden": false
+          }
+        ],
+        "items": [
+          {
+            "kind": "card",
+            "code": "KS",
+            "hidden": false
+          }
+        ],
+        "groupId": "li-4244",
+        "deckClass": "deck texas-holdem-street"
+      },
+      {
+        "label": "River",
+        "cards": [
+          {
+            "code": "AS",
+            "hidden": false
+          }
+        ],
+        "items": [
+          {
+            "kind": "card",
+            "code": "AS",
+            "hidden": false
+          }
+        ],
+        "groupId": "li-4244",
+        "deckClass": "deck texas-holdem-street"
+      },
+      {
+        "label": "",
+        "cards": [
+          {
+            "code": "4H",
+            "hidden": false
+          },
+          {
+            "code": "10C",
+            "hidden": false
+          },
+          {
+            "code": "7S",
+            "hidden": false
+          },
+          {
+            "code": "KS",
+            "hidden": false
+          },
+          {
+            "code": "AS",
+            "hidden": false
+          }
+        ],
+        "items": [
+          {
+            "kind": "card",
+            "code": "4H",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "10C",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "7S",
+            "hidden": false
+          },
+          {
+            "kind": "separator",
+            "text": "+"
+          },
+          {
+            "kind": "card",
+            "code": "KS",
+            "hidden": false
+          },
+          {
+            "kind": "separator",
+            "text": "+"
+          },
+          {
+            "kind": "card",
+            "code": "AS",
+            "hidden": false
+          }
+        ],
+        "groupId": "li-5085",
+        "deckClass": "deck"
+      }
+    ],
     "rounds": [
       "Opening deal - Each player is dealt two cards face down, which are known as hole cards or pocket cards.",
       "First round of betting - Starting with the player to the left of the big blind, each player can call the big blind, raise, or fold. The big blind has the option to raise an otherwise unraised pot.",
@@ -47,6 +342,89 @@ export const HOW_TO_GUIDES: HowToGuide[] = [
     "name": "Seven Card Stud High Low",
     "title": "Seven-Card Stud High-Low:",
     "description": "Seven-card stud high-low split is a stud game that is played both high and low. A qualifier of 8-or-better for low applies to all high-low split games, unless a specific posting to the contrary is displayed. The low card initiates the action on the first round, with an ace counting as a high card for this purpose. On subsequent rounds, the high hand initiates the action. If the high hand is tied, the first player clockwise from the dealer acts first. Fixed-limit games use the lower limit on third and fourth street and the upper limit on subsequent betting rounds, and an open pair does not affect the limit. Aces can be used for high or low. Straights and flushes do not affect the low value of a hand. A player can use any five cards to make the best high hand, and the same or any other grouping of five cards to make the best low hand.",
+    "cardExamples": [
+      {
+        "label": "",
+        "cards": [
+          {
+            "code": "4H",
+            "hidden": true
+          },
+          {
+            "code": "10C",
+            "hidden": true
+          },
+          {
+            "code": "7S",
+            "hidden": true
+          },
+          {
+            "code": "8S",
+            "hidden": true
+          },
+          {
+            "code": "9S",
+            "hidden": true
+          },
+          {
+            "code": "10S",
+            "hidden": true
+          },
+          {
+            "code": "JS",
+            "hidden": true
+          },
+          {
+            "code": "QS",
+            "hidden": true
+          }
+        ],
+        "items": [
+          {
+            "kind": "card",
+            "code": "4H",
+            "hidden": true
+          },
+          {
+            "kind": "card",
+            "code": "10C",
+            "hidden": true
+          },
+          {
+            "kind": "card",
+            "code": "7S",
+            "hidden": true
+          },
+          {
+            "kind": "card",
+            "code": "8S",
+            "hidden": true
+          },
+          {
+            "kind": "card",
+            "code": "9S",
+            "hidden": true
+          },
+          {
+            "kind": "card",
+            "code": "10S",
+            "hidden": true
+          },
+          {
+            "kind": "card",
+            "code": "JS",
+            "hidden": true
+          },
+          {
+            "kind": "card",
+            "code": "QS",
+            "hidden": true
+          }
+        ],
+        "groupId": "block-74",
+        "deckClass": "deck"
+      }
+    ],
     "rounds": [],
     "rules": [
       "All rules for seven-card stud apply to seven-card stud high-low split, except as otherwise noted.",
@@ -67,6 +445,476 @@ export const HOW_TO_GUIDES: HowToGuide[] = [
     "name": "Seven Card Stud",
     "title": "Seven Card Stud:",
     "description": "Seven-card stud is played with two downcards and one upcard dealt before the first betting round, followed by three more upcards (with a betting round after each card) and one more downcard. After the last downcard is dealt, there is a final round of betting. The best five-card poker hand wins the pot. In all fixed-limit games, the smaller bet is wagered on the first two betting rounds, and the larger bet is wagered after the betting rounds on the fifth, sixth, and seventh cards. If there is an open pair on the fourth card, any player has the option of making the smaller or larger bet. Deliberately changing the order of your upcards in a stud game is improper because it unfairly misleads the other players.",
+    "cardExamples": [
+      {
+        "label": "Flop",
+        "cards": [
+          {
+            "code": "4H",
+            "hidden": true
+          },
+          {
+            "code": "10C",
+            "hidden": true
+          },
+          {
+            "code": "3H",
+            "hidden": false
+          }
+        ],
+        "items": [
+          {
+            "kind": "card",
+            "code": "4H",
+            "hidden": true
+          },
+          {
+            "kind": "card",
+            "code": "10C",
+            "hidden": true
+          },
+          {
+            "kind": "card",
+            "code": "3H",
+            "hidden": false
+          }
+        ],
+        "groupId": "li-433",
+        "deckClass": "deck seven-card-stud-hole"
+      },
+      {
+        "label": "Hole Cards + Door Card",
+        "cards": [
+          {
+            "code": "4H",
+            "hidden": true
+          },
+          {
+            "code": "10C",
+            "hidden": true
+          },
+          {
+            "code": "3H",
+            "hidden": false
+          }
+        ],
+        "items": [
+          {
+            "kind": "card",
+            "code": "4H",
+            "hidden": true
+          },
+          {
+            "kind": "card",
+            "code": "10C",
+            "hidden": true
+          },
+          {
+            "kind": "card",
+            "code": "3H",
+            "hidden": false
+          }
+        ],
+        "groupId": "li-1109",
+        "deckClass": "deck seven-card-stud-hole"
+      },
+      {
+        "label": "4th Street",
+        "cards": [
+          {
+            "code": "4H",
+            "hidden": true
+          },
+          {
+            "code": "10C",
+            "hidden": true
+          },
+          {
+            "code": "3H",
+            "hidden": false
+          },
+          {
+            "code": "JS",
+            "hidden": false
+          }
+        ],
+        "items": [
+          {
+            "kind": "card",
+            "code": "4H",
+            "hidden": true
+          },
+          {
+            "kind": "card",
+            "code": "10C",
+            "hidden": true
+          },
+          {
+            "kind": "card",
+            "code": "3H",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "JS",
+            "hidden": false
+          }
+        ],
+        "groupId": "li-1109",
+        "deckClass": "deck seven-card-stud-hole"
+      },
+      {
+        "label": "Hole Cards + Door Card",
+        "cards": [
+          {
+            "code": "4H",
+            "hidden": true
+          },
+          {
+            "code": "10C",
+            "hidden": true
+          },
+          {
+            "code": "3H",
+            "hidden": false
+          }
+        ],
+        "items": [
+          {
+            "kind": "card",
+            "code": "4H",
+            "hidden": true
+          },
+          {
+            "kind": "card",
+            "code": "10C",
+            "hidden": true
+          },
+          {
+            "kind": "card",
+            "code": "3H",
+            "hidden": false
+          }
+        ],
+        "groupId": "li-2237",
+        "deckClass": "deck seven-card-stud-hole"
+      },
+      {
+        "label": "4th Street",
+        "cards": [
+          {
+            "code": "4H",
+            "hidden": true
+          },
+          {
+            "code": "10C",
+            "hidden": true
+          },
+          {
+            "code": "3H",
+            "hidden": false
+          },
+          {
+            "code": "JS",
+            "hidden": false
+          }
+        ],
+        "items": [
+          {
+            "kind": "card",
+            "code": "4H",
+            "hidden": true
+          },
+          {
+            "kind": "card",
+            "code": "10C",
+            "hidden": true
+          },
+          {
+            "kind": "card",
+            "code": "3H",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "JS",
+            "hidden": false
+          }
+        ],
+        "groupId": "li-2237",
+        "deckClass": "deck seven-card-stud-hole"
+      },
+      {
+        "label": "Hole Cards + Door Card",
+        "cards": [
+          {
+            "code": "4H",
+            "hidden": true
+          },
+          {
+            "code": "10C",
+            "hidden": true
+          },
+          {
+            "code": "3H",
+            "hidden": false
+          }
+        ],
+        "items": [
+          {
+            "kind": "card",
+            "code": "4H",
+            "hidden": true
+          },
+          {
+            "kind": "card",
+            "code": "10C",
+            "hidden": true
+          },
+          {
+            "kind": "card",
+            "code": "3H",
+            "hidden": false
+          }
+        ],
+        "groupId": "li-2237",
+        "deckClass": "deck seven-card-stud-hole"
+      },
+      {
+        "label": "5th Street",
+        "cards": [
+          {
+            "code": "4H",
+            "hidden": true
+          },
+          {
+            "code": "10C",
+            "hidden": true
+          },
+          {
+            "code": "3H",
+            "hidden": false
+          },
+          {
+            "code": "JS",
+            "hidden": false
+          },
+          {
+            "code": "8C",
+            "hidden": false
+          }
+        ],
+        "items": [
+          {
+            "kind": "card",
+            "code": "4H",
+            "hidden": true
+          },
+          {
+            "kind": "card",
+            "code": "10C",
+            "hidden": true
+          },
+          {
+            "kind": "card",
+            "code": "3H",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "JS",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "8C",
+            "hidden": false
+          }
+        ],
+        "groupId": "li-2237",
+        "deckClass": "deck seven-card-stud-hole"
+      },
+      {
+        "label": "Hole Cards + Door Card",
+        "cards": [
+          {
+            "code": "4H",
+            "hidden": true
+          },
+          {
+            "code": "10C",
+            "hidden": true
+          },
+          {
+            "code": "3H",
+            "hidden": false
+          }
+        ],
+        "items": [
+          {
+            "kind": "card",
+            "code": "4H",
+            "hidden": true
+          },
+          {
+            "kind": "card",
+            "code": "10C",
+            "hidden": true
+          },
+          {
+            "kind": "card",
+            "code": "3H",
+            "hidden": false
+          }
+        ],
+        "groupId": "li-4378",
+        "deckClass": "deck seven-card-stud-hole"
+      },
+      {
+        "label": "6th Street",
+        "cards": [
+          {
+            "code": "4H",
+            "hidden": true
+          },
+          {
+            "code": "10C",
+            "hidden": true
+          },
+          {
+            "code": "3H",
+            "hidden": false
+          },
+          {
+            "code": "JS",
+            "hidden": false
+          },
+          {
+            "code": "8C",
+            "hidden": false
+          }
+        ],
+        "items": [
+          {
+            "kind": "card",
+            "code": "4H",
+            "hidden": true
+          },
+          {
+            "kind": "card",
+            "code": "10C",
+            "hidden": true
+          },
+          {
+            "kind": "card",
+            "code": "3H",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "JS",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "8C",
+            "hidden": false
+          }
+        ],
+        "groupId": "li-4378",
+        "deckClass": "deck seven-card-stud-hole"
+      },
+      {
+        "label": "Hole Cards + Door Card",
+        "cards": [
+          {
+            "code": "4H",
+            "hidden": true
+          },
+          {
+            "code": "10C",
+            "hidden": true
+          },
+          {
+            "code": "3H",
+            "hidden": false
+          }
+        ],
+        "items": [
+          {
+            "kind": "card",
+            "code": "4H",
+            "hidden": true
+          },
+          {
+            "kind": "card",
+            "code": "10C",
+            "hidden": true
+          },
+          {
+            "kind": "card",
+            "code": "3H",
+            "hidden": false
+          }
+        ],
+        "groupId": "li-5576",
+        "deckClass": "deck seven-card-stud-hole"
+      },
+      {
+        "label": "River",
+        "cards": [
+          {
+            "code": "4H",
+            "hidden": true
+          },
+          {
+            "code": "10C",
+            "hidden": true
+          },
+          {
+            "code": "3H",
+            "hidden": false
+          },
+          {
+            "code": "JS",
+            "hidden": false
+          },
+          {
+            "code": "8C",
+            "hidden": false
+          }
+        ],
+        "items": [
+          {
+            "kind": "card",
+            "code": "4H",
+            "hidden": true
+          },
+          {
+            "kind": "card",
+            "code": "10C",
+            "hidden": true
+          },
+          {
+            "kind": "card",
+            "code": "3H",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "JS",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "8C",
+            "hidden": false
+          }
+        ],
+        "groupId": "li-5576",
+        "deckClass": "deck seven-card-stud-hole"
+      }
+    ],
     "rounds": [
       "Each player must place an ante into the pot.",
       "Each player is dealt two cards face down (hole cards) and one card face up (door card)",
@@ -109,6 +957,205 @@ export const HOW_TO_GUIDES: HowToGuide[] = [
     "name": "Omaha",
     "title": "Ohmaha:",
     "description": "Omaha is similar to hold'em in using a three-card flop on the board, a fourth board card, and then a fifth board card. Each player is dealt four hole cards (instead of two) at the start. To make a hand, a player must use precisely two hole cards with three board cards. The betting is the same as in hold'em. At the showdown, the entire four-card hand should be shown to receive the pot.",
+    "cardExamples": [
+      {
+        "label": "Pocket Cards",
+        "cards": [
+          {
+            "code": "3H",
+            "hidden": true
+          },
+          {
+            "code": "JS",
+            "hidden": true
+          },
+          {
+            "code": "8C",
+            "hidden": true
+          },
+          {
+            "code": "2C",
+            "hidden": true
+          }
+        ],
+        "items": [
+          {
+            "kind": "card",
+            "code": "3H",
+            "hidden": true
+          },
+          {
+            "kind": "card",
+            "code": "JS",
+            "hidden": true
+          },
+          {
+            "kind": "card",
+            "code": "8C",
+            "hidden": true
+          },
+          {
+            "kind": "card",
+            "code": "2C",
+            "hidden": true
+          }
+        ],
+        "groupId": "li-229",
+        "deckClass": "deck omaha-pocket"
+      },
+      {
+        "label": "",
+        "cards": [
+          {
+            "code": "3H",
+            "hidden": false
+          },
+          {
+            "code": "JS",
+            "hidden": false
+          },
+          {
+            "code": "8C",
+            "hidden": false
+          }
+        ],
+        "items": [
+          {
+            "kind": "card",
+            "code": "3H",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "JS",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "8C",
+            "hidden": false
+          }
+        ],
+        "groupId": "li-850",
+        "deckClass": "deck omaha-flop"
+      },
+      {
+        "label": "Flop",
+        "cards": [
+          {
+            "code": "3H",
+            "hidden": false
+          },
+          {
+            "code": "JS",
+            "hidden": false
+          },
+          {
+            "code": "8C",
+            "hidden": false
+          }
+        ],
+        "items": [
+          {
+            "kind": "card",
+            "code": "3H",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "JS",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "8C",
+            "hidden": false
+          }
+        ],
+        "groupId": "li-1445",
+        "deckClass": "deck omaha-flop"
+      },
+      {
+        "label": "Turn",
+        "cards": [
+          {
+            "code": "KD",
+            "hidden": false
+          }
+        ],
+        "items": [
+          {
+            "kind": "card",
+            "code": "KD",
+            "hidden": false
+          }
+        ],
+        "groupId": "li-1445",
+        "deckClass": "deck texas-holdem-street"
+      },
+      {
+        "label": "Flop + River",
+        "cards": [
+          {
+            "code": "3H",
+            "hidden": false
+          },
+          {
+            "code": "JS",
+            "hidden": false
+          },
+          {
+            "code": "8C",
+            "hidden": false
+          },
+          {
+            "code": "KD",
+            "hidden": false
+          },
+          {
+            "code": "AH",
+            "hidden": false
+          }
+        ],
+        "items": [
+          {
+            "kind": "card",
+            "code": "3H",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "JS",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "8C",
+            "hidden": false
+          },
+          {
+            "kind": "separator",
+            "text": "+"
+          },
+          {
+            "kind": "card",
+            "code": "KD",
+            "hidden": false
+          },
+          {
+            "kind": "separator",
+            "text": "+"
+          },
+          {
+            "kind": "card",
+            "code": "AH",
+            "hidden": false
+          }
+        ],
+        "groupId": "li-2276",
+        "deckClass": "deck omaha-flop"
+      }
+    ],
     "rounds": [
       "The dealer deals each player four cards face down (hole cards or pocket cards)",
       "First betting round.",
@@ -133,6 +1180,116 @@ export const HOW_TO_GUIDES: HowToGuide[] = [
     "name": "Lowball",
     "title": "Lowball:",
     "description": "Lowball is draw poker with the lowest hand winning the pot. Each player is dealt five cards face down, after which there is a betting round. Players are required to open with a bet or fold. The players who remain in the pot after the first betting round now have an option to improve their hands by replacing cards in their hands with new ones. This is the draw. The game is normally played with one or more blinds, sometimes with an ante added. Some betting structures allow the big blind to be called; other structures require the minimum open to be double the big blind. In limit poker, the usual structure has the limit double after the draw (Northern California is an exception.) The most popular forms of lowball are ace-to-five lowball (also known as California lowball), and deuce-to-seven lowball (also known as Kansas City lowball). Ace-to-five lowball gets its name because the best hand at that form is 5-4-3-2-A. Deuce-to-seven lowball gets its name because the best hand at that form is 7-5-4-3-2 (not of the same suit). For a further description of the forms of lowball, see the individual section for each game. All rules governing kill pots are listed in Kill Pots.",
+    "cardExamples": [
+      {
+        "label": "Ace-to-Five Wheel (Best Low)",
+        "cards": [
+          {
+            "code": "5C",
+            "hidden": false
+          },
+          {
+            "code": "4D",
+            "hidden": false
+          },
+          {
+            "code": "3H",
+            "hidden": false
+          },
+          {
+            "code": "2S",
+            "hidden": false
+          },
+          {
+            "code": "AC",
+            "hidden": false
+          }
+        ],
+        "items": [
+          {
+            "kind": "card",
+            "code": "5C",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "4D",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "3H",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "2S",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "AC",
+            "hidden": false
+          }
+        ],
+        "groupId": "supplemental-lowball-0",
+        "deckClass": "deck supplemental"
+      },
+      {
+        "label": "Deuce-to-Seven 7-5 Low",
+        "cards": [
+          {
+            "code": "7C",
+            "hidden": false
+          },
+          {
+            "code": "5D",
+            "hidden": false
+          },
+          {
+            "code": "4S",
+            "hidden": false
+          },
+          {
+            "code": "3H",
+            "hidden": false
+          },
+          {
+            "code": "2D",
+            "hidden": false
+          }
+        ],
+        "items": [
+          {
+            "kind": "card",
+            "code": "7C",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "5D",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "4S",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "3H",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "2D",
+            "hidden": false
+          }
+        ],
+        "groupId": "supplemental-lowball-1",
+        "deckClass": "deck supplemental"
+      }
+    ],
     "rounds": [],
     "rules": [
       "The rules governing misdeals for hold'em and other button games are used for lowball. See Explanations, discussion #7 , for more information on this rule.",
@@ -187,6 +1344,80 @@ export const HOW_TO_GUIDES: HowToGuide[] = [
     "name": "Mississippi Stud",
     "title": "Mississippi Stud:",
     "description": "The best five-card poker hand, out of seven cards, wins the pot.",
+    "cardExamples": [
+      {
+        "label": "Seven-Card Sample (Best Five: Broadway Straight)",
+        "cards": [
+          {
+            "code": "AS",
+            "hidden": false
+          },
+          {
+            "code": "KD",
+            "hidden": false
+          },
+          {
+            "code": "QH",
+            "hidden": false
+          },
+          {
+            "code": "JC",
+            "hidden": false
+          },
+          {
+            "code": "10S",
+            "hidden": false
+          },
+          {
+            "code": "4D",
+            "hidden": false
+          },
+          {
+            "code": "2C",
+            "hidden": false
+          }
+        ],
+        "items": [
+          {
+            "kind": "card",
+            "code": "AS",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "KD",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "QH",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "JC",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "10S",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "4D",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "2C",
+            "hidden": false
+          }
+        ],
+        "groupId": "supplemental-mississippi-stud-0",
+        "deckClass": "deck supplemental"
+      }
+    ],
     "rounds": [
       "Low ante games: Ante, one unit; bring-in, two units, complete, 10 units. The maximum bet for the first two rounds is 10 units. Bets double to 20 units for the third and fourth rounds.",
       "High ante: Ante, four units; bring-in, five units; raise, 10 units. Bets double to 20 units for the third and fourth rounds."
@@ -199,6 +1430,80 @@ export const HOW_TO_GUIDES: HowToGuide[] = [
     "name": "Razz",
     "title": "Razz:",
     "description": "The lowest hand wins the pot. The format is similar to seven-card stud high, except the high card (aces are low) is required to make the forced bet on the first round, and the low hand acts first on all subsequent rounds. Straights and flushes have no ranking, so the best possible hand is 5-4-3-2-A (a wheel). An open pair does not affect the betting limit.",
+    "cardExamples": [
+      {
+        "label": "Wheel Low from Seven Cards",
+        "cards": [
+          {
+            "code": "AC",
+            "hidden": false
+          },
+          {
+            "code": "2D",
+            "hidden": false
+          },
+          {
+            "code": "3S",
+            "hidden": false
+          },
+          {
+            "code": "4H",
+            "hidden": false
+          },
+          {
+            "code": "5C",
+            "hidden": false
+          },
+          {
+            "code": "KD",
+            "hidden": false
+          },
+          {
+            "code": "QS",
+            "hidden": false
+          }
+        ],
+        "items": [
+          {
+            "kind": "card",
+            "code": "AC",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "2D",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "3S",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "4H",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "5C",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "KD",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "QS",
+            "hidden": false
+          }
+        ],
+        "groupId": "supplemental-razz-0",
+        "deckClass": "deck supplemental"
+      }
+    ],
     "rounds": [],
     "rules": [
       "All seven-card stud rules apply in razz except as otherwise noted.",
@@ -214,6 +1519,116 @@ export const HOW_TO_GUIDES: HowToGuide[] = [
     "name": "Jacks or Better",
     "title": "Draw Jacks or Better:",
     "description": "The lowest hand wins the pot. The format is similar to seven-card stud high, except the high card (aces are low) is required to make the forced bet on the first round, and the low hand acts first on all subsequent rounds. Straights and flushes have no ranking, so the best possible hand is 5-4-3-2-A (a wheel). An open pair does not affect the betting limit.",
+    "cardExamples": [
+      {
+        "label": "Openers: Pair of Jacks",
+        "cards": [
+          {
+            "code": "JH",
+            "hidden": false
+          },
+          {
+            "code": "JD",
+            "hidden": false
+          },
+          {
+            "code": "9C",
+            "hidden": false
+          },
+          {
+            "code": "4S",
+            "hidden": false
+          },
+          {
+            "code": "2D",
+            "hidden": false
+          }
+        ],
+        "items": [
+          {
+            "kind": "card",
+            "code": "JH",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "JD",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "9C",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "4S",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "2D",
+            "hidden": false
+          }
+        ],
+        "groupId": "supplemental-jacks-or-better-0",
+        "deckClass": "deck supplemental"
+      },
+      {
+        "label": "Draw to Royal Flush",
+        "cards": [
+          {
+            "code": "AS",
+            "hidden": false
+          },
+          {
+            "code": "KS",
+            "hidden": false
+          },
+          {
+            "code": "QS",
+            "hidden": false
+          },
+          {
+            "code": "JS",
+            "hidden": false
+          },
+          {
+            "code": "2C",
+            "hidden": false
+          }
+        ],
+        "items": [
+          {
+            "kind": "card",
+            "code": "AS",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "KS",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "QS",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "JS",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "2C",
+            "hidden": false
+          }
+        ],
+        "groupId": "supplemental-jacks-or-better-1",
+        "deckClass": "deck supplemental"
+      }
+    ],
     "rounds": [],
     "rules": [
       "A pair of jacks or better is required to open the pot. If no player opens the pot, the button moves forward and each player must ante again, unless the limit of antes has been reached for that particular game. (Most games allow three consecutive deals before anteing stops.)",
@@ -235,6 +1650,116 @@ export const HOW_TO_GUIDES: HowToGuide[] = [
     "name": "Draw High",
     "title": "DrawHigh:",
     "description": "There are two betting rounds, one before the draw and one after the draw. The game is played with a button and an ante. Players in turn can check, open for the minimum, or open with a raise. After the first betting round, players have the opportunity to draw new cards to replace the ones they discard. Action after the draw starts with the opener, or next player proceeding clockwise if the opener has folded. The betting limit after the draw is twice the amount of the betting limit before the draw. Some draw high games allow a player to open with any holding; others require the opener to have a pair of jacks or better.",
+    "cardExamples": [
+      {
+        "label": "Pat Straight",
+        "cards": [
+          {
+            "code": "9C",
+            "hidden": false
+          },
+          {
+            "code": "8D",
+            "hidden": false
+          },
+          {
+            "code": "7H",
+            "hidden": false
+          },
+          {
+            "code": "6S",
+            "hidden": false
+          },
+          {
+            "code": "5C",
+            "hidden": false
+          }
+        ],
+        "items": [
+          {
+            "kind": "card",
+            "code": "9C",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "8D",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "7H",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "6S",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "5C",
+            "hidden": false
+          }
+        ],
+        "groupId": "supplemental-draw-high-0",
+        "deckClass": "deck supplemental"
+      },
+      {
+        "label": "Made Full House",
+        "cards": [
+          {
+            "code": "KH",
+            "hidden": false
+          },
+          {
+            "code": "KD",
+            "hidden": false
+          },
+          {
+            "code": "KC",
+            "hidden": false
+          },
+          {
+            "code": "4S",
+            "hidden": false
+          },
+          {
+            "code": "4D",
+            "hidden": false
+          }
+        ],
+        "items": [
+          {
+            "kind": "card",
+            "code": "KH",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "KD",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "KC",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "4S",
+            "hidden": false
+          },
+          {
+            "kind": "card",
+            "code": "4D",
+            "hidden": false
+          }
+        ],
+        "groupId": "supplemental-draw-high-1",
+        "deckClass": "deck supplemental"
+      }
+    ],
     "rounds": [],
     "rules": [
       "A maximum of one bet and four raises is permitted in multihanded pots. See Explanations, discussion #6 , for more information on this rule.",

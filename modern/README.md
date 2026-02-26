@@ -20,6 +20,7 @@ See `docs/developer-setup.md` for full setup/troubleshooting.
 See `docs/legacy-decommission-plan.md` for the staged plan to make modern the primary codebase.
 See `docs/legacy-removal-execution.md` for the final legacy removal runbook.
 See `docs/deployment-runbook.md` for modern runtime deployment entrypoints/checks.
+See `docs/client-animation-roadmap.md` for planned gameplay animation improvements.
 
 ## Commands
 
@@ -29,10 +30,11 @@ From `modern/`:
 - `npm install` - install all workspace dependencies
 - `npm run dev:client` - run client dev server
 - `npm run dev:server` - run authoritative server in watch mode
-- `npm run ci` - run typecheck + build + engine tests + server tests
+- `npm run ci` - run typecheck + build + client tests + engine tests + server tests
 - `npm run check:legacy-refs` - verify modern runtime source does not introduce new `legacy/` path references
 - `npm run check:server-env-template` - verify `apps/server/.env.example` includes required server env keys
 - `npm run typecheck` - run TypeScript checks across all workspaces
+- `npm run test:client` - run client regression tests (multi-table legality/runtime wiring)
 - `npm run build:server` - compile the server workspace
 - `npm run test:server` - run server hand lifecycle + auth/wallet tests
 - `npm run generate:howto-content` - extract legacy `HowTo` Vue content into modern typed guide data

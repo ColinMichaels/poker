@@ -708,3 +708,363 @@ Sources:
 
 - `apps/client/src/main.ts`
 - `apps/client/src/styles.css`
+
+## PR AM Progress: Action Input Stability + Accessibility States
+
+- Added target-bet draft amount persistence in play view so typed values survive normal re-renders during active gameplay updates.
+- Added reset guardrails for draft amount state when:
+  - hand transitions to a new hand
+  - table controller remounts for a different selected seat
+- Added mobile-friendly numeric entry semantics for target bet input:
+  - `inputmode="numeric"`
+  - number-pattern hint
+- Added accessibility state semantics:
+  - `aria-pressed` on view tabs, lobby table cards, lobby seat cards, and How To guide tabs
+  - amount-aware aria labels on action buttons and quick amount preset buttons
+
+Sources:
+
+- `apps/client/src/main.ts`
+
+## PR AN Progress: Multi-Table UI Screen + Thumb Action Bar
+
+- Added a new multi-table UI screen and composition in `apps/client`:
+  - open-table rail with mock table cards
+  - table-stage board preview and seat-status ring
+  - activity feed panel for recent hand updates
+- Added thumb-reachable mobile action controls:
+  - fixed bottom action bar
+  - large touch-target action buttons
+  - raise amount controls (number input, range slider, step buttons)
+- Added desktop layout behavior at `>=1024px`:
+  - action bar transitions to sticky side rail
+  - stage/feed region expands into multi-column composition
+- Added basic desktop keyboard support for the new action bar:
+  - `F/K/C/R/A` action shortcuts
+  - `ArrowLeft/ArrowRight` action cycling
+  - `Enter` action confirmation
+- Added explicit responsive behavior comments in client TS/CSS for the new screen.
+
+Sources:
+
+- `apps/client/src/main.ts`
+- `apps/client/src/styles.css`
+
+## PR AO Progress: Hand Randomization Upgrade + Animation Roadmap
+
+- Upgraded local table hand randomization in `apps/client`:
+  - replaced simple sequential hand seeds with runtime entropy-based seed generation
+  - randomized initial dealer seat selection at table bootstrap
+  - switched bot action randomness to a per-hand seeded RNG stream (instead of direct `Math.random` calls)
+- Improved local seat identity mapping:
+  - selected user seat now initializes as `you` in seat definitions at controller creation time
+- Added client animation planning artifact:
+  - `docs/client-animation-roadmap.md` with phased implementation plan for gameplay motion
+
+Sources:
+
+- `apps/client/src/table-controller.ts`
+- `docs/client-animation-roadmap.md`
+
+## PR AP Progress: Phase 1 Motion System Wiring
+
+- Added centralized event-to-motion cue mapping in `apps/client/src/main.ts`:
+  - cue resolution from render transition state + latest domain event log
+  - mapped cues:
+    - `HAND_STARTED`
+    - `BOARD_DEALT`
+    - `PLAYER_ACTION`
+    - `TURN_CHANGED`
+    - `HAND_COMPLETE`
+- Applied shared motion cue classes across both:
+  - play-table screen (felt/board/turn panel/action dock)
+  - multi-table screen (shell/feed/action bar)
+- Added reusable motion tokens in `styles.css`:
+  - duration tokens (`--motion-fast/mid/slow`)
+  - easing tokens (`--easing-emphasis/soft`)
+- Updated key animation timings to consume motion tokens for consistent pacing.
+
+Sources:
+
+- `apps/client/src/main.ts`
+- `apps/client/src/styles.css`
+
+## PR AQ Progress: Event-Driven Board Deal Sequencing
+
+- Added board-deal animation planning in `apps/client/src/main.ts` that uses actual latest deal events:
+  - `DEAL_FLOP`
+  - `DEAL_TURN`
+  - `DEAL_RIVER`
+- Added staged flop animation timing:
+  - per-card stagger delays at ~70ms intervals via inline `--deal-delay`
+- Added turn/river single-card emphasis:
+  - street-deal classing + card emphasis pulse state
+- Added CSS hooks/keyframes for staged board dealing:
+  - `is-flop-deal`
+  - `is-street-deal`
+  - `street-pop`
+
+Sources:
+
+- `apps/client/src/main.ts`
+- `apps/client/src/styles.css`
+
+## PR AR Progress: Chip Flow Event Bursts + Pot Transfer Motion
+
+- Added event-burst parsing in client rendering so motion cues use only newly-arrived domain events (avoids repeated replay during resize/view toggles).
+- Added chip-transfer animation planning for fresh events:
+  - seat-to-pot contributions:
+    - `BLIND_POSTED`
+    - `PLAYER_CALLED`
+    - `PLAYER_BET`
+    - `PLAYER_RAISED`
+    - `PLAYER_ALL_IN`
+  - pot-to-seat payout trails:
+    - `HAND_WON_UNCONTESTED`
+    - `SHOWDOWN_RESOLVED` (with `state.payouts` fallback for truncated log payloads)
+- Added felt overlay transfer trails and visual cue classes:
+  - `is-chip-flow-bet`
+  - `is-chip-flow-collect`
+  - animated `chip-transfer` overlays with staggered timing
+- Added multi-table feed chip-flow cue styling and activity line injection for payout/contribution moments.
+
+Sources:
+
+- `apps/client/src/main.ts`
+- `apps/client/src/styles.css`
+
+## PR AS Progress: HowTo Legacy Card Example Restoration
+
+- Extended HowTo content generator to extract legacy card-example rows from `rounds` slot markup:
+  - parses `div.cards` groups
+  - captures card code (`name`) and hidden/face-up state from `is_flipped`
+  - captures nearest deck labels (`h6`) when present
+- Added generated guide contract fields:
+  - `HowToCardExample`
+  - `HowToCardToken`
+  - `HowToGuide.cardExamples`
+- Updated modern How To view rendering to display extracted card rows using existing SVG card assets and hidden-card backs.
+- Added responsive styling for card-example rows and horizontal card strips in the How To screen.
+
+Sources:
+
+- `scripts/generate-howto-content.mjs`
+- `apps/client/src/content/howto-content.ts`
+- `apps/client/src/main.ts`
+- `apps/client/src/styles.css`
+
+## PR AT Progress: HowTo Flip-Card Interaction Parity
+
+- Added interactive flip-card behavior to modern How To card examples:
+  - click/tap toggles per-card front/back state
+  - initial state honors extracted legacy visibility (`is_flipped` semantics)
+- Added per-card UI state tracking keyed by guide/example/card index so toggles persist across routine re-renders.
+- Implemented modern flip-card rendering with front/back SVG faces and 3D rotate transitions.
+- Added keyboard accessibility via button semantics and visible focus styling for example cards.
+
+Sources:
+
+- `apps/client/src/main.ts`
+- `apps/client/src/styles.css`
+
+## PR AU Progress: HowTo Visual Sequence Extraction (Separators + Labels)
+
+- Extended HowTo extraction output with ordered example item sequences:
+  - supports both card tokens and separator tokens (`+`) from legacy deck markup
+  - preserves in-row visual composition used in legacy round examples
+- Improved extracted example labeling:
+  - normalizes deck labels (`Flop`, `Turn`, `River`, `Hole Cards`, `Door Card`)
+  - de-duplicates near-equivalent labels from `h6` and list-item `strong` text
+- Updated modern How To renderer to consume ordered example sequences:
+  - renders separator tokens between interactive flip-cards
+  - keeps per-card flip indexing stable while non-card tokens are present
+- Updated How To card-row layout styling for mixed token sequences.
+
+Sources:
+
+- `scripts/generate-howto-content.mjs`
+- `apps/client/src/content/howto-content.ts`
+- `apps/client/src/main.ts`
+- `apps/client/src/styles.css`
+
+## PR AV Progress: Deck-Container Grouping Preservation for HowTo Examples
+
+- Extended HowTo extraction schema to carry deck-container metadata per example:
+  - `groupId` (parent legacy list-item grouping)
+  - `deckClass` (legacy deck container class list)
+- Updated modern How To renderer to group adjacent examples by shared `groupId`, preserving multi-deck compositions from legacy round steps.
+- Added deck-class-aware row styling hooks for common legacy patterns:
+  - `texas-holdem-street`
+  - `seven-card-stud-hole`
+  - `omaha-pocket`
+- Retained interactive flip-card behavior and separator token rendering within grouped deck layouts.
+
+Sources:
+
+- `scripts/generate-howto-content.mjs`
+- `apps/client/src/content/howto-content.ts`
+- `apps/client/src/main.ts`
+- `apps/client/src/styles.css`
+
+## PR AW Progress: HowTo Repeated Example Preservation
+
+- Removed cross-example de-duplication from HowTo card-example extraction so legacy round visuals are preserved one-to-one in source order.
+- Restored missing repeated sequence rows for `SevenCardStud`:
+  - modern generated card examples now match legacy block count (`11` extracted rows).
+- Kept all prior sequence/group metadata behavior (`items`, `groupId`, `deckClass`) while restoring repeated rows.
+
+Sources:
+
+- `scripts/generate-howto-content.mjs`
+- `apps/client/src/content/howto-content.ts`
+
+## PR AX Progress: Supplemental Hand Examples for Remaining Game Types
+
+- Added generator-managed supplemental hand examples for game guides with no legacy card markup blocks:
+  - `lowball`
+  - `mississippi-stud`
+  - `razz`
+  - `jacks-or-better`
+  - `draw-high`
+- Wired supplemental examples as a fallback only when extracted `rounds` card examples are empty, preserving legacy-first behavior for guides that already provide deck markup.
+- Added card-code validation for supplemental definitions during generation to fail fast on bad example data.
+
+Sources:
+
+- `scripts/generate-howto-content.mjs`
+- `apps/client/src/content/howto-content.ts`
+
+## PR AY Progress: Hand-Aware Bot Decision Mechanics
+
+- Upgraded local gameplay bot action selection from simple pressure-only behavior to hand-aware decisioning in client table simulation:
+  - preflop hole-card strength scoring (pairs, broadway strength, suited/connectivity, wheel potential)
+  - postflop evaluated hand strength via engine `evaluateBestHand`
+  - draw-aware bonuses for flush/straight draw potential and two-overcards flop pressure
+- Added deterministic per-bot behavior profiles derived from seat/player identity:
+  - tightness
+  - aggression
+  - bluff rate
+  - gamble rate
+- Integrated pot-pressure and pot-odds-aware thresholds so fold/call/raise decisions better reflect hand quality and risk.
+- Updated bet/raise sizing to scale with evaluated hand strength and profile tendencies rather than fixed fractions.
+
+Sources:
+
+- `apps/client/src/table-controller.ts`
+
+## PR AZ Progress: Board-Texture + Short-Stack Bot Mechanics
+
+- Added board texture profiling to local bot decisioning:
+  - `wetness` (suitedness + rank connectivity + broadway concentration)
+  - `pairedness`
+  - `broadwayPressure`
+- Integrated texture-aware risk/aggression adjustments into betting decisions:
+  - stronger value pressure on wet boards with made strength
+  - reduced bluff frequency on high-risk/paired textures
+  - tighter call-down thresholds for weak holdings on wet boards
+- Added short-stack preflop push/fold behavior:
+  - shove thresholds when stack depth is low in big-blind terms
+  - fold-down thresholds when facing pressure without sufficient hand strength
+- Tuned bet/raise sizing to scale with both hand strength and board texture intensity.
+
+Sources:
+
+- `apps/client/src/table-controller.ts`
+
+## PR BA Progress: Position-Aware + Raise-Pressure Bot Mechanics
+
+- Added seat-position awareness for local bot strategy:
+  - computes relative position advantage from button order among currently contesting seats
+  - biases late-position bots toward wider aggression and earlier positions toward tighter lines
+- Added preflop raise-pressure context:
+  - open-raise pressure detection
+  - 3-bet pressure detection
+  - folds/calls/raises now adapt to raise pressure severity
+- Added heads-up adaptation:
+  - modest aggression and defend-frequency boost when only one opponent remains
+- Integrated position/pressure signals into:
+  - effective hand strength normalization
+  - short-stack push/fold thresholds
+  - surrender/call/raise probabilities
+  - continuation sizing tendencies
+
+Sources:
+
+- `apps/client/src/table-controller.ts`
+
+## PR BB Progress: Opponent-Memory Bot Adaptation
+
+- Added rolling per-seat action memory tracking for local simulation bots:
+  - tracked actions: `FOLD`, `CHECK`, `CALL`, `BET`, `RAISE`, `ALL_IN`
+  - capped rolling history window to recent actions per seat
+- Added memory-derived influence metrics used by bot decisioning:
+  - self aggression continuity
+  - average opponent aggression
+  - average opponent fold rate
+  - dominant opponent aggression pressure
+- Integrated memory signals into core decision thresholds:
+  - effective strength normalization
+  - bluff frequency gates
+  - raise/call/fold/jam probability tuning
+
+Sources:
+
+- `apps/client/src/table-controller.ts`
+
+## PR BC Progress: Multi-Table Urgency + Action Confirmation Feedback
+
+- Added pending-decision micro-state for multi-table rail cards:
+  - per-table pending-decision counts
+  - explicit `Acting now` state when the user is on the clock
+  - urgency styling for pending/acting tables
+- Added action-bar urgency and confirmation feedback:
+  - persistent on-turn action-bar emphasis
+  - short-lived confirmation pulse on selected action and primary confirm button
+- Added dynamic pending-queue messaging in multi-table activity/feed and action-head turn status text.
+
+Sources:
+
+- `apps/client/src/main.ts`
+- `apps/client/src/styles.css`
+
+## PR BD Progress: Multi-Table Live Runtime Wiring
+
+- Replaced mock pending-decision bookkeeping with live engine-backed table state in multi-table view:
+  - each table card now reads pending/acting state from a real `LocalTableController` instance
+  - pending queue counts now derive from actual `actingSeatId` + legal betting phase state
+- Wired multi-table action bar to real command execution:
+  - selected multi-table actions now map to current legal engine actions (`RAISE` fallback to `BET` when needed)
+  - action buttons/primary confirm now disable when action is illegal or table is not on user turn
+  - raise amount bounds now clamp against live min/max targets from legal action DTOs
+- Added live per-table gameplay data into multi-table stage:
+  - board preview, seat ring statuses, live pot, and latest event summary now come from controller state/logs
+- Added automatic next-hand continuation for background multi-table controllers after `HAND_COMPLETE` so table flow remains active.
+
+Sources:
+
+- `apps/client/src/main.ts`
+- `apps/client/src/styles.css`
+
+## PR BE Progress: Client Regression Tests for Multi-Table Action Legality
+
+- Added a dedicated multi-table legality/pending-state logic module in client runtime:
+  - legal action intent mapping (`RAISE` -> `RAISE` or fallback `BET`)
+  - available action projection
+  - selection normalization
+  - target-bet min/max bounds projection
+  - pending-decision derivation from phase + acting seat
+- Added Vitest coverage for multi-table gameplay control invariants:
+  - raise-intent fallback behavior
+  - disabled/available action derivation
+  - selection normalization on illegal current choice
+  - raise-bound clamping source behavior
+  - pending-turn detection behavior
+- Added client workspace test scripts and integrated client tests into canonical modern CI.
+
+Sources:
+
+- `apps/client/src/multi-table-logic.ts`
+- `apps/client/tests/multi-table-logic.test.ts`
+- `apps/client/src/main.ts`
+- `apps/client/package.json`
+- `package.json`
