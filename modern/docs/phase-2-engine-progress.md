@@ -388,3 +388,20 @@ Sources:
 
 - `docs/legacy-removal-execution.md`
 - `README.md`
+
+## PR P Progress: Password Hash Format Hardening
+
+- Added password-hash format validation during auth user normalization:
+  - accepts only `scrypt$<salt-hex>$<digest-hex>` for hash inputs
+- Added compatibility migration for legacy plaintext values found in `passwordHash`.
+- Added rejection path for unsupported hash formats to fail fast on startup.
+- Added auth regression tests:
+  - legacy plaintext `passwordHash` migration
+  - unsupported `passwordHash` format rejection
+
+Sources:
+
+- `apps/server/src/auth-wallet-service.ts`
+- `apps/server/src/auth-wallet-service.test.ts`
+- `apps/server/README.md`
+- `docs/deployment-runbook.md`

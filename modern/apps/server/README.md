@@ -90,4 +90,5 @@ Bootstrap users file:
 - Example file: `modern/apps/server/bootstrap-users.example.json`
 - Record fields:
   - required: `email` and one of `password` or `passwordHash`
+  - `passwordHash` must be a salted `scrypt$<salt-hex>$<digest-hex>` value
   - optional: `id`, `firstName`, `lastName`, `walletBalance`, `wins`, `gamesPlayed`, `walletUpdatedAt`, `walletLedger`

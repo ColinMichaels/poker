@@ -155,6 +155,14 @@ These are not extraction failures, but they are blockers to deleting the legacy 
   - `modern/docs/legacy-removal-execution.md`
 - Linked removal runbook from root + modern workspace documentation.
 
+## Completed in PR P
+
+- Hardened bootstrap credential handling in auth service:
+  - validates `passwordHash` format (`scrypt$<salt-hex>$<digest-hex>`)
+  - migrates legacy plaintext values in `passwordHash` to salted scrypt hash
+  - rejects unsupported hash formats at service startup
+- Added regression tests for password-hash compatibility and format rejection.
+
 ## Known Intentional Asset Exceptions
 
 - Non-canonical card extras remain excluded from canonical face set:
@@ -222,6 +230,7 @@ Exit criteria:
 13. PR M: Canonical modern CI script and workflow alignment.
 14. PR N: Runtime legacy-reference guard in modern CI.
 15. PR O: Legacy removal execution runbook and doc linkage.
+16. PR P: Password-hash format validation and legacy credential migration hardening.
 
 ## Cutover Go/No-Go Checklist
 

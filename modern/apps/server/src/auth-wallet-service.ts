@@ -178,6 +178,17 @@ function verifyPassword(password: string, passwordHash: string): boolean {
   return constantTimeEqual(actualDigest, expectedDigest);
 }
 
+function isValidScryptPasswordHash(passwordHash: string): boolean {
+  const parts = passwordHash.split('$');
+  if (parts.length !== 3 || parts[0] !== PASSWORD_HASH_PREFIX) {
+    return false;
+  }
+
+  const salt = parts[1];
+  const digest = parts[2];
+  return /^[0-9a-f]{32}$/i.test(salt) && /^[0-9a-f]{64}$/i.test(digest);
+}
+
 function signSessionPayload(payload: string, tokenSecret: string): string {
   return createHmac('sha256', tokenSecret).update(payload).digest('hex');
 }
@@ -283,13 +294,31 @@ function normalizePersistedUserRecord(
     throw new Error(`Invalid user id: ${String(user.id)}`);
   }
 
-  const passwordHash = typeof user.passwordHash === 'string' && user.passwordHash.length > 0
-    ? user.passwordHash
-    : typeof user.password === 'string' && user.password.length > 0
-      ? hashPassword(user.password)
-      : null;
+  const hasPasswordHash = typeof user.passwordHash === 'string' && user.passwordHash.length > 0;
+  const hasPassword = typeof user.password === 'string' && user.password.length > 0;
+  const passwordHash = (() => {
+    if (hasPasswordHash && isValidScryptPasswordHash(user.passwordHash as string)) {
+      return user.passwordHash as string;
+    }
 
-  if (!passwordHash) {
+    if (hasPassword) {
+      return hashPassword(user.password as string);
+    }
+
+    if (hasPasswordHash) {
+      const legacyPasswordValue = user.passwordHash as string;
+      if (legacyPasswordValue.includes('$')) {
+        throw new Error(`User ${id} has unsupported passwordHash format.`);
+      }
+
+      // Compatibility path for older persisted payloads that stored plaintext in passwordHash.
+      return hashPassword(legacyPasswordValue);
+    }
+
+    return null;
+  })();
+
+  if (passwordHash === null) {
     throw new Error(`User ${id} is missing password credentials.`);
   }
 

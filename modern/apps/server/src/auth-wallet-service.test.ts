@@ -234,6 +234,43 @@ function testRestoresLegacyPlaintextUserRecords(): void {
   );
 }
 
+function testRestoresLegacyPlaintextPasswordHashField(): void {
+  const service = new AuthWalletService({
+    users: [
+      {
+        id: 120,
+        email: 'legacy-hash@example.com',
+        passwordHash: 'demo',
+        firstName: 'Legacy',
+        lastName: 'Hash',
+      },
+    ],
+    allowDefaultUsers: false,
+  });
+
+  const login = service.login({ email: 'legacy-hash@example.com', password: 'demo' });
+  assertEqual(login.session.user.id, 120, 'Expected legacy plaintext passwordHash value to be migrated.');
+}
+
+function testRejectsUnsupportedPasswordHashFormat(): void {
+  assertThrows(
+    () => new AuthWalletService({
+      users: [
+        {
+          id: 130,
+          email: 'bad-hash@example.com',
+          passwordHash: 'bcrypt$not-supported$hash',
+          firstName: 'Bad',
+          lastName: 'Hash',
+        },
+      ],
+      allowDefaultUsers: false,
+    }),
+    /unsupported passwordHash format/i,
+    'Expected unsupported password hash formats to fail during service initialization.',
+  );
+}
+
 function testStateRoundTripRestore(): void {
   const service = new AuthWalletService();
   const login = service.login({ email: 'colin@example.com', password: 'demo' });
@@ -279,6 +316,8 @@ function runAll(): void {
   testCanDisableDefaultUsers();
   testBootstrapsUsersFromSeedRecords();
   testRestoresLegacyPlaintextUserRecords();
+  testRestoresLegacyPlaintextPasswordHashField();
+  testRejectsUnsupportedPasswordHashFormat();
   testStateRoundTripRestore();
   testRestoreWithoutAuditLogField();
   console.info('Auth/wallet tests passed (session + wallet + profile flows).');
