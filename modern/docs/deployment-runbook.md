@@ -43,9 +43,11 @@ Auth/wallet sanity checks:
 1. `POST /api/auth/login`
 2. `GET /api/auth/session` with bearer token
 3. `GET /api/wallet` with bearer token
+4. `GET /api/auth/audit?limit=20` with bearer token
 
 ## Deployment Notes
 
 - Current runtime persists table/auth/wallet state to local JSON for restart continuity.
 - Current auth/session uses signed, expiring bearer tokens and salted scrypt password hashes.
-- Remaining production hardening: external identity provider, secret management/rotation, and revocation/audit controls.
+- Current auth API supports session revocation (`/api/auth/revoke-others`) and per-user audit logs.
+- Remaining production hardening: external identity provider, secret management/rotation, and role-based audit governance.

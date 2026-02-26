@@ -69,10 +69,12 @@ function testSaveAndRestoreRoundTrip(): void {
 
     const restoredWallet = restoredAuthService.getWallet(userId);
     const restoredSession = restoredAuthService.getSession(login.session.token);
+    const restoredAudit = restoredAuthService.getAuthAuditLog(20, userId);
     const restoredTableSnapshot = restoredTableService.getSnapshot();
 
     assertEqual(restoredWallet.balance, 540, 'Expected restored wallet balance to match persisted value.');
     assertEqual(restoredSession.user.id, userId, 'Expected restored session user id to match.');
+    assert(restoredAudit.length > 0, 'Expected restored auth audit log to contain entries.');
     assertEqual(
       restoredTableSnapshot.commandSequence,
       3,

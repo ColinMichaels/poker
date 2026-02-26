@@ -34,6 +34,10 @@ function assertSnapshotShape(value: unknown): asserts value is RuntimeStateSnaps
   if (!isRecord(value.auth) || !Array.isArray(value.auth.users) || !Array.isArray(value.auth.sessions)) {
     throw new Error('Runtime state payload is missing auth snapshot.');
   }
+
+  if (value.auth.auditLog !== undefined && !Array.isArray(value.auth.auditLog)) {
+    throw new Error('Runtime state payload auth.auditLog must be an array when present.');
+  }
 }
 
 export class RuntimeStateStore {

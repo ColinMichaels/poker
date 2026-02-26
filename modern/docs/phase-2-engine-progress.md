@@ -256,3 +256,25 @@ Sources:
 - `apps/server/src/auth-wallet-service.ts`
 - `apps/server/src/auth-wallet-service.test.ts`
 - `apps/server/src/index.ts`
+
+## PR H Progress: Auth Audit + Session Revocation Controls
+
+- Added auth audit trail capture for:
+  - login success/failure
+  - logout
+  - invalid/expired session usage
+  - restored-session drops
+  - revoke-others operations
+- Added session revocation operation for current user:
+  - revoke all sessions except current token
+- Added auth API routes:
+  - `GET /api/auth/audit`
+  - `POST /api/auth/revoke-others`
+- Added persistence + test coverage for auth audit behavior.
+
+Sources:
+
+- `apps/server/src/auth-wallet-service.ts`
+- `apps/server/src/auth-wallet-service.test.ts`
+- `apps/server/src/runtime-state-store.test.ts`
+- `apps/server/src/index.ts`

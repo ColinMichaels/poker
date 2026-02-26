@@ -50,6 +50,8 @@ Auth/session behavior:
 - `POST /api/auth/login`
 - `POST /api/auth/logout`
 - `GET /api/auth/session`
+- `GET /api/auth/audit?limit=100`
+- `POST /api/auth/revoke-others`
 - `GET /api/users/me`
 - `PATCH /api/users/me`
 - `GET /api/wallet`

@@ -17,6 +17,27 @@ const SESSION_TOKEN_PREFIX = 'pkr';
 const PASSWORD_HASH_PREFIX = 'scrypt';
 const PASSWORD_HASH_KEY_LENGTH = 32;
 const PASSWORD_SALT_BYTES = 16;
+const MAX_AUTH_AUDIT_LIMIT = 500;
+const MAX_AUTH_AUDIT_ENTRIES = 2000;
+
+export type AuthAuditEvent =
+  | 'LOGIN_SUCCESS'
+  | 'LOGIN_FAILURE'
+  | 'LOGOUT'
+  | 'SESSION_REVOKED'
+  | 'SESSION_INVALID'
+  | 'SESSION_EXPIRED'
+  | 'SESSION_RESTORE_DROPPED';
+
+export interface AuthAuditEntry {
+  id: string;
+  createdAt: string;
+  event: AuthAuditEvent;
+  userId: number | null;
+  email: string | null;
+  tokenHint: string | null;
+  reason: string | null;
+}
 
 export interface PersistedUserRecord {
   id: number;
@@ -46,11 +67,13 @@ export interface PersistedSessionRecord {
 export interface AuthWalletStateSnapshot {
   users: PersistedUserRecord[];
   sessions: PersistedSessionRecord[];
+  auditLog: AuthAuditEntry[];
 }
 
 export interface AuthWalletServiceOptions {
   users?: Array<PersistedUserRecord | LegacyPersistedUserRecord>;
   sessions?: PersistedSessionRecord[];
+  auditLog?: AuthAuditEntry[];
   tokenSecret?: string;
   sessionTtlMs?: number;
 }
@@ -99,6 +122,10 @@ function toIso(valueMs: number): string {
 
 function isFiniteTimestamp(valueMs: number): boolean {
   return Number.isFinite(valueMs) && valueMs > 0;
+}
+
+function toTokenHint(token: string): string {
+  return token.length <= 14 ? token : token.slice(-14);
 }
 
 function constantTimeEqual(left: string, right: string): boolean {
@@ -254,16 +281,21 @@ export class AuthWalletService {
   private readonly sessionsByToken: Map<string, PersistedSessionRecord>;
   private readonly tokenSecret: string;
   private readonly sessionTtlMs: number;
+  private readonly authAuditLog: AuthAuditEntry[];
+  private authAuditSequence: number;
 
   public constructor(options: AuthWalletServiceOptions = {}) {
     const users = options.users ? cloneDeep(options.users) : buildDefaultUsers();
     const sessions = options.sessions ? cloneDeep(options.sessions) : [];
+    const auditLog = options.auditLog ? cloneDeep(options.auditLog) : [];
 
     this.usersById = new Map();
     this.usersByEmail = new Map();
     this.sessionsByToken = new Map();
     this.tokenSecret = requireTokenSecret(options.tokenSecret);
     this.sessionTtlMs = options.sessionTtlMs ?? DEFAULT_SESSION_TTL_MS;
+    this.authAuditLog = auditLog;
+    this.authAuditSequence = auditLog.length;
 
     requirePositiveInteger(this.sessionTtlMs, 'sessionTtlMs');
 
@@ -308,10 +340,24 @@ export class AuthWalletService {
 
     const user = this.usersByEmail.get(normalizeEmail(request.email));
     if (!user) {
+      this.appendAuthAudit({
+        event: 'LOGIN_FAILURE',
+        userId: null,
+        email: normalizeEmail(request.email),
+        tokenHint: null,
+        reason: 'unknown-email',
+      });
       throw new Error('Invalid credentials.');
     }
 
     if (!verifyPassword(request.password, user.passwordHash)) {
+      this.appendAuthAudit({
+        event: 'LOGIN_FAILURE',
+        userId: user.id,
+        email: user.email,
+        tokenHint: null,
+        reason: 'invalid-password',
+      });
       throw new Error('Invalid credentials.');
     }
 
@@ -326,6 +372,13 @@ export class AuthWalletService {
     };
 
     this.sessionsByToken.set(session.token, session);
+    this.appendAuthAudit({
+      event: 'LOGIN_SUCCESS',
+      userId: user.id,
+      email: user.email,
+      tokenHint: toTokenHint(session.token),
+      reason: null,
+    });
 
     return {
       session: this.toSessionDTO(session),
@@ -333,7 +386,18 @@ export class AuthWalletService {
   }
 
   public logout(token: string): void {
+    const session = this.sessionsByToken.get(token);
     this.sessionsByToken.delete(token);
+    if (session) {
+      const user = this.usersById.get(session.userId);
+      this.appendAuthAudit({
+        event: 'LOGOUT',
+        userId: session.userId,
+        email: user?.email ?? null,
+        tokenHint: toTokenHint(token),
+        reason: null,
+      });
+    }
   }
 
   public requireAuth(token: string | undefined): AuthContext {
@@ -430,23 +494,71 @@ export class AuthWalletService {
     return this.requireUser(userId).walletBalance;
   }
 
+  public revokeOtherSessions(userId: number, currentToken: string): number {
+    this.requireUser(userId);
+
+    let revokedCount = 0;
+    for (const [token, session] of this.sessionsByToken.entries()) {
+      if (session.userId !== userId || token === currentToken) {
+        continue;
+      }
+
+      this.sessionsByToken.delete(token);
+      revokedCount += 1;
+      this.appendAuthAudit({
+        event: 'SESSION_REVOKED',
+        userId,
+        email: this.usersById.get(userId)?.email ?? null,
+        tokenHint: toTokenHint(token),
+        reason: 'revoke-others',
+      });
+    }
+
+    return revokedCount;
+  }
+
+  public getAuthAuditLog(limit = 100, userId?: number): AuthAuditEntry[] {
+    const boundedLimit = Math.max(1, Math.min(limit, MAX_AUTH_AUDIT_LIMIT));
+    const entries = userId === undefined
+      ? this.authAuditLog
+      : this.authAuditLog.filter((entry) => entry.userId === userId);
+
+    return cloneDeep(entries.slice(-boundedLimit));
+  }
+
   public exportState(): AuthWalletStateSnapshot {
     return {
       users: cloneDeep(Array.from(this.usersById.values()).sort((left, right) => left.id - right.id)),
       sessions: cloneDeep(Array.from(this.sessionsByToken.values()).sort((left, right) =>
         left.issuedAt.localeCompare(right.issuedAt),
       )),
+      auditLog: cloneDeep(this.authAuditLog),
     };
   }
 
   private normalizeSessionForRestore(rawSession: PersistedSessionRecord): PersistedSessionRecord | null {
     const parsed = this.tryParseSession(rawSession.token);
     if (!parsed) {
+      this.appendAuthAudit({
+        event: 'SESSION_RESTORE_DROPPED',
+        userId: null,
+        email: null,
+        tokenHint: toTokenHint(rawSession.token),
+        reason: 'invalid-session-token',
+      });
       return null;
     }
 
     const nowMs = Date.now();
     if (parsed.expiresAtMs <= nowMs) {
+      const user = this.usersById.get(parsed.userId);
+      this.appendAuthAudit({
+        event: 'SESSION_RESTORE_DROPPED',
+        userId: parsed.userId,
+        email: user?.email ?? null,
+        tokenHint: toTokenHint(rawSession.token),
+        reason: 'expired-session',
+      });
       return null;
     }
 
@@ -461,18 +573,43 @@ export class AuthWalletService {
   private requireSession(token: string): PersistedSessionRecord {
     const session = this.sessionsByToken.get(token);
     if (!session) {
+      const parsed = this.tryParseSession(token);
+      const user = parsed ? this.usersById.get(parsed.userId) : undefined;
+      this.appendAuthAudit({
+        event: 'SESSION_INVALID',
+        userId: parsed?.userId ?? null,
+        email: user?.email ?? null,
+        tokenHint: toTokenHint(token),
+        reason: 'missing-session',
+      });
       throw new Error('Invalid session token.');
     }
 
     const parsed = this.tryParseSession(token);
     if (!parsed || parsed.userId !== session.userId) {
       this.sessionsByToken.delete(token);
+      const user = this.usersById.get(session.userId);
+      this.appendAuthAudit({
+        event: 'SESSION_INVALID',
+        userId: session.userId,
+        email: user?.email ?? null,
+        tokenHint: toTokenHint(token),
+        reason: 'signature-or-user-mismatch',
+      });
       throw new Error('Invalid session token.');
     }
 
     const nowMs = Date.now();
     if (parsed.expiresAtMs <= nowMs) {
       this.sessionsByToken.delete(token);
+      const user = this.usersById.get(session.userId);
+      this.appendAuthAudit({
+        event: 'SESSION_EXPIRED',
+        userId: session.userId,
+        email: user?.email ?? null,
+        tokenHint: toTokenHint(token),
+        reason: null,
+      });
       throw new Error('Session expired.');
     }
 
@@ -484,6 +621,23 @@ export class AuthWalletService {
       return parseSessionToken(token, this.tokenSecret);
     } catch {
       return null;
+    }
+  }
+
+  private appendAuthAudit(entry: Omit<AuthAuditEntry, 'id' | 'createdAt'>): void {
+    this.authAuditSequence += 1;
+    this.authAuditLog.push({
+      id: `auth_audit_${this.authAuditSequence}`,
+      createdAt: nowIso(),
+      event: entry.event,
+      userId: entry.userId,
+      email: entry.email,
+      tokenHint: entry.tokenHint,
+      reason: entry.reason,
+    });
+
+    if (this.authAuditLog.length > MAX_AUTH_AUDIT_ENTRIES) {
+      this.authAuditLog.splice(0, this.authAuditLog.length - MAX_AUTH_AUDIT_ENTRIES);
     }
   }
 

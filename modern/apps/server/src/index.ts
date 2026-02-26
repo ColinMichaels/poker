@@ -107,6 +107,19 @@ function parseLogLimit(rawValue: string | null, fallback: number): number {
   return Math.min(parsed, MAX_LOG_LIMIT);
 }
 
+function parseOptionalPositiveInteger(rawValue: string | null, label: string): number | undefined {
+  if (!rawValue) {
+    return undefined;
+  }
+
+  const parsed = Number.parseInt(rawValue, 10);
+  if (!Number.isInteger(parsed) || parsed <= 0) {
+    throw new HttpError(400, 'BAD_REQUEST', `Invalid ${label} value: ${rawValue}`);
+  }
+
+  return parsed;
+}
+
 function getHeaderValue(request: IncomingMessage, headerName: string): string | undefined {
   const value = request.headers[headerName];
   if (Array.isArray(value)) {
@@ -378,6 +391,29 @@ async function handleRequest(
       return;
     }
 
+    if (method === 'GET' && pathname === '/api/auth/audit') {
+      const { userId } = requireAuthenticatedContext(request, authWalletService);
+      const limit = parseLogLimit(requestUrl.searchParams.get('limit'), 100);
+      const requestedUserId = parseOptionalPositiveInteger(requestUrl.searchParams.get('userId'), 'userId');
+
+      if (requestedUserId !== undefined && requestedUserId !== userId) {
+        throw new HttpError(403, 'FORBIDDEN', 'Cannot access audit logs for another user.');
+      }
+
+      sendJson(response, 200, {
+        records: authWalletService.getAuthAuditLog(limit, requestedUserId ?? userId),
+      });
+      return;
+    }
+
+    if (method === 'POST' && pathname === '/api/auth/revoke-others') {
+      const { token, userId } = requireAuthenticatedContext(request, authWalletService);
+      const revoked = authWalletService.revokeOtherSessions(userId, token);
+      persistRuntimeState();
+      sendJson(response, 200, { revoked });
+      return;
+    }
+
     if (method === 'GET' && pathname === '/api/users/me') {
       const { userId } = requireAuthenticatedContext(request, authWalletService);
       sendJson(response, 200, {
@@ -551,6 +587,7 @@ const authWalletService = persistedRuntimeState
   ? new AuthWalletService({
     users: persistedRuntimeState.auth.users,
     sessions: persistedRuntimeState.auth.sessions,
+    auditLog: persistedRuntimeState.auth.auditLog,
     tokenSecret: authTokenSecret,
     sessionTtlMs: authSessionTtlMs,
   })

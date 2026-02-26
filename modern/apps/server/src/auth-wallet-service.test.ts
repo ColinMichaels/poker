@@ -105,6 +105,40 @@ function testRejectsTamperedSessionToken(): void {
   );
 }
 
+function testRecordsLoginFailuresInAuditLog(): void {
+  const service = new AuthWalletService();
+
+  assertThrows(
+    () => service.login({ email: 'missing@example.com', password: 'demo' }),
+    /Invalid credentials/,
+    'Expected login with unknown email to fail.',
+  );
+
+  const audit = service.getAuthAuditLog(20);
+  assert(audit.some((entry) => entry.event === 'LOGIN_FAILURE'), 'Expected LOGIN_FAILURE entry in audit log.');
+}
+
+function testRevokeOtherSessions(): void {
+  const service = new AuthWalletService();
+  const sessionA = service.login({ email: 'colin@example.com', password: 'demo' }).session;
+  const sessionB = service.login({ email: 'colin@example.com', password: 'demo' }).session;
+
+  const revoked = service.revokeOtherSessions(sessionA.user.id, sessionB.token);
+  assertEqual(revoked, 1, 'Expected exactly one other session to be revoked.');
+
+  assertThrows(
+    () => service.getSession(sessionA.token),
+    /Invalid session token/,
+    'Expected revoked session token to be invalid.',
+  );
+
+  const activeSession = service.getSession(sessionB.token);
+  assertEqual(activeSession.user.id, sessionA.user.id, 'Expected current session to remain valid.');
+
+  const audit = service.getAuthAuditLog(20, sessionA.user.id);
+  assert(audit.some((entry) => entry.event === 'SESSION_REVOKED'), 'Expected SESSION_REVOKED entry in audit log.');
+}
+
 function testSessionExpiry(): void {
   const service = new AuthWalletService({ sessionTtlMs: 1 });
   const login = service.login({ email: 'colin@example.com', password: 'demo' });
@@ -165,11 +199,13 @@ function testStateRoundTripRestore(): void {
   const restoredSession = restored.getSession(login.session.token);
   const restoredWallet = restored.getWallet(userId);
   const restoredLedger = restored.getWalletLedger(userId, 10);
+  const restoredAudit = restored.getAuthAuditLog(20, userId);
 
   assertEqual(restoredSession.user.id, userId, 'Expected restored session to resolve original user.');
   assertEqual(restoredWallet.balance, 530, 'Expected restored wallet balance to persist.');
   assertEqual(restoredLedger.length, 1, 'Expected restored wallet ledger to persist.');
   assertEqual(restoredLedger[0]?.reason, 'restore-test', 'Expected restored ledger reason to persist.');
+  assert(restoredAudit.length > 0, 'Expected auth audit log to persist through restore.');
 }
 
 function runAll(): void {
@@ -177,6 +213,8 @@ function runAll(): void {
   testWalletAdjustmentsAndLedger();
   testInsufficientBalanceAndProfileUpdate();
   testRejectsTamperedSessionToken();
+  testRecordsLoginFailuresInAuditLog();
+  testRevokeOtherSessions();
   testSessionExpiry();
   testRestoresLegacyPlaintextUserRecords();
   testStateRoundTripRestore();
