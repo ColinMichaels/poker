@@ -435,3 +435,20 @@ Sources:
 - `apps/server/src/startup-config.test.ts`
 - `apps/server/src/index.ts`
 - `apps/server/package.json`
+
+## PR S Progress: Root Environment Doctor
+
+- Added root Node/npm environment checks:
+  - `scripts/doctor-modern-env.mjs`
+  - `npm run doctor`
+- Added root toolchain metadata:
+  - `.nvmrc`
+  - root `package.json` engines (`node >=22 <25`, `npm >=10`)
+- Updated onboarding/developer setup docs to run doctor early in setup.
+
+Sources:
+
+- `scripts/doctor-modern-env.mjs`
+- `package.json`
+- `.nvmrc`
+- `README.md`

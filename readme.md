@@ -12,13 +12,15 @@ This repository now defaults to the modern TypeScript workspace in `modern/`.
 
 From repository root:
 
-1. `cd modern`
-2. `nvm use` (or `nvm install && nvm use`)
-3. `npm install`
-4. `npm run typecheck`
-5. `npm run build`
-6. `npm run test:engine`
-7. `npm run test:server`
+1. `nvm use` (or `nvm install && nvm use`)
+2. `npm run doctor`
+3. `cd modern`
+4. `nvm use` (or `nvm install && nvm use`)
+5. `npm install`
+6. `npm run typecheck`
+7. `npm run build`
+8. `npm run test:engine`
+9. `npm run test:server`
 
 Or use root shortcuts:
 

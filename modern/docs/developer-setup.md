@@ -12,11 +12,13 @@ This setup is for the `modern/` npm workspace.
 
 From repository root:
 
-1. `cd modern`
-2. `nvm use` (or `nvm install && nvm use`)
-3. `npm install`
-4. `npm run test:engine`
-5. `npm run build:client`
+1. `nvm use` (or `nvm install && nvm use`) from repository root
+2. `npm run doctor`
+3. `cd modern`
+4. `nvm use` (or `nvm install && nvm use`)
+5. `npm install`
+6. `npm run test:engine`
+7. `npm run build:client`
 
 ## Common Commands
 
@@ -33,6 +35,7 @@ From repository root:
 Root shortcut scripts are also available:
 
 - `npm run dev` (modern client)
+- `npm run doctor` (root environment check for modern workspace requirements)
 - `npm run ci` (modern full verification)
 - `npm run build` (modern workspace build)
 - `npm run test` (modern engine + server tests)
