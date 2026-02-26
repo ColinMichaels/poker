@@ -14,7 +14,7 @@ Purpose: make `modern/` the primary codebase without losing reusable legacy func
   - avatars: 33/33 normalized (1 typo rename normalized)
   - sounds: 12/12 normalized with categories
   - logos: 4/4 normalized (1 ID collision handled via alias)
-- CI coverage for modern workspace: added (`.github/workflows/modern-ci.yml`) with typecheck/build/engine tests.
+- CI coverage for modern workspace: added (`.github/workflows/modern-ci.yml`) with typecheck/build/engine and server tests.
 
 ## Remaining Gaps Before Full Legacy Removal
 
@@ -109,6 +109,21 @@ These are not extraction failures, but they are blockers to deleting the legacy 
   - `POKER_AUTH_BOOTSTRAP_USERS_FILE` (JSON array or `{ users: [...] }`)
 - Added bootstrap/default-user guardrails and tests to prevent unconfigured auth startup.
 
+## Completed in PR J
+
+- Expanded modern CI workflow coverage to include server regression tests:
+  - `npm run test:server`
+- Expanded CI trigger scope to include root modern entrypoint docs/scripts changes:
+  - `package.json`
+  - `readme.md`
+
+## Completed in PR K
+
+- Added legacy archive guard workflow to block non-documentation edits under `legacy/**` by default:
+  - `.github/workflows/legacy-archive-guard.yml`
+- Added explicit emergency override path:
+  - PR label: `allow-legacy-change`
+
 ## Known Intentional Asset Exceptions
 
 - Non-canonical card extras remain excluded from canonical face set:
@@ -170,13 +185,17 @@ Exit criteria:
 7. PR G: Auth/session hardening primitives.
 8. PR H: Auth audit + session revocation controls.
 9. PR I: Bootstrap users + production demo-user controls.
+10. PR J: CI server-test coverage + root entrypoint trigger expansion.
+11. PR K: Legacy archive read-only CI guardrail.
 
 ## Cutover Go/No-Go Checklist
 
 - `npm run typecheck` passes in `modern/`.
 - `npm run build` passes in `modern/`.
 - `npm run test:engine` passes in `modern/`.
+- `npm run test:server` passes in `modern/`.
 - Required user journeys validated in modern app.
 - Deployment runbook updated for modern runtime.
 - Production auth bootstrap strategy documented (`POKER_AUTH_BOOTSTRAP_USERS_FILE` or explicit demo override).
+- Legacy archive guard is active (or documented emergency override applied for approved fixes).
 - Rollback path documented before legacy removal PR merges.

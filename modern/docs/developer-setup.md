@@ -62,6 +62,7 @@ CI runs the following from `modern/`:
 2. `npm run typecheck`
 3. `npm run build`
 4. `npm run test:engine`
+5. `npm run test:server`
 
 ## Troubleshooting
 

@@ -45,6 +45,7 @@ From `modern/`:
   - `npm run typecheck`
   - `npm run build`
   - `npm run test:engine`
+  - `npm run test:server`
 
 ## Notes
 

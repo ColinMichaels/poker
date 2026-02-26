@@ -5,6 +5,8 @@ on:
     paths:
       - '.github/workflows/modern-ci.yml'
       - 'modern/**'
+      - 'package.json'
+      - 'readme.md'
   push:
     branches:
       - main
@@ -13,6 +15,8 @@ on:
     paths:
       - '.github/workflows/modern-ci.yml'
       - 'modern/**'
+      - 'package.json'
+      - 'readme.md'
   workflow_dispatch:
 
 permissions:
@@ -24,7 +28,7 @@ concurrency:
 
 jobs:
   modern-ci:
-    name: Typecheck, Build, Test Engine
+    name: Typecheck, Build, Engine + Server Tests
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -52,3 +56,6 @@ jobs:
 
       - name: Engine Tests
         run: npm run test:engine
+
+      - name: Server Tests
+        run: npm run test:server

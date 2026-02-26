@@ -297,3 +297,32 @@ Sources:
 - `apps/server/src/auth-wallet-service.ts`
 - `apps/server/src/auth-wallet-service.test.ts`
 - `apps/server/bootstrap-users.example.json`
+
+## PR J Progress: CI Guardrail Expansion
+
+- Expanded modern GitHub Actions workflow to run:
+  - `npm run test:engine`
+  - `npm run test:server`
+- Expanded CI path triggers to include root modern entrypoint updates:
+  - `package.json`
+  - `readme.md`
+
+Sources:
+
+- `.github/workflows/modern-ci.yml`
+- `README.md`
+- `docs/developer-setup.md`
+
+## PR K Progress: Legacy Archive Guardrail
+
+- Added legacy archive CI guard workflow:
+  - blocks non-doc edits under `legacy/**` during PR checks
+  - allows documentation-only updates (`legacy/README.md`, `legacy/laravel-readme.md`)
+- Added explicit emergency bypass convention:
+  - apply PR label `allow-legacy-change`
+
+Sources:
+
+- `.github/workflows/legacy-archive-guard.yml`
+- `README.md`
+- `docs/legacy-decommission-plan.md`

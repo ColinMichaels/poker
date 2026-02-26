@@ -24,3 +24,11 @@ Root shortcut wrappers:
 - `npm run legacy:build`
 
 PHP/composer runtime remains legacy and is intentionally not part of the modern default flow.
+
+## Archive Guardrail
+
+Legacy code is treated as read-only by default in pull requests.
+
+- Guard workflow: `.github/workflows/legacy-archive-guard.yml`
+- Allowed routine edits: `legacy/README.md`, `legacy/laravel-readme.md`
+- Emergency override: apply PR label `allow-legacy-change`

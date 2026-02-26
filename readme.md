@@ -41,3 +41,4 @@ The Laravel/Vue2 implementation remains in place for controlled migration and hi
 - Legacy archive location: `legacy/`
 - Legacy framework notes: `legacy/laravel-readme.md`
 - Legacy archive README: `legacy/README.md`
+- Legacy archive guard workflow: `.github/workflows/legacy-archive-guard.yml`
