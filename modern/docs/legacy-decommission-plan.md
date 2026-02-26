@@ -140,6 +140,15 @@ These are not extraction failures, but they are blockers to deleting the legacy 
   - `npm run ci`
 - Updated modern CI workflow to use canonical verification script to reduce drift.
 
+## Completed in PR N
+
+- Added automated guard against new runtime legacy path dependencies:
+  - `modern/scripts/check-legacy-references.mjs`
+- Added modern workspace script:
+  - `npm run check:legacy-refs`
+- Integrated legacy reference guard into canonical modern CI script:
+  - `npm run ci`
+
 ## Known Intentional Asset Exceptions
 
 - Non-canonical card extras remain excluded from canonical face set:
@@ -205,6 +214,7 @@ Exit criteria:
 11. PR K: Legacy archive read-only CI guardrail.
 12. PR L: Explicit acknowledgement wrapper for root legacy commands.
 13. PR M: Canonical modern CI script and workflow alignment.
+14. PR N: Runtime legacy-reference guard in modern CI.
 
 ## Cutover Go/No-Go Checklist
 

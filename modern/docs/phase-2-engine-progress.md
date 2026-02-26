@@ -359,3 +359,17 @@ Sources:
 - `package.json`
 - `.github/workflows/modern-ci.yml`
 - `docs/developer-setup.md`
+
+## PR N Progress: Runtime Legacy Reference Guard
+
+- Added script to detect `legacy/` path references in modern runtime source:
+  - `scripts/check-legacy-references.mjs`
+- Added workspace command:
+  - `npm run check:legacy-refs`
+- Integrated guard into canonical CI verification flow:
+  - `npm run ci`
+
+Sources:
+
+- `scripts/check-legacy-references.mjs`
+- `package.json`

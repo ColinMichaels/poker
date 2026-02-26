@@ -23,6 +23,7 @@ From repository root:
 - `npm run dev:client` - start Vite client dev server
 - `npm run dev:server` - start authoritative table server (watch mode)
 - `npm run ci` - run full modern CI verification locally (typecheck/build/engine/server tests)
+- `npm run check:legacy-refs` - ensure runtime source stays independent from `legacy/` paths
 - `npm run typecheck` - run TypeScript checks in all workspaces
 - `npm run test:engine` - run poker-engine fixtures + reducer tests
 - `npm run test:server` - run server lifecycle + auth/wallet parity tests
