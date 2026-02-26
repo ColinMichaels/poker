@@ -87,7 +87,7 @@ From current UI and evaluator content:
 ## Reusable Formulas and Utilities
 
 - Chip denomination splitting (`[1,5,10,25,50,100,500,1000]`) is valid and reusable.
-- Existing bitmath hand ranker in `resources/js/plugins/game/GamePlugin.js` can be used as reference test oracle, but should be re-implemented in typed domain code.
+- Existing bitmath hand ranker in `legacy/resources/js/plugins/game/GamePlugin.js` can be used as reference test oracle, but should be re-implemented in typed domain code.
 
 ## Logic Gaps to Fix During Migration
 
@@ -115,4 +115,3 @@ export interface HandRank {
   tiebreak: number[];
 }
 ```
-

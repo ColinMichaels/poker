@@ -23,10 +23,10 @@ From repository root:
 Or use root shortcuts:
 
 - `npm run dev` (modern client)
-- `npm run modern:server`
-- `npm run modern:typecheck`
-- `npm run modern:build`
-- `npm run modern:test`
+- `npm run dev:server`
+- `npm run typecheck`
+- `npm run build`
+- `npm run test`
 
 ## Docs
 
@@ -38,5 +38,6 @@ Or use root shortcuts:
 
 The Laravel/Vue2 implementation remains in place for controlled migration and historical reference.
 
-- Legacy framework notes: `laravel-readme.md`
-- Legacy frontend/backend scripts are still available through existing `legacy:*` and Laravel scripts in `package.json`.
+- Legacy archive location: `legacy/`
+- Legacy framework notes: `legacy/laravel-readme.md`
+- Legacy archive README: `legacy/README.md`

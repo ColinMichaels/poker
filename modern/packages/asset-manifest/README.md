@@ -1,6 +1,6 @@
 # Asset Manifest Package
 
-Generates a normalized manifest from legacy assets located at `public/Poker`.
+Generates a normalized manifest from legacy assets located at `legacy/public/Poker`.
 
 ## Scripts
 

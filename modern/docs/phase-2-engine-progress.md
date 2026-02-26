@@ -145,7 +145,7 @@ Validation notes:
 
 ## PR A Progress: Legacy HowTo Content Migration
 
-- Added generated typed guide data from legacy `resources/js/Pages/HowTo/games/*.vue` sources.
+- Added generated typed guide data from legacy `legacy/resources/js/Pages/HowTo/games/*.vue` sources.
 - Added generator script: `modern/scripts/generate-howto-content.mjs`.
 - Added modern client `How To` view with game variant tabs and migrated rounds/rules sections.
 
@@ -195,7 +195,7 @@ Sources:
 
 - Updated root onboarding/readme to point contributors to `modern/` first.
 - Added root npm entrypoints that execute modern workflows by default:
-  - `dev`, `build`, `test`, plus explicit `modern:*` script aliases
+  - `dev`, `dev:server`, `typecheck`, `build`, `test`
 - Added modern deployment runbook with build/start/health-check sequence.
 
 Sources:
@@ -203,3 +203,18 @@ Sources:
 - `readme.md`
 - `package.json`
 - `modern/docs/deployment-runbook.md`
+
+## PR E Progress: Legacy Archive Move + Repository Cleanup
+
+- Moved Laravel/Vue2 legacy code from repository root into `legacy/`.
+- Added `legacy/README.md` for archive context and legacy execution notes.
+- Updated modern extraction scripts to read legacy sources from `legacy/`:
+  - HowTo content generator source path
+  - asset manifest legacy source root
+- Updated root and workspace docs to reflect archived legacy pathing.
+
+Sources:
+
+- `legacy/README.md`
+- `modern/scripts/generate-howto-content.mjs`
+- `modern/packages/asset-manifest/scripts/generate-manifest.mjs`

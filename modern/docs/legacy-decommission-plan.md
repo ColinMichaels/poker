@@ -54,11 +54,21 @@ These are not extraction failures, but they are blockers to deleting the legacy 
 
 - Updated root repository onboarding to default to modern workspace:
   - `readme.md`
-  - root `package.json` modern entrypoint scripts (`dev`, `build`, `test`, `modern:*`)
+  - root `package.json` modern entrypoint scripts (`dev`, `dev:server`, `typecheck`, `build`, `test`)
 - Added modern deployment runbook:
   - `modern/docs/deployment-runbook.md`
 - Linked modern deployment docs from workspace README:
   - `modern/README.md`
+
+## Completed in PR E
+
+- Archived legacy Laravel/Vue2 codebase into `legacy/` from repository root.
+- Added archive orientation doc:
+  - `legacy/README.md`
+- Updated modern extraction tooling to use archived legacy paths:
+  - `modern/scripts/generate-howto-content.mjs`
+  - `modern/packages/asset-manifest/scripts/generate-manifest.mjs`
+- Updated root + modern docs to reflect new archive location and modern-first defaults.
 
 ## Known Intentional Asset Exceptions
 

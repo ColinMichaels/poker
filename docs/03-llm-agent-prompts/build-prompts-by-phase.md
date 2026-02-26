@@ -86,7 +86,7 @@ Must include:
 - pot chip stack visualization
 - HUD controls for next legal actions
 
-Use assets from public/Poker via a generated manifest.
+Use assets from legacy/public/Poker via a generated manifest.
 No game rules inside scene files.
 
 Return:
@@ -98,7 +98,7 @@ Return:
 ## Prompt 5: Integrate Legacy Assets Cleanly
 
 ```text
-Create an asset ingestion pipeline from legacy public/Poker assets.
+Create an asset ingestion pipeline from legacy/public/Poker assets.
 
 Tasks:
 - copy/import assets into new public assets directory
@@ -160,4 +160,3 @@ Return:
 - remaining blockers
 - release recommendation (go/no-go)
 ```
-

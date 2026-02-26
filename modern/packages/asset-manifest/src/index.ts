@@ -6,6 +6,6 @@ export interface AssetManifestSummary {
 
 export const manifestInfo: AssetManifestSummary = {
   generatedAt: 'run npm run generate:assets:normalize in modern/ to refresh',
-  sourceRoot: 'public/Poker',
+  sourceRoot: 'legacy/public/Poker',
   normalizedOutputRoot: 'modern/apps/client/public/assets',
 };

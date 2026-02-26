@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '../../../../');
-const sourceRoot = path.resolve(repoRoot, 'public/Poker');
+const sourceRoot = path.resolve(repoRoot, 'legacy/public/Poker');
 const generatedRoot = path.resolve(__dirname, '../generated');
 const normalizedOutputRoot = path.resolve(repoRoot, 'modern/apps/client/public/assets');
 
@@ -235,7 +235,7 @@ function generateManifest() {
 
   const manifest = {
     generatedAt: new Date().toISOString(),
-    sourceRoot: 'public/Poker',
+    sourceRoot: 'legacy/public/Poker',
     normalizedOutputRoot: 'modern/apps/client/public/assets',
     normalization: {
       enabled: normalizeOutput,

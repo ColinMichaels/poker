@@ -5,37 +5,37 @@ Severity reflects migration impact and production risk.
 ## Critical
 
 1. Secrets committed in repository
-- `.env.staging` includes application/database/mail/API credentials.
+- `legacy/.env.staging` includes application/database/mail/API credentials.
 - Risk: credential compromise and account takeover.
 - Action: rotate all secrets immediately and purge secret history.
 
 2. Incomplete/incorrect poker evaluator implementation in PHP domain
-- `app/Poker/EvaluateHand.php` expects methods like `getRank()` not implemented in `app/Poker/Card.php`.
-- `app/Poker/Hand.php` also depends on missing card methods.
+- `legacy/app/Poker/EvaluateHand.php` expects methods like `getRank()` not implemented in `legacy/app/Poker/Card.php`.
+- `legacy/app/Poker/Hand.php` also depends on missing card methods.
 - Risk: backend hand scoring is nonfunctional.
 
 3. Invalid model source file
-- `app/Menu.php` contains invalid PHP method syntax.
+- `legacy/app/Menu.php` contains invalid PHP method syntax.
 - Risk: fatal parse errors when class autoloads.
 
 ## High
 
 1. Inheritance misuse in core domain
-- `app/Poker/Card.php` and `app/Poker/Hand.php` extend `Game`.
+- `legacy/app/Poker/Card.php` and `legacy/app/Poker/Hand.php` extend `Game`.
 - Risk: side effects, hidden state coupling, hard-to-test behavior.
 
 2. Frontend deck data defects
-- `resources/js/plugins/game/GamePlugin.js` has incorrect Diamond high-card mappings (`AD/QD/KD` ranks swapped).
+- `legacy/resources/js/plugins/game/GamePlugin.js` has incorrect Diamond high-card mappings (`AD/QD/KD` ranks swapped).
 - Risk: incorrect hand evaluation and gameplay decisions.
 
 3. API/controller contract inconsistencies
-- `app/Http/Controllers/UsersController.php` references fields/relations not in schema (e.g., `name`, `owner`, `account`).
-- `app/Http/Controllers/PlayerWalletController.php` references `User` without import in `show`.
-- `app/Http/Controllers/PlayerController.php` calls `request()->validated()` without a FormRequest.
+- `legacy/app/Http/Controllers/UsersController.php` references fields/relations not in schema (e.g., `name`, `owner`, `account`).
+- `legacy/app/Http/Controllers/PlayerWalletController.php` references `User` without import in `show`.
+- `legacy/app/Http/Controllers/PlayerController.php` calls `request()->validated()` without a FormRequest.
 - Risk: runtime failures and broken CRUD flows.
 
 4. Authentication/profile assumptions with nullable player relation
-- `app/Providers/AppServiceProvider.php` assumes `Auth::user()->player()` always exists.
+- `legacy/app/Providers/AppServiceProvider.php` assumes `Auth::user()->player()` always exists.
 - Risk: null errors during page bootstrap.
 
 ## Medium
@@ -73,4 +73,3 @@ Because engine correctness is central to poker, the safest path is:
 1. Re-specify domain rules as pure typed modules.
 2. Port only validated logic + assets.
 3. Treat current implementation as reference material, not direct drop-in code.
-

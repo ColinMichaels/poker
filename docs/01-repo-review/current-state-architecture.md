@@ -10,12 +10,12 @@
 
 ## Top-Level Structure
 
-- `app/Poker/*`: poker domain classes (`Game`, `Deck`, `Card`, `Player`, `Chip`, `Hand`, `EvaluateHand`)
-- `resources/js/plugins/game/*`: client-side game orchestration and hand ranking logic
-- `resources/js/components/Poker/*`: card/chip/deck UI components
-- `resources/js/Pages/HowTo/*`: rules/educational game-variant content
-- `public/Poker/*`: reusable poker asset library (cards/chips/avatars/sounds/logos)
-- `database/*`: user/player/game/menu schema + seeders
+- `legacy/app/Poker/*`: poker domain classes (`Game`, `Deck`, `Card`, `Player`, `Chip`, `Hand`, `EvaluateHand`)
+- `legacy/resources/js/plugins/game/*`: client-side game orchestration and hand ranking logic
+- `legacy/resources/js/components/Poker/*`: card/chip/deck UI components
+- `legacy/resources/js/Pages/HowTo/*`: rules/educational game-variant content
+- `legacy/public/Poker/*`: reusable poker asset library (cards/chips/avatars/sounds/logos)
+- `legacy/database/*`: user/player/game/menu schema + seeders
 
 ## Runtime Flow (Today)
 
@@ -55,4 +55,3 @@ This is the right conceptual direction and should be preserved in the rebuild, b
 - Event-bus state management leads to hidden coupling.
 - Incomplete/inconsistent API/resource/controller layer for production play.
 - Outdated framework/dependency base and legacy PingCRM scaffolding leftovers.
-

@@ -2,7 +2,7 @@
 
 ## Inventory Summary
 
-Under `public/Poker/`:
+Under `legacy/public/Poker/`:
 
 - `cards/`: 60 files (~1.9 MB)
 - `chips/`: 8 files (~32 KB)
@@ -10,13 +10,13 @@ Under `public/Poker/`:
 - `sounds/`: 12 files (~168 KB)
 - `logos/`: 4 files (~92 KB)
 
-Total `public/Poker/`: ~2.6 MB
+Total `legacy/public/Poker/`: ~2.6 MB
 
 ## Asset Groups
 
 ## Cards
 
-Path: `public/Poker/cards/`
+Path: `legacy/public/Poker/cards/`
 
 Contains:
 
@@ -33,7 +33,7 @@ Reuse recommendation:
 
 ## Chips
 
-Path: `public/Poker/chips/`
+Path: `legacy/public/Poker/chips/`
 
 Denominations present and complete:
 
@@ -46,7 +46,7 @@ Reuse recommendation:
 
 ## Avatars
 
-Path: `public/Poker/avatars/`
+Path: `legacy/public/Poker/avatars/`
 
 Contains 33 SVGs (people, robots, pop-culture style icons).
 
@@ -58,7 +58,7 @@ Reuse recommendation:
 
 ## Sounds
 
-Path: `public/Poker/sounds/`
+Path: `legacy/public/Poker/sounds/`
 
 Includes:
 
@@ -73,7 +73,7 @@ Reuse recommendation:
 
 ## Logos
 
-Path: `public/Poker/logos/`
+Path: `legacy/public/Poker/logos/`
 
 Contains:
 
@@ -106,4 +106,3 @@ Create an asset manifest package:
 2. Add checksums for cache-busting and integrity checks.
 3. Add per-asset license/provenance notes.
 4. Convert frequently used SVGs to Babylon-friendly texture loading strategy (preload + lazy load tiers).
-
