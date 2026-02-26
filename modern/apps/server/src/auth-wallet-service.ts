@@ -64,16 +64,31 @@ export interface PersistedSessionRecord {
   expiresAt: string | null;
 }
 
+export interface AuthUserSeedRecord {
+  id?: number;
+  email: string;
+  passwordHash?: string;
+  password?: string;
+  firstName?: string;
+  lastName?: string;
+  walletBalance?: number;
+  wins?: number;
+  gamesPlayed?: number;
+  walletUpdatedAt?: string;
+  walletLedger?: WalletLedgerEntryDTO[];
+}
+
 export interface AuthWalletStateSnapshot {
   users: PersistedUserRecord[];
   sessions: PersistedSessionRecord[];
-  auditLog: AuthAuditEntry[];
+  auditLog?: AuthAuditEntry[];
 }
 
 export interface AuthWalletServiceOptions {
-  users?: Array<PersistedUserRecord | LegacyPersistedUserRecord>;
+  users?: Array<PersistedUserRecord | LegacyPersistedUserRecord | AuthUserSeedRecord>;
   sessions?: PersistedSessionRecord[];
   auditLog?: AuthAuditEntry[];
+  allowDefaultUsers?: boolean;
   tokenSecret?: string;
   sessionTtlMs?: number;
 }
@@ -217,8 +232,56 @@ function parseSessionToken(token: string, tokenSecret: string): ParsedSessionTok
   };
 }
 
-function normalizePersistedUserRecord(rawUser: PersistedUserRecord | LegacyPersistedUserRecord): PersistedUserRecord {
-  const user = cloneDeep(rawUser as LegacyPersistedUserRecord);
+function capitalize(value: string): string {
+  if (!value) {
+    return value;
+  }
+
+  return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+}
+
+function deriveDefaultName(email: string): { firstName: string; lastName: string } {
+  const localPart = email.split('@')[0] ?? 'player';
+  const segments = localPart
+    .split(/[._-]+/g)
+    .map((segment) => segment.trim())
+    .filter(Boolean);
+
+  if (segments.length === 0) {
+    return {
+      firstName: 'Demo',
+      lastName: 'User',
+    };
+  }
+
+  if (segments.length === 1) {
+    return {
+      firstName: capitalize(segments[0]),
+      lastName: 'User',
+    };
+  }
+
+  return {
+    firstName: capitalize(segments[0]),
+    lastName: capitalize(segments.slice(1).join(' ')),
+  };
+}
+
+function normalizePersistedUserRecord(
+  rawUser: PersistedUserRecord | LegacyPersistedUserRecord | AuthUserSeedRecord,
+  fallbackId: number,
+): PersistedUserRecord {
+  const user = cloneDeep(rawUser as LegacyPersistedUserRecord & AuthUserSeedRecord);
+
+  const normalizedEmail = normalizeEmail(user.email ?? '');
+  if (!normalizedEmail) {
+    throw new Error('User email is required.');
+  }
+
+  const id = Number.isInteger(user.id) && (user.id as number) > 0 ? (user.id as number) : fallbackId;
+  if (!Number.isInteger(id) || id <= 0) {
+    throw new Error(`Invalid user id: ${String(user.id)}`);
+  }
 
   const passwordHash = typeof user.passwordHash === 'string' && user.passwordHash.length > 0
     ? user.passwordHash
@@ -227,19 +290,37 @@ function normalizePersistedUserRecord(rawUser: PersistedUserRecord | LegacyPersi
       : null;
 
   if (!passwordHash) {
-    throw new Error(`User ${user.id} is missing password credentials.`);
+    throw new Error(`User ${id} is missing password credentials.`);
   }
 
+  const derivedName = deriveDefaultName(normalizedEmail);
+  const firstName = typeof user.firstName === 'string' && user.firstName.trim().length > 0
+    ? user.firstName.trim()
+    : derivedName.firstName;
+  const lastName = typeof user.lastName === 'string' && user.lastName.trim().length > 0
+    ? user.lastName.trim()
+    : derivedName.lastName;
+
+  const walletBalance = Number.isInteger(user.walletBalance) && (user.walletBalance as number) >= 0
+    ? (user.walletBalance as number)
+    : 500;
+  const wins = Number.isInteger(user.wins) && (user.wins as number) >= 0 ? (user.wins as number) : 0;
+  const gamesPlayed = Number.isInteger(user.gamesPlayed) && (user.gamesPlayed as number) >= 0
+    ? (user.gamesPlayed as number)
+    : 0;
+
   return {
-    id: user.id,
-    email: user.email,
+    id,
+    email: normalizedEmail,
     passwordHash,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    walletBalance: user.walletBalance,
-    wins: user.wins,
-    gamesPlayed: user.gamesPlayed,
-    walletUpdatedAt: user.walletUpdatedAt,
+    firstName,
+    lastName,
+    walletBalance,
+    wins,
+    gamesPlayed,
+    walletUpdatedAt: typeof user.walletUpdatedAt === 'string' && user.walletUpdatedAt.length > 0
+      ? user.walletUpdatedAt
+      : nowIso(),
     walletLedger: Array.isArray(user.walletLedger) ? user.walletLedger : [],
   };
 }
@@ -285,7 +366,13 @@ export class AuthWalletService {
   private authAuditSequence: number;
 
   public constructor(options: AuthWalletServiceOptions = {}) {
-    const users = options.users ? cloneDeep(options.users) : buildDefaultUsers();
+    const allowDefaultUsers = options.allowDefaultUsers ?? true;
+    const userSeeds = options.users ? cloneDeep(options.users) : [];
+    const users = userSeeds.length > 0
+      ? userSeeds
+      : allowDefaultUsers
+        ? buildDefaultUsers()
+        : [];
     const sessions = options.sessions ? cloneDeep(options.sessions) : [];
     const auditLog = options.auditLog ? cloneDeep(options.auditLog) : [];
 
@@ -298,9 +385,14 @@ export class AuthWalletService {
     this.authAuditSequence = auditLog.length;
 
     requirePositiveInteger(this.sessionTtlMs, 'sessionTtlMs');
+    if (users.length === 0) {
+      throw new Error('No auth users configured. Provide bootstrap users or enable demo users.');
+    }
 
+    let nextFallbackUserId = 1;
     for (const rawUser of users) {
-      const user = normalizePersistedUserRecord(rawUser);
+      const user = normalizePersistedUserRecord(rawUser, nextFallbackUserId);
+      nextFallbackUserId = Math.max(nextFallbackUserId, user.id + 1);
 
       if (this.usersById.has(user.id)) {
         throw new Error(`Duplicate user id detected during auth restore: ${user.id}`);

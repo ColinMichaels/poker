@@ -33,6 +33,8 @@ Environment overrides:
 - `POKER_STATE_FILE` (absolute path to JSON runtime state file)
 - `POKER_AUTH_TOKEN_SECRET` (HMAC signing secret for bearer sessions)
 - `POKER_SESSION_TTL_MS` (session ttl in milliseconds, default `28800000`)
+- `POKER_AUTH_ALLOW_DEMO_USERS` (`1`/`0`, default `1` unless `NODE_ENV=production`)
+- `POKER_AUTH_BOOTSTRAP_USERS_FILE` (path to JSON file with bootstrap auth users)
 
 Runtime persistence:
 
@@ -76,7 +78,16 @@ Legacy compatibility wallet routes:
 - `{ "command": { ...TableCommand } }`
 - `{ ...TableCommand }`
 
-Demo login users:
+Default demo login users (when enabled):
 
 - `colin@example.com` / `demo`
 - `luna@example.com` / `demo`
+
+Bootstrap users file:
+
+- Used when no persisted auth state is available.
+- File can be either an array of user records or `{ "users": [...] }`.
+- Example file: `modern/apps/server/bootstrap-users.example.json`
+- Record fields:
+  - required: `email` and one of `password` or `passwordHash`
+  - optional: `id`, `firstName`, `lastName`, `walletBalance`, `wins`, `gamesPlayed`, `walletUpdatedAt`, `walletLedger`

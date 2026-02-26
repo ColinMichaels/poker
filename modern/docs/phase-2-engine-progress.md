@@ -278,3 +278,22 @@ Sources:
 - `apps/server/src/auth-wallet-service.test.ts`
 - `apps/server/src/runtime-state-store.test.ts`
 - `apps/server/src/index.ts`
+
+## PR I Progress: Bootstrap Auth Users + Demo User Controls
+
+- Added explicit auth startup controls:
+  - `POKER_AUTH_ALLOW_DEMO_USERS` (defaults to enabled except in `NODE_ENV=production`)
+  - `POKER_AUTH_BOOTSTRAP_USERS_FILE` (bootstrap users JSON path)
+- Added auth bootstrap seed support:
+  - accepts array format or `{ users: [...] }` wrapper format
+  - supports plaintext password seeds (stored as salted `scrypt` hash on initialization)
+  - assigns fallback ids and profile defaults for minimal seed records
+- Added constructor guardrail when demo users are disabled and no users are configured.
+- Added auth test coverage for demo-user disablement and bootstrap seed normalization.
+
+Sources:
+
+- `apps/server/src/index.ts`
+- `apps/server/src/auth-wallet-service.ts`
+- `apps/server/src/auth-wallet-service.test.ts`
+- `apps/server/bootstrap-users.example.json`

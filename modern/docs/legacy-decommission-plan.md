@@ -20,7 +20,8 @@ Purpose: make `modern/` the primary codebase without losing reusable legacy func
 
 These are not extraction failures, but they are blockers to deleting the legacy app:
 
-1. Real auth hardening is not yet complete (current auth/session still uses demo credentials and no external identity provider).
+1. External identity integration is still pending (current auth is local account/session management only).
+2. Operational role/authorization boundaries are still pending for broader audit visibility requirements.
 
 ## Completed in PR A
 
@@ -100,6 +101,14 @@ These are not extraction failures, but they are blockers to deleting the legacy 
 - Persisted auth audit logs alongside auth/table runtime snapshot.
 - Added auth audit/revocation tests.
 
+## Completed in PR I
+
+- Added configurable demo-user behavior:
+  - `POKER_AUTH_ALLOW_DEMO_USERS` (defaults off in production via `NODE_ENV=production`)
+- Added bootstrap user seeding support:
+  - `POKER_AUTH_BOOTSTRAP_USERS_FILE` (JSON array or `{ users: [...] }`)
+- Added bootstrap/default-user guardrails and tests to prevent unconfigured auth startup.
+
 ## Known Intentional Asset Exceptions
 
 - Non-canonical card extras remain excluded from canonical face set:
@@ -160,6 +169,7 @@ Exit criteria:
 6. PR F: Server runtime persistence.
 7. PR G: Auth/session hardening primitives.
 8. PR H: Auth audit + session revocation controls.
+9. PR I: Bootstrap users + production demo-user controls.
 
 ## Cutover Go/No-Go Checklist
 
@@ -168,4 +178,5 @@ Exit criteria:
 - `npm run test:engine` passes in `modern/`.
 - Required user journeys validated in modern app.
 - Deployment runbook updated for modern runtime.
+- Production auth bootstrap strategy documented (`POKER_AUTH_BOOTSTRAP_USERS_FILE` or explicit demo override).
 - Rollback path documented before legacy removal PR merges.

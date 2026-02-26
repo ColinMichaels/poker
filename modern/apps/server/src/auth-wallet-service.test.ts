@@ -155,6 +155,56 @@ function testSessionExpiry(): void {
   );
 }
 
+function testCanDisableDefaultUsers(): void {
+  assertThrows(
+    () => new AuthWalletService({ allowDefaultUsers: false }),
+    /No auth users configured/,
+    'Expected service construction to fail when default users are disabled without bootstrap users.',
+  );
+}
+
+function testBootstrapsUsersFromSeedRecords(): void {
+  const service = new AuthWalletService({
+    allowDefaultUsers: false,
+    users: [
+      {
+        email: 'alex.smith@example.com',
+        password: 'alpha',
+      },
+      {
+        id: 10,
+        email: 'sam@example.com',
+        password: 'bravo',
+        firstName: 'Sam',
+        lastName: 'Seeder',
+        walletBalance: 650,
+        wins: 3,
+        gamesPlayed: 7,
+      },
+    ],
+  });
+
+  const alexLogin = service.login({ email: 'alex.smith@example.com', password: 'alpha' });
+  const samLogin = service.login({ email: 'sam@example.com', password: 'bravo' });
+
+  assertEqual(alexLogin.session.user.id, 1, 'Expected first bootstrap user without id to get fallback id 1.');
+  assertEqual(alexLogin.session.user.displayName, 'Alex Smith', 'Expected default display name to derive from email.');
+  assertEqual(samLogin.session.user.id, 10, 'Expected explicit bootstrap user id to be preserved.');
+
+  const alexWallet = service.getWallet(alexLogin.session.user.id);
+  const samWallet = service.getWallet(samLogin.session.user.id);
+  assertEqual(alexWallet.balance, 500, 'Expected bootstrap wallet default balance for omitted value.');
+  assertEqual(samWallet.balance, 650, 'Expected explicit bootstrap wallet balance to be preserved.');
+
+  const snapshot = service.exportState();
+  const alexSnapshot = snapshot.users.find((user) => user.id === 1);
+  assert(alexSnapshot !== undefined, 'Expected bootstrap snapshot to include fallback-id user.');
+  assert(
+    alexSnapshot.passwordHash.startsWith('scrypt$'),
+    'Expected bootstrap plaintext password to be persisted as scrypt hash.',
+  );
+}
+
 function testRestoresLegacyPlaintextUserRecords(): void {
   const createdAt = new Date().toISOString();
   const legacyUserRecord = {
@@ -208,6 +258,16 @@ function testStateRoundTripRestore(): void {
   assert(restoredAudit.length > 0, 'Expected auth audit log to persist through restore.');
 }
 
+function testRestoreWithoutAuditLogField(): void {
+  const service = new AuthWalletService();
+  const snapshot = service.exportState();
+  delete snapshot.auditLog;
+
+  const restored = new AuthWalletService(snapshot);
+  const login = restored.login({ email: 'colin@example.com', password: 'demo' });
+  assert(login.session.token.length > 0, 'Expected login to succeed when restoring state without audit log field.');
+}
+
 function runAll(): void {
   testLoginSessionAndLogoutFlow();
   testWalletAdjustmentsAndLedger();
@@ -216,8 +276,11 @@ function runAll(): void {
   testRecordsLoginFailuresInAuditLog();
   testRevokeOtherSessions();
   testSessionExpiry();
+  testCanDisableDefaultUsers();
+  testBootstrapsUsersFromSeedRecords();
   testRestoresLegacyPlaintextUserRecords();
   testStateRoundTripRestore();
+  testRestoreWithoutAuditLogField();
   console.info('Auth/wallet tests passed (session + wallet + profile flows).');
 }
 

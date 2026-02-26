@@ -1,7 +1,8 @@
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
+import fs from 'node:fs';
 import type { LoginRequestDTO, UpdateProfileRequestDTO, WalletAdjustmentRequestDTO } from '@poker/game-contracts';
 import type { TableCommand } from '@poker/poker-engine';
-import { AuthWalletService } from './auth-wallet-service.ts';
+import { AuthWalletService, type AuthUserSeedRecord } from './auth-wallet-service.ts';
 import { RuntimeStateStore, type RuntimeStateSnapshot } from './runtime-state-store.ts';
 import { TableService, createDefaultTableState } from './table-service.ts';
 
@@ -62,6 +63,86 @@ function parseSessionTtlMs(rawValue: string | undefined): number | undefined {
   }
 
   return parsed;
+}
+
+function parseBooleanEnv(rawValue: string, label: string): boolean {
+  const normalized = rawValue.trim().toLowerCase();
+  if (['1', 'true', 'yes', 'on'].includes(normalized)) {
+    return true;
+  }
+
+  if (['0', 'false', 'no', 'off'].includes(normalized)) {
+    return false;
+  }
+
+  throw new Error(`Invalid ${label} value: ${rawValue}`);
+}
+
+function parseAllowDemoUsers(rawValue: string | undefined, nodeEnv: string | undefined): boolean {
+  if (rawValue !== undefined) {
+    return parseBooleanEnv(rawValue, 'POKER_AUTH_ALLOW_DEMO_USERS');
+  }
+
+  const normalizedNodeEnv = nodeEnv?.trim().toLowerCase();
+  return normalizedNodeEnv !== 'production';
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function loadBootstrapUsersFromFile(filePathValue: string | undefined): AuthUserSeedRecord[] | undefined {
+  const filePath = filePathValue?.trim();
+  if (!filePath) {
+    return undefined;
+  }
+
+  if (!fs.existsSync(filePath)) {
+    throw new Error(`POKER_AUTH_BOOTSTRAP_USERS_FILE does not exist: ${filePath}`);
+  }
+
+  const rawText = fs.readFileSync(filePath, 'utf8').trim();
+  if (rawText.length === 0) {
+    throw new Error(`POKER_AUTH_BOOTSTRAP_USERS_FILE is empty: ${filePath}`);
+  }
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(rawText) as unknown;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(`Failed to parse POKER_AUTH_BOOTSTRAP_USERS_FILE JSON: ${message}`);
+  }
+
+  const users = Array.isArray(parsed)
+    ? parsed
+    : isRecord(parsed) && Array.isArray(parsed.users)
+      ? parsed.users
+      : null;
+
+  if (!users || users.length === 0) {
+    throw new Error('Bootstrap users file must contain at least one user record.');
+  }
+
+  const normalizedUsers = users.map((entry, index) => {
+    if (!isRecord(entry)) {
+      throw new Error('Bootstrap users file must contain object records only.');
+    }
+
+    if (typeof entry.email !== 'string' || entry.email.trim().length === 0) {
+      throw new Error(`Bootstrap user at index ${index} must include a non-empty email.`);
+    }
+
+    const hasPassword = typeof entry.password === 'string' && entry.password.length > 0;
+    const hasPasswordHash = typeof entry.passwordHash === 'string' && entry.passwordHash.length > 0;
+    if (!hasPassword && !hasPasswordHash) {
+      throw new Error(`Bootstrap user at index ${index} must include password or passwordHash.`);
+    }
+
+    return entry as unknown as AuthUserSeedRecord;
+  });
+
+  return normalizedUsers;
 }
 
 function defaultStateFilePath(): string {
@@ -547,6 +628,9 @@ const persistenceEnabled = parsePersistenceEnabled(process.env.POKER_STATE_PERSI
 const stateFilePath = process.env.POKER_STATE_FILE ?? defaultStateFilePath();
 const authTokenSecret = process.env.POKER_AUTH_TOKEN_SECRET;
 const authSessionTtlMs = parseSessionTtlMs(process.env.POKER_SESSION_TTL_MS);
+const authAllowDemoUsers = parseAllowDemoUsers(process.env.POKER_AUTH_ALLOW_DEMO_USERS, process.env.NODE_ENV);
+const authBootstrapUsersFile = process.env.POKER_AUTH_BOOTSTRAP_USERS_FILE?.trim();
+const authBootstrapUsers = loadBootstrapUsersFromFile(authBootstrapUsersFile);
 const runtimeStateStore = persistenceEnabled ? new RuntimeStateStore(stateFilePath) : null;
 
 let persistedRuntimeState: RuntimeStateSnapshot | null = null;
@@ -588,10 +672,13 @@ const authWalletService = persistedRuntimeState
     users: persistedRuntimeState.auth.users,
     sessions: persistedRuntimeState.auth.sessions,
     auditLog: persistedRuntimeState.auth.auditLog,
+    allowDefaultUsers: authAllowDemoUsers,
     tokenSecret: authTokenSecret,
     sessionTtlMs: authSessionTtlMs,
   })
   : new AuthWalletService({
+    users: authBootstrapUsers,
+    allowDefaultUsers: authAllowDemoUsers,
     tokenSecret: authTokenSecret,
     sessionTtlMs: authSessionTtlMs,
   });
@@ -629,5 +716,13 @@ server.listen(port, host, () => {
   }
   if (!authTokenSecret) {
     console.warn('Auth token secret: using development default. Set POKER_AUTH_TOKEN_SECRET for non-dev environments.');
+  }
+  console.info(`Auth demo users: ${authAllowDemoUsers ? 'enabled' : 'disabled'}`);
+  if (authBootstrapUsersFile) {
+    if (persistedRuntimeState) {
+      console.info('Auth bootstrap users: file configured but ignored because persisted auth state was restored.');
+    } else {
+      console.info(`Auth bootstrap users: loaded from ${authBootstrapUsersFile}`);
+    }
   }
 });

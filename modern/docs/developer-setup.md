@@ -50,6 +50,8 @@ Root shortcut scripts are also available:
 4. Adjust wallet:
    `curl -s -X PATCH http://127.0.0.1:8787/api/wallet -H 'authorization: Bearer <TOKEN>' -H 'content-type: application/json' -d '{"method":"add","amount":25,"reason":"smoke-check"}'`
 
+If demo users are disabled (`POKER_AUTH_ALLOW_DEMO_USERS=0`), set `POKER_AUTH_BOOTSTRAP_USERS_FILE` to a valid JSON seed file first (see `apps/server/bootstrap-users.example.json`).
+
 ## CI Parity
 
 GitHub Actions workflow: `.github/workflows/modern-ci.yml`
