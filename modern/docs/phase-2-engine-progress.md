@@ -1124,3 +1124,14 @@ Sources:
 
 - `apps/client/scripts/run-browser-ui-tests.mjs`
 - `apps/client/src/styles.css`
+
+## PR BI Progress: HowTo Flip-Card Browser Regression Coverage
+
+- Added browser-level interaction assertions for the modern `How To` view flip-cards:
+  - verifies first toggle flips card face state (`is-face-down`) and `aria-pressed`
+  - verifies second toggle restores original face/accessibility state
+- Prevents regressions for the restored HowTo click-to-flip behavior in real browser runtime checks.
+
+Sources:
+
+- `apps/client/scripts/run-browser-ui-tests.mjs`

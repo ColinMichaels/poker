@@ -557,6 +557,13 @@ These are not extraction failures, but they are blockers to deleting the legacy 
 - Added viewport emulation and app-ready waiting utilities to the browser harness for stable mobile checks.
 - Updated client primary CTA styling to enforce `44px` minimum touch target height.
 
+## Completed in PR BI
+
+- Added browser-level regression assertion for modern `How To` flip-card behavior:
+  - verifies click toggle flips face state and `aria-pressed`
+  - verifies second click restores the original state
+- Extended browser UI harness coverage so restored HowTo card interactivity remains protected in CI/local browser verification.
+
 ## Known Intentional Asset Exceptions
 
 - Non-canonical card extras remain excluded from canonical face set:
@@ -669,6 +676,7 @@ Exit criteria:
 58. PR BF: Multi-table action-submission integration tests and shared submit helper.
 59. PR BG: Browser-level multi-table UI regression harness and CI enforcement.
 60. PR BH: Mobile reachability and lobby-flow browser assertions with CTA touch-target hardening.
+61. PR BI: HowTo flip-card browser regression assertions.
 
 ## Cutover Go/No-Go Checklist
 

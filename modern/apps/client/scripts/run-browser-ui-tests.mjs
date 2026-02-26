@@ -435,6 +435,51 @@ async function run() {
 
     assertCondition(Boolean(keyboardSubmit?.ok), 'Multi-table keyboard submit assertions failed.', keyboardSubmit);
 
+    const howToFlip = await cdpClient.evaluate(`
+      (async () => {
+        const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+        const howToViewButton = document.querySelector('[data-role="view-howto"]');
+        if (!howToViewButton) {
+          return { ok: false, reason: 'missing-howto-view-button' };
+        }
+        howToViewButton.click();
+        await sleep(80);
+
+        const cardButton = document.querySelector('[data-role="howto-card-toggle"]');
+        if (!cardButton) {
+          return { ok: false, reason: 'missing-howto-card-toggle' };
+        }
+
+        const beforePressed = cardButton.getAttribute('aria-pressed');
+        const beforeFaceDown = cardButton.classList.contains('is-face-down');
+        cardButton.click();
+        await sleep(60);
+
+        const afterPressed = cardButton.getAttribute('aria-pressed');
+        const afterFaceDown = cardButton.classList.contains('is-face-down');
+        cardButton.click();
+        await sleep(60);
+
+        const restoredPressed = cardButton.getAttribute('aria-pressed');
+        const restoredFaceDown = cardButton.classList.contains('is-face-down');
+        return {
+          ok:
+            beforePressed !== afterPressed &&
+            beforeFaceDown !== afterFaceDown &&
+            restoredPressed === beforePressed &&
+            restoredFaceDown === beforeFaceDown,
+          beforePressed,
+          afterPressed,
+          restoredPressed,
+          beforeFaceDown,
+          afterFaceDown,
+          restoredFaceDown,
+        };
+      })()
+    `);
+
+    assertCondition(Boolean(howToFlip?.ok), 'How To flip-card interaction assertions failed.', howToFlip);
+
     await setViewport(cdpClient, {
       width: 390,
       height: 844,
