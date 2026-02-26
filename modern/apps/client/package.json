@@ -10,7 +10,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@poker/game-contracts": "workspace:*",
-    "@poker/poker-engine": "workspace:*"
+    "@poker/game-contracts": "file:../../packages/game-contracts",
+    "@poker/poker-engine": "file:../../packages/poker-engine"
   }
 }

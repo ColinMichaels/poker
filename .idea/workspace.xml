@@ -4,16 +4,28 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1eee6476-c5d8-4dc1-b068-da2be4a7c407" name="Default Changelist" comment="Introduce modern client scaffold with initial dependencies, configurations, and asset structure.">
+    <list default="true" id="1eee6476-c5d8-4dc1-b068-da2be4a7c407" name="Default Changelist" comment="Expand Texas Hold'em engine with betting flow, side-pot payouts, client action DTOs, and comprehensive test coverage.">
+      <change afterPath="$PROJECT_DIR$/.github/workflows/modern-ci.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/modern/.nvmrc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/modern/apps/client/src/content/howto-content.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/modern/apps/client/src/styles.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/modern/apps/client/src/table-controller.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/modern/docs/developer-setup.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/modern/docs/legacy-decommission-plan.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/modern/package-lock.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/modern/scripts/generate-howto-content.mjs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/02-upgrade-plan/target-architecture-babylon.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/02-upgrade-plan/target-architecture-babylon.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/client/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/client/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/client/src/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/src/main.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/server/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/docs/phase-2-engine-progress.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/docs/phase-2-engine-progress.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/modern/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/packages/game-contracts/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/packages/game-contracts/src/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/packages/poker-engine/scripts/run-fixture-tests.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/modern/packages/poker-engine/scripts/run-fixture-tests.mjs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/packages/poker-engine/src/commands.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/packages/poker-engine/src/commands.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/packages/poker-engine/src/engine.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/packages/poker-engine/src/engine.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/packages/poker-engine/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/packages/poker-engine/src/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/packages/poker-engine/src/state.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/packages/poker-engine/src/state.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/tsconfig.base.json" beforeDir="false" afterPath="$PROJECT_DIR$/modern/tsconfig.base.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,7 +63,7 @@
     <select />
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="473" />
+    <option name="cachedIndexableFilesCount" value="639" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
@@ -72,18 +84,18 @@
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "ColinMichaels"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;ColinMichaels&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/ColinMichaels/poker.git",
-    "accountId": "766fa723-3ebb-47d4-b69b-294d9a253afa"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/ColinMichaels/poker.git&quot;,
+    &quot;accountId&quot;: &quot;766fa723-3ebb-47d4-b69b-294d9a253afa&quot;
   }
-}]]></component>
+}</component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/app/Poker/Game.php" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" />
   </component>
@@ -173,9 +185,9 @@
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="AISelfReview" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 7
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
   <component name="ProjectId" id="1SW7ZXvS3DoDmcb7n1oBC0iatKD" />
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="2" id="Add" />
@@ -193,22 +205,26 @@
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
     "git-widget-placeholder": "feature/modernizing",
+    "javascript.preferred.runtime.type.id": "node",
     "junie.onboarding.icon.badge.shown": "true",
     "last_opened_file_path": "/Users/colin/Projects/poker",
     "node.js.detected.package.eslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+    "npm.build.executor": "Run",
+    "npm.dev.executor": "Run",
+    "settings.editor.selected.configurable": "configurable.group.tools",
     "to.speed.mode.migration.done": "true",
-    "ts.external.directory.path": "/Applications/WebStorm.app/Contents/plugins/javascript-plugin/jsLanguageServicesImpl/external",
+    "ts.external.directory.path": "/Users/colin/Projects/poker/modern/node_modules/typescript/lib",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
   <component name="RecapSpentCounter">
     <option name="endsOfQuotaMs" value="1773266417423" />
-    <option name="spentUsd" value="0.0328978" />
+    <option name="spentUsd" value="0.035380602" />
   </component>
   <component name="RecapUselessUpdatesCounter">
-    <option name="suspendCountdown" value="7" />
+    <option name="suspendCountdown" value="6" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -226,7 +242,7 @@
       <recent name="$PROJECT_DIR$/resources/views/dnu" />
     </key>
   </component>
-  <component name="RunManager" selected="JavaScript Debug.GameComponent.vue">
+  <component name="RunManager" selected="npm.dev">
     <configuration name="GameComponent.vue" type="JavascriptDebugType" nameIsGenerated="true" uri="http://localhost:63342/Poker/resources/js/plugins/game/GameComponent.vue" useBuiltInWebServerPort="true">
       <method v="2" />
     </configuration>
@@ -239,6 +255,32 @@
       <PhpTestRunnerSettings method="" scope="ConfigurationFile" />
       <method v="2" />
     </configuration>
+    <configuration name="build" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/modern/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="build" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <configuration name="dev" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/modern/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="dev" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="npm.dev" />
+        <item itemvalue="npm.build" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="ServiceViewManager">
     <option name="viewStates">
@@ -340,7 +382,15 @@
       <option name="project" value="LOCAL" />
       <updated>1772059477595</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Expand Texas Hold'em engine with betting flow, side-pot payouts, client action DTOs, and comprehensive test coverage.">
+      <option name="closed" value="true" />
+      <created>1772065822931</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1772065822931</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -360,7 +410,8 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="Introduce modern client scaffold with initial dependencies, configurations, and asset structure." />
-    <option name="LAST_COMMIT_MESSAGE" value="Introduce modern client scaffold with initial dependencies, configurations, and asset structure." />
+    <MESSAGE value="Expand Texas Hold'em engine with betting flow, side-pot payouts, client action DTOs, and comprehensive test coverage." />
+    <option name="LAST_COMMIT_MESSAGE" value="Expand Texas Hold'em engine with betting flow, side-pot payouts, client action DTOs, and comprehensive test coverage." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

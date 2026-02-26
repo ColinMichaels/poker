@@ -1,6 +1,6 @@
 # Modern Workspace
 
-This directory contains the modernization scaffold for rebuilding the legacy poker project.
+This directory contains the modernization workspace for rebuilding the legacy poker project.
 
 ## Layout
 
@@ -10,16 +10,39 @@ This directory contains the modernization scaffold for rebuilding the legacy pok
 - `packages/game-contracts`: shared command/event contracts
 - `packages/asset-manifest`: asset normalization + manifest generator
 
+## Prerequisites
+
+- `nvm`
+- Node `22` LTS (`.nvmrc`)
+- npm `10+`
+
+See `docs/developer-setup.md` for full setup/troubleshooting.
+See `docs/legacy-decommission-plan.md` for the staged plan to make modern the primary codebase.
+
 ## Commands
 
 From `modern/`:
 
+- `nvm use` - switch to the workspace Node version
+- `npm install` - install all workspace dependencies
+- `npm run dev:client` - run client dev server
+- `npm run typecheck` - run TypeScript checks across all workspaces
+- `npm run generate:howto-content` - extract legacy `HowTo` Vue content into modern typed guide data
 - `npm run generate:assets` - generate asset manifest only
 - `npm run generate:assets:normalize` - generate manifest and write normalized assets to `apps/client/public/assets`
 - `npm run validate:fixtures` - validate Texas Hold'em fixtures
 - `npm run test --workspace @poker/poker-engine` - run evaluator/showdown/reducer tests
 
+## CI
+
+- Workflow: `.github/workflows/modern-ci.yml`
+- Runs on changes under `modern/**` (plus manual dispatch)
+- Executes:
+  - `npm run typecheck`
+  - `npm run build`
+  - `npm run test:engine`
+
 ## Notes
 
-- `pnpm` is not available in this environment, so this scaffold is wired with npm workspaces.
-- Dependencies are declared but not installed yet.
+- This workspace is wired for npm workspaces.
+- Run all workspace install/build commands from `modern/`.

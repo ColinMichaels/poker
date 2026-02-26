@@ -10,7 +10,7 @@
 ## Recommended Stack
 
 - Language: TypeScript end-to-end
-- Build: Vite + pnpm workspace
+- Build: Vite + npm workspaces
 - 3D/Table rendering: Babylon.js
 - UI shell: React (or Vue 3) overlay for menus/lobby/settings
 - State: reducer/event-sourced domain store (no ad-hoc event bus)
@@ -110,4 +110,3 @@ Responsibilities:
 - Do not port Laravel/Inertia UI as-is.
 - Do not re-implement Spotify integration until core gameplay is stable.
 - Do not optimize advanced shaders before gameplay correctness.
-

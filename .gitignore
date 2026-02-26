@@ -1,4 +1,8 @@
 /node_modules
+/modern/node_modules
+/modern/apps/*/node_modules
+/modern/apps/*/dist
+/modern/packages/*/dist
 /public/hot
 /public/storage
 /storage/*.key

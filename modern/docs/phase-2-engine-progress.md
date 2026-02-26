@@ -118,3 +118,33 @@ Coverage currently includes:
 - heads-up blind/button transition suite
 
 Latest run status: PASS
+
+## Client Integration Slice (Phase 2 MVP Progress)
+
+Added a playable local simulation client wired directly to `@poker/poker-engine`:
+
+- new `LocalTableController` to own state + command application
+- automated phase progression (`DEAL_*` + `RESOLVE_SHOWDOWN`)
+- simple bot policy for non-user seats
+- user HUD actions driven strictly by legal action DTOs
+- board + hole card rendering using normalized `/assets/cards/*` assets
+- seat avatars wired from normalized `/assets/avatars/*` assets
+- event/command log surface for transition debugging
+
+Sources:
+
+- `apps/client/src/table-controller.ts`
+- `apps/client/src/main.ts`
+- `apps/client/src/styles.css`
+
+Validation notes:
+
+- Engine fixture suite passes: `npm run test --workspace @poker/poker-engine`.
+- Client typecheck/build passes: `npm run typecheck` and `npm run build:client`.
+- See `./developer-setup.md` for npm/nvm troubleshooting and workspace command conventions.
+
+## PR A Progress: Legacy HowTo Content Migration
+
+- Added generated typed guide data from legacy `resources/js/Pages/HowTo/games/*.vue` sources.
+- Added generator script: `modern/scripts/generate-howto-content.mjs`.
+- Added modern client `How To` view with game variant tabs and migrated rounds/rules sections.
