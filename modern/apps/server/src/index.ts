@@ -293,6 +293,11 @@ async function handleRequest(
   response: ServerResponse,
   tableService: TableService,
   authWalletService: AuthWalletService,
+  runtimeInfo: {
+    persistenceEnabled: boolean;
+    authAllowDemoUsers: boolean;
+    allowLegacyWalletRoutes: boolean;
+  },
   allowLegacyWalletRoutes: boolean,
   persistRuntimeState: () => void,
 ): Promise<void> {
@@ -316,6 +321,11 @@ async function handleRequest(
         phase: snapshot.state.phase,
         commandSequence: snapshot.commandSequence,
         eventSequence: snapshot.eventSequence,
+        runtime: {
+          persistenceEnabled: runtimeInfo.persistenceEnabled,
+          authDemoUsersEnabled: runtimeInfo.authAllowDemoUsers,
+          legacyWalletRoutesEnabled: runtimeInfo.allowLegacyWalletRoutes,
+        },
       });
       return;
     }
@@ -583,6 +593,11 @@ const server = createServer((request, response) => {
     response,
     tableService,
     authWalletService,
+    {
+      persistenceEnabled,
+      authAllowDemoUsers,
+      allowLegacyWalletRoutes,
+    },
     allowLegacyWalletRoutes,
     persistRuntimeState,
   );

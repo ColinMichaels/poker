@@ -40,6 +40,7 @@ Template reference:
 ## Health + Readiness Checks
 
 - `GET /health` (liveness)
+  - includes runtime flags for persistence/demo-users/legacy-wallet-route modes
 - `GET /api/table/state` (authoritative table snapshot)
 
 Auth/wallet sanity checks:

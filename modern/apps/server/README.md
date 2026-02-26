@@ -46,6 +46,10 @@ Runtime persistence:
 - Enabled by default.
 - Persists table/auth state after mutating requests.
 - Default file: `modern/apps/server/.data/runtime-state.json`
+- `/health` includes runtime mode flags:
+  - `runtime.persistenceEnabled`
+  - `runtime.authDemoUsersEnabled`
+  - `runtime.legacyWalletRoutesEnabled`
 
 Auth/session behavior:
 

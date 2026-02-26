@@ -516,3 +516,17 @@ Sources:
 - `scripts/check-server-env-template.mjs`
 - `apps/server/.env.example`
 - `package.json`
+
+## PR Y Progress: Health Runtime Diagnostics
+
+- Extended `/health` response with runtime mode fields:
+  - `runtime.persistenceEnabled`
+  - `runtime.authDemoUsersEnabled`
+  - `runtime.legacyWalletRoutesEnabled`
+- Updated server/deployment docs to include the new health payload details.
+
+Sources:
+
+- `apps/server/src/index.ts`
+- `apps/server/README.md`
+- `docs/deployment-runbook.md`

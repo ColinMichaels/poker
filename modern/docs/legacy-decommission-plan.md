@@ -219,6 +219,14 @@ These are not extraction failures, but they are blockers to deleting the legacy 
   - `npm run check:server-env-template`
 - Integrated env-template guard into canonical modern CI verification script.
 
+## Completed in PR Y
+
+- Extended `/health` payload with runtime mode visibility:
+  - persistence enabled status
+  - demo-user mode status
+  - legacy-wallet-route mode status
+- Updated server/deployment docs to reflect expanded health diagnostics.
+
 ## Known Intentional Asset Exceptions
 
 - Non-canonical card extras remain excluded from canonical face set:
@@ -295,6 +303,7 @@ Exit criteria:
 22. PR V: Root CI now enforces doctor-first verification.
 23. PR W: Server environment template and doc alignment.
 24. PR X: CI guard for server env-template key coverage.
+25. PR Y: Health endpoint runtime mode diagnostics.
 
 ## Cutover Go/No-Go Checklist
 
