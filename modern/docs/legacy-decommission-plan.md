@@ -245,6 +245,13 @@ These are not extraction failures, but they are blockers to deleting the legacy 
 - Expanded modern CI trigger scope to include npm engine-enforcement config changes:
   - `.npmrc`
 
+## Completed in PR AC
+
+- Added production-mode startup warnings when compatibility overrides are enabled:
+  - demo users enabled in production
+  - legacy wallet routes enabled in production
+- Added startup-config `isProduction` signal for explicit runtime-mode handling.
+
 ## Known Intentional Asset Exceptions
 
 - Non-canonical card extras remain excluded from canonical face set:
@@ -325,6 +332,7 @@ Exit criteria:
 26. PR Z: Production auth token secret fail-fast enforcement.
 27. PR AA: Repository-level npm engine enforcement.
 28. PR AB: Modern CI trigger coverage for `.npmrc` changes.
+29. PR AC: Production compatibility-override startup warnings.
 
 ## Cutover Go/No-Go Checklist
 

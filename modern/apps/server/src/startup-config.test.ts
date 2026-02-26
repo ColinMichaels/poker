@@ -31,6 +31,7 @@ function assertThrows(fn: () => void, expectedPattern: RegExp, message: string):
 
 function testLoadsDevelopmentDefaults(): void {
   const config = loadStartupConfig({});
+  assertEqual(config.isProduction, false, 'Expected non-production mode by default.');
   assertEqual(config.port, 8787, 'Expected default port for missing env.');
   assertEqual(config.host, '127.0.0.1', 'Expected default host for missing env.');
   assertEqual(config.tableId, 'table-1', 'Expected default table id for missing env.');
@@ -47,6 +48,7 @@ function testProductionDefaultsDisableCompatibilityModes(): void {
     POKER_AUTH_TOKEN_SECRET: 'prod-secret-value',
   });
 
+  assertEqual(config.isProduction, true, 'Expected production mode for NODE_ENV=production.');
   assertEqual(config.authAllowDemoUsers, false, 'Expected demo users disabled by default in production.');
   assertEqual(config.allowLegacyWalletRoutes, false, 'Expected legacy routes disabled by default in production.');
 }

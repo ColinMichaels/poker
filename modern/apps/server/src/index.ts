@@ -505,6 +505,7 @@ async function handleRequest(
 }
 
 const {
+  isProduction,
   port,
   host,
   tableId,
@@ -649,6 +650,12 @@ server.listen(port, host, () => {
   }
   console.info(`Auth demo users: ${authAllowDemoUsers ? 'enabled' : 'disabled'}`);
   console.info(`Legacy wallet routes: ${allowLegacyWalletRoutes ? 'enabled' : 'disabled'}`);
+  if (isProduction && authAllowDemoUsers) {
+    console.warn('Production mode warning: demo users are enabled.');
+  }
+  if (isProduction && allowLegacyWalletRoutes) {
+    console.warn('Production mode warning: legacy wallet compatibility routes are enabled.');
+  }
   if (authBootstrapUsersFile) {
     if (persistedRuntimeState) {
       console.info('Auth bootstrap users: file configured but ignored because persisted auth state was restored.');

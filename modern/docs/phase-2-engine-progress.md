@@ -567,3 +567,16 @@ Sources:
 Sources:
 
 - `.github/workflows/modern-ci.yml`
+
+## PR AC Progress: Production Compatibility Warnings
+
+- Added production-mode startup warnings when either compatibility override is enabled:
+  - `POKER_AUTH_ALLOW_DEMO_USERS=1`
+  - `POKER_ENABLE_LEGACY_WALLET_ROUTES=1`
+- Added explicit `isProduction` startup config signal used by server bootstrap logging.
+
+Sources:
+
+- `apps/server/src/startup-config.ts`
+- `apps/server/src/startup-config.test.ts`
+- `apps/server/src/index.ts`

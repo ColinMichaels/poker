@@ -142,6 +142,7 @@ function defaultStateFilePath(): string {
 }
 
 export interface StartupConfig {
+  isProduction: boolean;
   port: number;
   host: string;
   tableId: string;
@@ -157,14 +158,16 @@ export interface StartupConfig {
 
 export function loadStartupConfig(env: Record<string, string | undefined>): StartupConfig {
   const normalizedNodeEnv = env.NODE_ENV?.trim().toLowerCase();
+  const isProduction = normalizedNodeEnv === 'production';
   const authBootstrapUsersFile = env.POKER_AUTH_BOOTSTRAP_USERS_FILE?.trim();
   const authTokenSecret = env.POKER_AUTH_TOKEN_SECRET?.trim();
 
-  if (normalizedNodeEnv === 'production' && !authTokenSecret) {
+  if (isProduction && !authTokenSecret) {
     throw new Error('POKER_AUTH_TOKEN_SECRET is required when NODE_ENV=production.');
   }
 
   return {
+    isProduction,
     port: parsePort(env.PORT),
     host: env.HOST ?? DEFAULT_HOST,
     tableId: env.TABLE_ID ?? DEFAULT_TABLE_ID,
