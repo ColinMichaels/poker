@@ -20,8 +20,7 @@ Purpose: make `modern/` the primary codebase without losing reusable legacy func
 
 These are not extraction failures, but they are blockers to deleting the legacy app:
 
-1. Legacy auth/wallet/user CRUD flows do not yet have modern replacements.
-2. Root repository still reflects legacy project shape and README messaging.
+1. Server/runtime persistence and real auth hardening are not yet implemented (current auth/wallet parity is in-memory MVP).
 
 ## Completed in PR A
 
@@ -41,6 +40,25 @@ These are not extraction failures, but they are blockers to deleting the legacy 
   - replay verification endpoint: `GET /api/table/hands/:handId/replay`
 - Added server lifecycle/replay tests:
   - `modern/apps/server/src/table-service.test.ts`
+
+## Completed in PR C
+
+- Added minimal auth/profile/wallet contracts in `modern/packages/game-contracts/src/index.ts`.
+- Added in-memory auth + wallet parity service in `modern/apps/server/src/auth-wallet-service.ts`.
+- Added API endpoints for auth/session/profile/wallet in `modern/apps/server/src/index.ts`.
+- Added legacy wallet compatibility routes (`GET /wallet`, `PATCH /wallet/:id`) to support migration continuity.
+- Added auth/wallet tests:
+  - `modern/apps/server/src/auth-wallet-service.test.ts`
+
+## Completed in PR D
+
+- Updated root repository onboarding to default to modern workspace:
+  - `readme.md`
+  - root `package.json` modern entrypoint scripts (`dev`, `build`, `test`, `modern:*`)
+- Added modern deployment runbook:
+  - `modern/docs/deployment-runbook.md`
+- Linked modern deployment docs from workspace README:
+  - `modern/README.md`
 
 ## Known Intentional Asset Exceptions
 

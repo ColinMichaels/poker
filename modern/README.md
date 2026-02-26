@@ -18,6 +18,7 @@ This directory contains the modernization workspace for rebuilding the legacy po
 
 See `docs/developer-setup.md` for full setup/troubleshooting.
 See `docs/legacy-decommission-plan.md` for the staged plan to make modern the primary codebase.
+See `docs/deployment-runbook.md` for modern runtime deployment entrypoints/checks.
 
 ## Commands
 
@@ -29,7 +30,7 @@ From `modern/`:
 - `npm run dev:server` - run authoritative server in watch mode
 - `npm run typecheck` - run TypeScript checks across all workspaces
 - `npm run build:server` - compile the server workspace
-- `npm run test:server` - run server hand lifecycle/replay tests
+- `npm run test:server` - run server hand lifecycle + auth/wallet tests
 - `npm run generate:howto-content` - extract legacy `HowTo` Vue content into modern typed guide data
 - `npm run generate:assets` - generate asset manifest only
 - `npm run generate:assets:normalize` - generate manifest and write normalized assets to `apps/client/public/assets`

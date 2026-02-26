@@ -1,7 +1,15 @@
 {
     "private": true,
     "scripts": {
-        "dev": "npm run development",
+        "dev": "npm run modern:dev",
+        "build": "npm run modern:build",
+        "test": "npm run modern:test",
+        "modern:dev": "npm run dev:client --prefix modern",
+        "modern:server": "npm run dev:server --prefix modern",
+        "modern:typecheck": "npm run typecheck --prefix modern",
+        "modern:build": "npm run build --prefix modern",
+        "modern:test": "npm run test:engine --prefix modern && npm run test:server --prefix modern",
+        "legacy:dev": "npm run development",
         "development": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
         "watch": "npm run development -- --watch",
         "watch-poll": "npm run watch -- --watch-poll",

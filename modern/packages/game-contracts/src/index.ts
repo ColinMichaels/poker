@@ -62,3 +62,64 @@ export interface TableActionStateDTO {
   actingSeatId: number;
   seats: SeatActionStateDTO[];
 }
+
+export type WalletAdjustmentMethod = 'add' | 'sub';
+
+export interface PlayerWalletDTO {
+  userId: number;
+  balance: number;
+  wins: number;
+  gamesPlayed: number;
+  updatedAt: string;
+}
+
+export interface UserProfileDTO {
+  id: number;
+  email: string;
+  firstName: string;
+  lastName: string;
+  displayName: string;
+  wallet: PlayerWalletDTO;
+}
+
+export interface AuthSessionDTO {
+  token: string;
+  issuedAt: string;
+  expiresAt: string | null;
+  user: UserProfileDTO;
+}
+
+export interface LoginRequestDTO {
+  email: string;
+  password?: string;
+}
+
+export interface LoginResponseDTO {
+  session: AuthSessionDTO;
+}
+
+export interface UpdateProfileRequestDTO {
+  firstName?: string;
+  lastName?: string;
+}
+
+export interface WalletAdjustmentRequestDTO {
+  method: WalletAdjustmentMethod;
+  amount: number;
+  reason?: string;
+}
+
+export interface WalletLedgerEntryDTO {
+  id: string;
+  userId: number;
+  method: WalletAdjustmentMethod;
+  amount: number;
+  balanceAfter: number;
+  reason: string;
+  createdAt: string;
+}
+
+export interface WalletAdjustmentResponseDTO {
+  wallet: PlayerWalletDTO;
+  entry: WalletLedgerEntryDTO;
+}

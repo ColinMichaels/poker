@@ -1,34 +1,42 @@
+# Poker Modernization Workspace
 
-## POKER
+This repository now defaults to the modern TypeScript workspace in `modern/`.
 
-This is a learning project. 
+## Current Default
 
-## Source
+- Client: `modern/apps/client`
+- Server: `modern/apps/server`
+- Engine + contracts: `modern/packages/*`
 
-gihub : [https://github.com/ColinMichaels/poker](https://github.com/ColinMichaels/poker)
+## Quick Start
 
-## Demo
+From repository root:
 
-coming soon 
+1. `cd modern`
+2. `nvm use` (or `nvm install && nvm use`)
+3. `npm install`
+4. `npm run typecheck`
+5. `npm run build`
+6. `npm run test:engine`
+7. `npm run test:server`
 
-## Inspiration
+Or use root shortcuts:
 
-Many thanks to all those people in the open source community.  And those that share and collaborate. I will list borrowed snipits and inspirations.   
+- `npm run dev` (modern client)
+- `npm run modern:server`
+- `npm run modern:typecheck`
+- `npm run modern:build`
+- `npm run modern:test`
 
-## Usage
+## Docs
 
-The concept here is for me to practice PHPSpec , VueJs , Laravel, Tailwind , and learning Inertia.   
-I started this building out classes in PHP using PHPspec.  I am going to continue working on that end but wanted something visually happening so I jumped ahead a bit and starting implementing Inertia.js (used alot of the Inertia.js demo project PingCRM to get me up to speed) _Thank you Jonathan Reinink @Reinink_ for all your hard work there.   Also want to give a shout out to the man the myth, the legend Jeffery Way @laracast.  Without his videos and hard work I would have never been able to do any of this.   
+- Modern workspace guide: `modern/README.md`
+- Developer setup/troubleshooting: `modern/docs/developer-setup.md`
+- Legacy decommission + cutover status: `modern/docs/legacy-decommission-plan.md`
 
+## Legacy Codebase
 
-## Contributing
+The Laravel/Vue2 implementation remains in place for controlled migration and historical reference.
 
-Email me [colin@colinmichaels.com](mailto::colin@colinmichaels.com?subject=poker_project)
-
-## Security Vulnerabilities
-
-Email me [colin@colinmichaels.com](mailto::colin@colinmichaels.com?subject=poker_project_security_issues)
-
-## License
-
-The Laravel framework is open-source software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- Legacy framework notes: `laravel-readme.md`
+- Legacy frontend/backend scripts are still available through existing `legacy:*` and Laravel scripts in `package.json`.

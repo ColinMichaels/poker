@@ -168,3 +168,38 @@ Sources:
 - `apps/server/src/table-service.ts`
 - `apps/server/src/index.ts`
 - `apps/server/src/table-service.test.ts`
+
+## PR C Progress: Minimal Auth/Wallet Parity + Contracts
+
+- Added shared auth/wallet DTO contracts in `@poker/game-contracts`:
+  - `AuthSessionDTO`, `UserProfileDTO`, `PlayerWalletDTO`
+  - `WalletAdjustmentRequestDTO`, `WalletAdjustmentResponseDTO`, `WalletLedgerEntryDTO`
+- Added in-memory auth/wallet service in server:
+  - login/logout/session lifecycle
+  - profile read/update (`/api/users/me`)
+  - wallet balance adjust + ledger (`/api/wallet`, `/api/wallet/ledger`)
+- Added legacy wallet compatibility routes:
+  - `GET /wallet`
+  - `PATCH /wallet/:id`
+- Added auth/wallet test coverage:
+  - `apps/server/src/auth-wallet-service.test.ts`
+
+Sources:
+
+- `packages/game-contracts/src/index.ts`
+- `apps/server/src/auth-wallet-service.ts`
+- `apps/server/src/index.ts`
+- `apps/server/src/auth-wallet-service.test.ts`
+
+## PR D Progress: Root Docs + Runtime Entry Point Promotion
+
+- Updated root onboarding/readme to point contributors to `modern/` first.
+- Added root npm entrypoints that execute modern workflows by default:
+  - `dev`, `build`, `test`, plus explicit `modern:*` script aliases
+- Added modern deployment runbook with build/start/health-check sequence.
+
+Sources:
+
+- `readme.md`
+- `package.json`
+- `modern/docs/deployment-runbook.md`

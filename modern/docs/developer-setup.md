@@ -24,15 +24,31 @@ From repository root:
 - `npm run dev:server` - start authoritative table server (watch mode)
 - `npm run typecheck` - run TypeScript checks in all workspaces
 - `npm run test:engine` - run poker-engine fixtures + reducer tests
-- `npm run test:server` - run server lifecycle + replay tests
+- `npm run test:server` - run server lifecycle + auth/wallet parity tests
 - `npm run generate:howto-content` - regenerate migrated legacy HowTo content
 - `npm run generate:assets:normalize` - regenerate normalized asset pack + manifest
+
+Root shortcut scripts are also available:
+
+- `npm run dev` (modern client)
+- `npm run build` (modern workspace build)
+- `npm run test` (modern engine + server tests)
 
 ## Server Smoke Check
 
 1. `npm run dev:server`
 2. `curl http://127.0.0.1:8787/health`
 3. `curl http://127.0.0.1:8787/api/table/state`
+
+## Auth/Wallet Smoke Check
+
+1. Login:
+   `curl -s -X POST http://127.0.0.1:8787/api/auth/login -H 'content-type: application/json' -d '{"email":"colin@example.com","password":"demo"}'`
+2. Use returned `session.token` as bearer token.
+3. Read wallet:
+   `curl -s http://127.0.0.1:8787/api/wallet -H 'authorization: Bearer <TOKEN>'`
+4. Adjust wallet:
+   `curl -s -X PATCH http://127.0.0.1:8787/api/wallet -H 'authorization: Bearer <TOKEN>' -H 'content-type: application/json' -d '{"method":"add","amount":25,"reason":"smoke-check"}'`
 
 ## CI Parity
 

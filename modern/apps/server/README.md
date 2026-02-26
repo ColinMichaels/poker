@@ -1,6 +1,6 @@
 # Poker Server MVP
 
-This service is the PR B authoritative single-table runtime for `modern/`.
+This service is the PR B/PR C runtime for `modern/` (authoritative table + minimal auth/wallet parity).
 
 ## What It Does
 
@@ -32,6 +32,14 @@ Environment overrides:
 
 ## HTTP API
 
+- `POST /api/auth/login`
+- `POST /api/auth/logout`
+- `GET /api/auth/session`
+- `GET /api/users/me`
+- `PATCH /api/users/me`
+- `GET /api/wallet`
+- `PATCH /api/wallet`
+- `GET /api/wallet/ledger?limit=50`
 - `GET /health`
 - `GET /api/table/state`
 - `POST /api/table/command`
@@ -41,7 +49,17 @@ Environment overrides:
 - `GET /api/table/hands/:handId`
 - `GET /api/table/hands/:handId/replay`
 
+Legacy compatibility wallet routes:
+
+- `GET /wallet`
+- `PATCH /wallet/:id`
+
 `POST /api/table/command` accepts either:
 
 - `{ "command": { ...TableCommand } }`
 - `{ ...TableCommand }`
+
+Demo login users:
+
+- `colin@example.com` / `demo`
+- `luna@example.com` / `demo`
