@@ -1,0 +1,15 @@
+{
+  "name": "@poker/poker-engine",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "npm run validate:fixtures && npm run test:engine",
+    "validate:fixtures": "node ./scripts/validate-fixtures.mjs",
+    "test:engine": "node --experimental-strip-types ./scripts/run-fixture-tests.mjs"
+  }
+}

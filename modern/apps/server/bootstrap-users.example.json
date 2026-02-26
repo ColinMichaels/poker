@@ -1,0 +1,19 @@
+{
+  "users": [
+    {
+      "id": 101,
+      "email": "admin@example.com",
+      "password": "change-me",
+      "firstName": "Admin",
+      "lastName": "User",
+      "walletBalance": 1000,
+      "wins": 0,
+      "gamesPlayed": 0
+    },
+    {
+      "email": "qa.player@example.com",
+      "password": "change-me",
+      "walletBalance": 500
+    }
+  ]
+}

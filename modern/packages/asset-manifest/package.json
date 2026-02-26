@@ -1,0 +1,13 @@
+{
+  "name": "@poker/asset-manifest",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "generate": "node ./scripts/generate-manifest.mjs",
+    "generate:normalize": "node ./scripts/generate-manifest.mjs --normalize-output",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  }
+}

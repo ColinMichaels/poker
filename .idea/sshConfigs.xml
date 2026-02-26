@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SshConfigs">
+    <configs>
+      <sshConfig authType="PASSWORD" connectionConfig="{&quot;serverAliveInterval&quot;:300}" host="192.168.1.14" id="e2f194d1-875d-46e6-9c11-d7fc3287aea4" port="22" customName="Raspberry" nameFormat="CUSTOM" username="pi" useOpenSSHConfig="true">
+        <option name="customName" value="Raspberry" />
+      </sshConfig>
+    </configs>
+  </component>
+</project>

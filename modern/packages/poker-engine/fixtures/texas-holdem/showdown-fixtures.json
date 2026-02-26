@@ -1,0 +1,29 @@
+[
+  {
+    "id": "board-straight-shared-split",
+    "board": ["10H", "JH", "QC", "KD", "AS"],
+    "players": [
+      { "seatId": 1, "hole": ["2C", "2D"] },
+      { "seatId": 2, "hole": ["3C", "3D"] }
+    ],
+    "expectedWinnerSeatIds": [1, 2]
+  },
+  {
+    "id": "top-pair-kicker-wins",
+    "board": ["AH", "7D", "4C", "10S", "2H"],
+    "players": [
+      { "seatId": 1, "hole": ["KC", "QD"] },
+      { "seatId": 2, "hole": ["JC", "9D"] }
+    ],
+    "expectedWinnerSeatIds": [1]
+  },
+  {
+    "id": "flush-beats-straight",
+    "board": ["2H", "5H", "9H", "10C", "JD"],
+    "players": [
+      { "seatId": 1, "hole": ["KH", "3H"] },
+      { "seatId": 2, "hole": ["8S", "7D"] }
+    ],
+    "expectedWinnerSeatIds": [1]
+  }
+]

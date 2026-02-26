@@ -1,0 +1,58 @@
+name: Modern CI
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/modern-ci.yml'
+      - 'modern/**'
+      - 'package.json'
+      - 'readme.md'
+      - '.npmrc'
+      - '.nvmrc'
+      - 'scripts/doctor-modern-env.mjs'
+  push:
+    branches:
+      - main
+      - master
+      - feature/**
+    paths:
+      - '.github/workflows/modern-ci.yml'
+      - 'modern/**'
+      - 'package.json'
+      - 'readme.md'
+      - '.npmrc'
+      - '.nvmrc'
+      - 'scripts/doctor-modern-env.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: modern-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  modern-ci:
+    name: Modern CI Verify
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: modern
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: modern/.nvmrc
+          cache: npm
+          cache-dependency-path: modern/package-lock.json
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Verify
+        run: npm run ci

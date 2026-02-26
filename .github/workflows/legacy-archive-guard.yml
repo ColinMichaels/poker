@@ -1,0 +1,51 @@
+name: Legacy Archive Guard
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/legacy-archive-guard.yml'
+      - 'legacy/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  legacy-archive-guard:
+    name: Block Legacy Code Changes
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, 'allow-legacy-change') }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify Legacy Archive Is Read-Only
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          set -euo pipefail
+
+          base_sha="${{ github.event.pull_request.base.sha }}"
+          head_sha="${{ github.sha }}"
+
+          changed="$(git diff --name-only "${base_sha}...${head_sha}" -- legacy/)"
+          if [ -z "${changed}" ]; then
+            echo "No legacy changes detected."
+            exit 0
+          fi
+
+          disallowed="$(printf '%s\n' "${changed}" | grep -v -E '^legacy/(README\.md|laravel-readme\.md)$' || true)"
+          if [ -n "${disallowed}" ]; then
+            echo "Legacy archive guard failure. The following legacy files are not allowed to change:"
+            printf '%s\n' "${disallowed}"
+            echo
+            echo "Allowed legacy updates are documentation-only:"
+            echo "- legacy/README.md"
+            echo "- legacy/laravel-readme.md"
+            echo
+            echo "If this is an approved emergency change, add the PR label 'allow-legacy-change' and rerun checks."
+            exit 1
+          fi
+
+          echo "Legacy changes are documentation-only and allowed."

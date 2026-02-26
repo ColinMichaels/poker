@@ -1,0 +1,39 @@
+{
+  "name": "poker-modern-workspace",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Modern Babylon.js poker workspace scaffold",
+  "engines": {
+    "node": ">=22 <25",
+    "npm": ">=10"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace @poker/client",
+    "dev:client": "npm run dev --workspace @poker/client",
+    "dev:server": "npm run dev --workspace @poker/server",
+    "preview": "npm run preview --workspace @poker/client",
+    "build:client": "npm run build --workspace @poker/client",
+    "build:server": "npm run build --workspace @poker/server",
+    "test:engine": "npm run test --workspace @poker/poker-engine",
+    "test:server": "npm run test --workspace @poker/server",
+    "build": "npm run build --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "check:server-env-template": "node ./scripts/check-server-env-template.mjs",
+    "check:legacy-refs": "node ./scripts/check-legacy-references.mjs",
+    "ci": "npm run check:legacy-refs && npm run check:server-env-template && npm run typecheck && npm run build && npm run test:engine && npm run test:server",
+    "generate:howto-content": "node ./scripts/generate-howto-content.mjs",
+    "generate:assets": "npm run generate --workspace @poker/asset-manifest",
+    "generate:assets:normalize": "npm run generate:normalize --workspace @poker/asset-manifest",
+    "validate:fixtures": "npm run validate:fixtures --workspace @poker/poker-engine"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3",
+    "vite": "^6.1.0",
+    "vitest": "^3.0.5"
+  }
+}

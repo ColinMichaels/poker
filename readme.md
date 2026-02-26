@@ -1,34 +1,55 @@
+# Poker Modernization Workspace
 
-## POKER
+This repository now defaults to the modern TypeScript workspace in `modern/`.
 
-This is a learning project. 
+## Current Default
 
-## Source
+- Client: `modern/apps/client`
+- Server: `modern/apps/server`
+- Engine + contracts: `modern/packages/*`
 
-gihub : [https://github.com/ColinMichaels/poker](https://github.com/ColinMichaels/poker)
+## Quick Start
 
-## Demo
+From repository root:
 
-coming soon 
+1. `nvm use` (or `nvm install && nvm use`)
+2. `npm run doctor`
+3. `cd modern`
+4. `nvm use` (or `nvm install && nvm use`)
+5. `npm install`
+6. `npm run typecheck`
+7. `npm run build`
+8. `npm run test:engine`
+9. `npm run test:server`
 
-## Inspiration
+Note: installs are engine-enforced (`.npmrc` with `engine-strict=true`), so use Node 22-24 and npm 10+.
 
-Many thanks to all those people in the open source community.  And those that share and collaborate. I will list borrowed snipits and inspirations.   
+Or use root shortcuts:
 
-## Usage
+- `npm run dev` (modern client)
+- `npm run dev:server`
+- `npm run ci` (doctor + modern typecheck/build/engine/server tests)
+- `npm run audit:legacy-references` (inventory `legacy/` path references outside archive)
+- `npm run readiness:legacy-cutover` (legacy-removal static readiness checks)
+- `npm run typecheck`
+- `npm run build`
+- `npm run test`
 
-The concept here is for me to practice PHPSpec , VueJs , Laravel, Tailwind , and learning Inertia.   
-I started this building out classes in PHP using PHPspec.  I am going to continue working on that end but wanted something visually happening so I jumped ahead a bit and starting implementing Inertia.js (used alot of the Inertia.js demo project PingCRM to get me up to speed) _Thank you Jonathan Reinink @Reinink_ for all your hard work there.   Also want to give a shout out to the man the myth, the legend Jeffery Way @laracast.  Without his videos and hard work I would have never been able to do any of this.   
+## Docs
 
+- Modern workspace guide: `modern/README.md`
+- Developer setup/troubleshooting: `modern/docs/developer-setup.md`
+- Legacy decommission + cutover status: `modern/docs/legacy-decommission-plan.md`
+- Final legacy removal runbook: `modern/docs/legacy-removal-execution.md`
 
-## Contributing
+## Legacy Codebase
 
-Email me [colin@colinmichaels.com](mailto::colin@colinmichaels.com?subject=poker_project)
+The Laravel/Vue2 implementation remains in place for controlled migration and historical reference.
 
-## Security Vulnerabilities
-
-Email me [colin@colinmichaels.com](mailto::colin@colinmichaels.com?subject=poker_project_security_issues)
-
-## License
-
-The Laravel framework is open-source software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- Legacy archive location: `legacy/`
+- Legacy framework notes: `legacy/laravel-readme.md`
+- Legacy archive README: `legacy/README.md`
+- Legacy archive guard workflow: `.github/workflows/legacy-archive-guard.yml`
+- Root legacy scripts require explicit acknowledgement:
+  - `LEGACY_ARCHIVE_ACK=1 npm run legacy:dev`
+  - `LEGACY_ARCHIVE_ACK=1 npm run legacy:build`

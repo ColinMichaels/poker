@@ -1,0 +1,52 @@
+[
+  {
+    "id": "royal-flush-spades",
+    "cards": ["AS", "KS", "QS", "JS", "10S"],
+    "expectedCategory": "ROYAL_FLUSH"
+  },
+  {
+    "id": "straight-flush-nine-high",
+    "cards": ["9H", "8H", "7H", "6H", "5H"],
+    "expectedCategory": "STRAIGHT_FLUSH"
+  },
+  {
+    "id": "four-of-a-kind-queens",
+    "cards": ["QH", "QS", "QC", "QD", "2D"],
+    "expectedCategory": "FOUR_OF_A_KIND"
+  },
+  {
+    "id": "full-house-jacks-over-tens",
+    "cards": ["JS", "JD", "JC", "10H", "10D"],
+    "expectedCategory": "FULL_HOUSE"
+  },
+  {
+    "id": "flush-no-straight",
+    "cards": ["2C", "5C", "9C", "JC", "KC"],
+    "expectedCategory": "FLUSH"
+  },
+  {
+    "id": "wheel-straight",
+    "cards": ["AH", "2D", "3C", "4S", "5H"],
+    "expectedCategory": "STRAIGHT"
+  },
+  {
+    "id": "three-of-a-kind-fives",
+    "cards": ["5C", "5D", "5S", "JC", "10H"],
+    "expectedCategory": "THREE_OF_A_KIND"
+  },
+  {
+    "id": "two-pair-fours-and-twos",
+    "cards": ["4H", "4D", "2C", "2S", "9D"],
+    "expectedCategory": "TWO_PAIR"
+  },
+  {
+    "id": "pair-of-aces",
+    "cards": ["AH", "AC", "4S", "7H", "6D"],
+    "expectedCategory": "PAIR"
+  },
+  {
+    "id": "high-card-jack",
+    "cards": ["JH", "10C", "5S", "3H", "7D"],
+    "expectedCategory": "HIGH_CARD"
+  }
+]

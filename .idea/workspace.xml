@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AIDiffSettings">
+    <option name="showAIDiff" value="true" />
+  </component>
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="1eee6476-c5d8-4dc1-b068-da2be4a7c407" name="Default Changelist" comment="">
+    <list default="true" id="1eee6476-c5d8-4dc1-b068-da2be4a7c407" name="Default Changelist" comment="feat: add auth bootstrap and demo user controls&#10;&#10;Add `POKER_AUTH_BOOTSTRAP_USERS_FILE` for JSON-based seed user initialization and `POKER_AUTH_ALLOW_DEMO_USERS` to control demo user access. Update docs, tests, and examples for auth bootstrap and production guardrails.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Menu.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Menu.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/js/5.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/5.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/js/7.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/7.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/mix-manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/mix-manifest.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/Poker/Card.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/Poker/Card.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/plugins/game/GameComponent.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/plugins/game/GameComponent.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/plugins/game/GamePlugin.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/plugins/game/GamePlugin.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/client/src/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/src/main.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/client/src/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/src/styles.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/docs/legacy-decommission-plan.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/docs/legacy-decommission-plan.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/docs/phase-2-engine-progress.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/docs/phase-2-engine-progress.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,6 +49,10 @@
     </expand>
     <select />
   </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="639" />
+    <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
+  </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
@@ -59,10 +64,31 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;ColinMichaels&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/ColinMichaels/poker.git&quot;,
+    &quot;accountId&quot;: &quot;766fa723-3ebb-47d4-b69b-294d9a253afa&quot;
+  }
+}</component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/app/Poker/Game.php" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
   </component>
   <component name="PhpDebugGeneral" listening_started="true" />
   <component name="PhpWorkspaceProjectConfiguration" interpreter_name="PHP 7.2 (1)">
@@ -143,34 +169,49 @@
       <path value="$PROJECT_DIR$/vendor/barryvdh/laravel-debugbar" />
     </include_path>
   </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="AISelfReview" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
   <component name="ProjectId" id="1SW7ZXvS3DoDmcb7n1oBC0iatKD" />
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="2" id="Add" />
   </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
-    <option name="showExcludedFiles" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">
-    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
-    <property name="DatabaseDriversLRU" value="mysql" />
-    <property name="DefaultHtmlFileTemplate" value="HTML File" />
-    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="WebServerToolWindowFactoryState" value="true" />
-    <property name="WebServerToolWindowPanel.toolwindow.highlight.mappings" value="true" />
-    <property name="WebServerToolWindowPanel.toolwindow.highlight.symlinks" value="true" />
-    <property name="WebServerToolWindowPanel.toolwindow.show.date" value="false" />
-    <property name="WebServerToolWindowPanel.toolwindow.show.permissions" value="false" />
-    <property name="WebServerToolWindowPanel.toolwindow.show.size" value="false" />
-    <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/New Scratch File" value="PHP" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="node.js.detected.package.stylelint" value="true" />
-    <property name="node.js.path.for.package.stylelint" value="project" />
-    <property name="node.js.selected.package.stylelint" value="$PROJECT_DIR$/node_modules" />
-    <property name="nodejs_package_manager_path" value="npm" />
-    <property name="settings.editor.selected.configurable" value="preferences.pathVariables" />
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "feature/modernizing",
+    "javascript.preferred.runtime.type.id": "node",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "/Users/colin/Projects/poker",
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "npm.build.executor": "Run",
+    "npm.dev.executor": "Run",
+    "settings.editor.selected.configurable": "configurable.group.tools",
+    "to.speed.mode.migration.done": "true",
+    "ts.external.directory.path": "/Users/colin/Projects/poker/modern/node_modules/typescript/lib",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RecapSpentCounter">
+    <option name="endsOfQuotaMs" value="1773266417423" />
+    <option name="spentUsd" value="0.035380602" />
+  </component>
+  <component name="RecapUselessUpdatesCounter">
+    <option name="suspendCountdown" value="6" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -188,7 +229,7 @@
       <recent name="$PROJECT_DIR$/resources/views/dnu" />
     </key>
   </component>
-  <component name="RunManager" selected="JavaScript Debug.GameComponent.vue">
+  <component name="RunManager" selected="npm.dev">
     <configuration name="GameComponent.vue" type="JavascriptDebugType" nameIsGenerated="true" uri="http://localhost:63342/Poker/resources/js/plugins/game/GameComponent.vue" useBuiltInWebServerPort="true">
       <method v="2" />
     </configuration>
@@ -201,6 +242,32 @@
       <PhpTestRunnerSettings method="" scope="ConfigurationFile" />
       <method v="2" />
     </configuration>
+    <configuration name="build" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/modern/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="build" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <configuration name="dev" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/modern/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="dev" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="npm.dev" />
+        <item itemvalue="npm.build" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="ServiceViewManager">
     <option name="viewStates">
@@ -213,6 +280,13 @@
         </serviceView>
       </list>
     </option>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-WS-253.31033.133" />
+      </set>
+    </attachedChunks>
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -279,19 +353,82 @@
       <workItem from="1578331910838" duration="246000" />
       <workItem from="1578515312078" duration="235000" />
     </task>
+    <task id="LOCAL-00001" summary="Introduce modern client scaffold with initial dependencies, configurations, and asset structure.">
+      <option name="closed" value="true" />
+      <created>1772058894590</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1772058894590</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Introduce modern client scaffold with initial dependencies, configurations, and asset structure.">
+      <option name="closed" value="true" />
+      <created>1772059477595</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1772059477595</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Expand Texas Hold'em engine with betting flow, side-pot payouts, client action DTOs, and comprehensive test coverage.">
+      <option name="closed" value="true" />
+      <created>1772065822931</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1772065822931</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Add `package-lock.json` for the modern Poker workspace with updated dependencies and configurations">
+      <option name="closed" value="true" />
+      <created>1772092379697</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1772092379697</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Add Poker Server MVP with hand lifecycle, deterministic replay, and lifecycle/replay tests.">
+      <option name="closed" value="true" />
+      <created>1772093257148</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1772093257148</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Add auth and wallet API to Poker Server MVP with session handling, user profiles, wallet adjustments, and ledger tracking. Extend tests, docs, and CLI scripts to ensure parity and coverage.">
+      <option name="closed" value="true" />
+      <created>1772093846306</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1772093846306</updated>
+    </task>
+    <task id="LOCAL-00007" summary="chore: update `.idea/workspace.xml` with extended legacy file references and default changelist adjustments">
+      <option name="closed" value="true" />
+      <created>1772094650330</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1772094650330</updated>
+    </task>
+    <task id="LOCAL-00008" summary="feat: add auth bootstrap and demo user controls&#10;&#10;Add `POKER_AUTH_BOOTSTRAP_USERS_FILE` for JSON-based seed user initialization and `POKER_AUTH_ALLOW_DEMO_USERS` to control demo user access. Update docs, tests, and examples for auth bootstrap and production guardrails.">
+      <option name="closed" value="true" />
+      <created>1772096727497</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1772096727497</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="1" />
+    <option name="version" value="3" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
       <map>
         <entry key="MAIN">
           <value>
-            <State>
-              <option name="COLUMN_ORDER" />
-            </State>
+            <State />
           </value>
         </entry>
       </map>
@@ -299,99 +436,14 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-  </component>
-  <component name="WindowStateProjectService">
-    <state x="-1570" y="316" key="#PHP" timestamp="1575997751162">
-      <screen x="-2560" y="23" width="2560" height="1417" />
-    </state>
-    <state x="-1570" y="316" key="#PHP/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575997751162" />
-    <state x="385" y="277" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1577990966765">
-      <screen x="0" y="23" width="1920" height="1177" />
-    </state>
-    <state x="385" y="277" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.23.1920.1177@0.23.1920.1177" timestamp="1577990966765" />
-    <state x="-1592" y="466" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1578331773312">
-      <screen x="-2560" y="23" width="2560" height="1417" />
-    </state>
-    <state x="-1592" y="466" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1578331773312" />
-    <state x="726" y="391" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.23.1920.1177@0.23.1920.1177" timestamp="1577911959224" />
-    <state x="-1553" y="403" key="#phpspec.yml" timestamp="1575997777019">
-      <screen x="-2560" y="23" width="2560" height="1417" />
-    </state>
-    <state x="-1553" y="403" key="#phpspec.yml/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575997777019" />
-    <state width="2518" height="501" key="GridCell.Tab.0.bottom" timestamp="1575999847734">
-      <screen x="-2560" y="23" width="2560" height="1417" />
-    </state>
-    <state width="2518" height="501" key="GridCell.Tab.0.bottom/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575999847734" />
-    <state width="2518" height="501" key="GridCell.Tab.0.center" timestamp="1575999847733">
-      <screen x="-2560" y="23" width="2560" height="1417" />
-    </state>
-    <state width="2518" height="501" key="GridCell.Tab.0.center/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575999847733" />
-    <state width="2518" height="501" key="GridCell.Tab.0.left" timestamp="1575999847733">
-      <screen x="-2560" y="23" width="2560" height="1417" />
-    </state>
-    <state width="2518" height="501" key="GridCell.Tab.0.left/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575999847733" />
-    <state width="2518" height="501" key="GridCell.Tab.0.right" timestamp="1575999847733">
-      <screen x="-2560" y="23" width="2560" height="1417" />
-    </state>
-    <state width="2518" height="501" key="GridCell.Tab.0.right/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575999847733" />
-    <state width="2518" height="501" key="GridCell.Tab.1.bottom" timestamp="1575999847735">
-      <screen x="-2560" y="23" width="2560" height="1417" />
-    </state>
-    <state width="2518" height="501" key="GridCell.Tab.1.bottom/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575999847735" />
-    <state width="2518" height="501" key="GridCell.Tab.1.center" timestamp="1575999847734">
-      <screen x="-2560" y="23" width="2560" height="1417" />
-    </state>
-    <state width="2518" height="501" key="GridCell.Tab.1.center/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575999847734" />
-    <state width="2518" height="501" key="GridCell.Tab.1.left" timestamp="1575999847734">
-      <screen x="-2560" y="23" width="2560" height="1417" />
-    </state>
-    <state width="2518" height="501" key="GridCell.Tab.1.left/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575999847734" />
-    <state width="2518" height="501" key="GridCell.Tab.1.right" timestamp="1575999847735">
-      <screen x="-2560" y="23" width="2560" height="1417" />
-    </state>
-    <state width="2518" height="501" key="GridCell.Tab.1.right/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575999847735" />
-    <state width="2518" height="501" key="GridCell.Tab.2.bottom" timestamp="1575999847736">
-      <screen x="-2560" y="23" width="2560" height="1417" />
-    </state>
-    <state width="2518" height="501" key="GridCell.Tab.2.bottom/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575999847736" />
-    <state width="2518" height="501" key="GridCell.Tab.2.center" timestamp="1575999847735">
-      <screen x="-2560" y="23" width="2560" height="1417" />
-    </state>
-    <state width="2518" height="501" key="GridCell.Tab.2.center/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575999847735" />
-    <state width="2518" height="501" key="GridCell.Tab.2.left" timestamp="1575999847735">
-      <screen x="-2560" y="23" width="2560" height="1417" />
-    </state>
-    <state width="2518" height="501" key="GridCell.Tab.2.left/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575999847735" />
-    <state width="2518" height="501" key="GridCell.Tab.2.right" timestamp="1575999847736">
-      <screen x="-2560" y="23" width="2560" height="1417" />
-    </state>
-    <state width="2518" height="501" key="GridCell.Tab.2.right/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575999847736" />
-    <state x="-1734" y="370" key="SettingsEditor" timestamp="1575998462662">
-      <screen x="-2560" y="23" width="2560" height="1417" />
-    </state>
-    <state x="-1734" y="370" key="SettingsEditor/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575998462662" />
-    <state x="-1270" y="620" width="390" height="268" key="XPathView.InputDialog.DIMENSION_SERVICE_KEY.SIMPLE" timestamp="1575998331608">
-      <screen x="-2560" y="23" width="2560" height="1417" />
-    </state>
-    <state x="-1270" y="620" width="390" height="268" key="XPathView.InputDialog.DIMENSION_SERVICE_KEY.SIMPLE/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575998331608" />
-    <state x="-1417" y="501" key="com.intellij.database.view.ui.DbObjectDialog" timestamp="1575914771646">
-      <screen x="-2560" y="23" width="2560" height="1417" />
-    </state>
-    <state x="-1417" y="501" key="com.intellij.database.view.ui.DbObjectDialog/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575914771646" />
-    <state x="-1603" y="564" key="com.intellij.ide.util.TipDialog" timestamp="1578515345423">
-      <screen x="-2560" y="23" width="2560" height="1417" />
-    </state>
-    <state x="-1603" y="564" key="com.intellij.ide.util.TipDialog/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1578515345423" />
-    <state x="718" y="472" key="com.intellij.ide.util.TipDialog/0.23.1920.1177@0.23.1920.1177" timestamp="1577918764660" />
-    <state x="646" y="252" key="refactoring.ChangeSignatureDialog" timestamp="1577990951422">
-      <screen x="0" y="23" width="1920" height="1177" />
-    </state>
-    <state x="646" y="252" key="refactoring.ChangeSignatureDialog/0.23.1920.1177@0.23.1920.1177" timestamp="1577990951422" />
-    <state x="709" y="293" width="670" height="562" key="search.everywhere.popup" timestamp="1577990957697">
-      <screen x="0" y="23" width="1920" height="1177" />
-    </state>
-    <state x="-1615" y="348" width="670" height="676" key="search.everywhere.popup/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1576168255727" />
-    <state x="709" y="293" width="670" height="562" key="search.everywhere.popup/0.23.1920.1177@0.23.1920.1177" timestamp="1577990957697" />
+    <MESSAGE value="Introduce modern client scaffold with initial dependencies, configurations, and asset structure." />
+    <MESSAGE value="Expand Texas Hold'em engine with betting flow, side-pot payouts, client action DTOs, and comprehensive test coverage." />
+    <MESSAGE value="Add `package-lock.json` for the modern Poker workspace with updated dependencies and configurations" />
+    <MESSAGE value="Add auth and wallet API to Poker Server MVP with session handling, user profiles, wallet adjustments, and ledger tracking. Extend tests, docs, and CLI scripts to ensure parity and coverage." />
+    <MESSAGE value="Add Poker Server MVP with hand lifecycle, deterministic replay, and lifecycle/replay tests." />
+    <MESSAGE value="chore: update `.idea/workspace.xml` with extended legacy file references and default changelist adjustments" />
+    <MESSAGE value="feat: add auth bootstrap and demo user controls&#10;&#10;Add `POKER_AUTH_BOOTSTRAP_USERS_FILE` for JSON-based seed user initialization and `POKER_AUTH_ALLOW_DEMO_USERS` to control demo user access. Update docs, tests, and examples for auth bootstrap and production guardrails." />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: add auth bootstrap and demo user controls&#10;&#10;Add `POKER_AUTH_BOOTSTRAP_USERS_FILE` for JSON-based seed user initialization and `POKER_AUTH_ALLOW_DEMO_USERS` to control demo user access. Update docs, tests, and examples for auth bootstrap and production guardrails." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
