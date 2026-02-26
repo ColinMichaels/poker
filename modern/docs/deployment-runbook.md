@@ -33,6 +33,10 @@ Environment variables:
 - `POKER_AUTH_BOOTSTRAP_USERS_FILE` (JSON seed file used when no persisted auth state exists)
 - `POKER_ENABLE_LEGACY_WALLET_ROUTES` (`1`/`0`, default: `0` when `NODE_ENV=production`)
 
+Template reference:
+
+- `apps/server/.env.example`
+
 ## Health + Readiness Checks
 
 - `GET /health` (liveness)

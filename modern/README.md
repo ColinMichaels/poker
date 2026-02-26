@@ -52,3 +52,4 @@ From `modern/`:
 - This workspace is wired for npm workspaces.
 - Run all workspace install/build commands from `modern/`.
 - Server API details: `apps/server/README.md`.
+- Server env template: `apps/server/.env.example`.

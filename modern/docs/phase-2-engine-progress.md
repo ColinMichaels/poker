@@ -489,3 +489,16 @@ Sources:
 - `package.json`
 - `README.md`
 - `docs/developer-setup.md`
+
+## PR W Progress: Server Env Template
+
+- Added canonical server environment template with current runtime/auth/compat controls:
+  - `apps/server/.env.example`
+- Linked template from workspace/server/deployment setup documentation.
+
+Sources:
+
+- `apps/server/.env.example`
+- `apps/server/README.md`
+- `docs/developer-setup.md`
+- `docs/deployment-runbook.md`

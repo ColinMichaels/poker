@@ -206,6 +206,12 @@ These are not extraction failures, but they are blockers to deleting the legacy 
   - `npm run doctor && npm run ci --prefix modern`
 - Updated root/developer docs to reflect doctor-first CI flow.
 
+## Completed in PR W
+
+- Added canonical modern server environment template:
+  - `modern/apps/server/.env.example`
+- Linked env template from server/developer/deployment docs for consistent setup.
+
 ## Known Intentional Asset Exceptions
 
 - Non-canonical card extras remain excluded from canonical face set:
@@ -280,6 +286,7 @@ Exit criteria:
 20. PR T: Modern CI trigger coverage for root toolchain guardrails.
 21. PR U: Graceful shutdown and final-persist handling for modern server.
 22. PR V: Root CI now enforces doctor-first verification.
+23. PR W: Server environment template and doc alignment.
 
 ## Cutover Go/No-Go Checklist
 

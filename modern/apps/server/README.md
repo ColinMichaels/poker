@@ -37,6 +37,10 @@ Environment overrides:
 - `POKER_AUTH_BOOTSTRAP_USERS_FILE` (path to JSON file with bootstrap auth users)
 - `POKER_ENABLE_LEGACY_WALLET_ROUTES` (`1`/`0`, default `1` unless `NODE_ENV=production`)
 
+Environment template:
+
+- `modern/apps/server/.env.example`
+
 Runtime persistence:
 
 - Enabled by default.

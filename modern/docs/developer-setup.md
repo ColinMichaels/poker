@@ -46,6 +46,10 @@ Root shortcut scripts are also available:
 2. `curl http://127.0.0.1:8787/health`
 3. `curl http://127.0.0.1:8787/api/table/state`
 
+Server env template:
+
+- `apps/server/.env.example`
+
 ## Auth/Wallet Smoke Check
 
 1. Login:
