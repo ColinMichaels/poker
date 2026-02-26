@@ -33,6 +33,9 @@ Environment overrides:
 - `POKER_STATE_FILE` (absolute path to JSON runtime state file)
 - `POKER_AUTH_TOKEN_SECRET` (HMAC signing secret for bearer sessions; required when `NODE_ENV=production`)
 - `POKER_SESSION_TTL_MS` (session ttl in milliseconds, default `28800000`)
+- `POKER_EXTERNAL_AUTH_ENABLED` (`1`/`0`, default `0`)
+- `POKER_EXTERNAL_AUTH_ISSUER` (expected issuer for signed assertions, default `external-idp`)
+- `POKER_EXTERNAL_AUTH_SHARED_SECRET` (HMAC verification secret for signed assertions; required when external auth is enabled)
 - `POKER_AUTH_ALLOW_DEMO_USERS` (`1`/`0`, default `1` unless `NODE_ENV=production`)
 - `POKER_AUTH_BOOTSTRAP_USERS_FILE` (path to JSON file with bootstrap auth users)
 - `POKER_ENABLE_LEGACY_WALLET_ROUTES` (`1`/`0`, default `1` unless `NODE_ENV=production`)
@@ -50,6 +53,8 @@ Runtime persistence:
   - `runtime.persistenceEnabled`
   - `runtime.authDemoUsersEnabled`
   - `runtime.legacyWalletRoutesEnabled`
+  - `runtime.externalAuthEnabled`
+  - `runtime.externalAuthIssuer`
 
 Auth/session behavior:
 
@@ -60,6 +65,7 @@ Auth/session behavior:
 ## HTTP API
 
 - `POST /api/auth/login`
+- `POST /api/auth/external/login`
 - `POST /api/auth/logout`
 - `GET /api/auth/session`
 - `GET /api/auth/audit?limit=100&userId=<id>`
@@ -92,6 +98,19 @@ Default demo login users (when enabled):
 
 - `colin@example.com` / `demo`
 - `luna@example.com` / `demo`
+
+External auth login:
+
+- Send a signed assertion payload to `POST /api/auth/external/login`:
+  - `{ "assertion": "<base64url(payload)>.<base64url(hmac-signature)>" }`
+- Assertion payload fields:
+  - required: `iss`, `sub`, `email`, `exp`
+  - optional: `firstName`, `lastName`, `role`
+- The server verifies:
+  - HMAC signature with `POKER_EXTERNAL_AUTH_SHARED_SECRET`
+  - issuer match with `POKER_EXTERNAL_AUTH_ISSUER`
+  - expiration (`exp`) against current server time
+- On success, the server links/reuses user identity and returns the same session shape as `/api/auth/login`.
 
 Bootstrap users file:
 

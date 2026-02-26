@@ -42,7 +42,7 @@ declare module 'node:os' {
 declare module 'node:crypto' {
   export interface Hmac {
     update(data: string): Hmac;
-    digest(encoding: 'hex'): string;
+    digest(encoding: 'hex' | 'base64'): string;
   }
 
   export interface BinaryValue {

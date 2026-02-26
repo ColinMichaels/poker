@@ -1183,3 +1183,37 @@ Sources:
 - `apps/server/package.json`
 - `apps/server/bootstrap-users.example.json`
 - `apps/server/README.md`
+
+## PR BL Progress: External Identity Signed-Assertion Login
+
+- Added an external assertion verification module in server runtime:
+  - HMAC-SHA256 signed assertion format (`payload.signature`)
+  - normalized payload validation (`iss`, `sub`, `email`, `exp`)
+  - issuer and expiration enforcement
+- Added external auth startup configuration and env validation:
+  - `POKER_EXTERNAL_AUTH_ENABLED`
+  - `POKER_EXTERNAL_AUTH_ISSUER`
+  - `POKER_EXTERNAL_AUTH_SHARED_SECRET`
+- Added external identity login/linking behavior in auth service:
+  - link provider/subject to existing user by email
+  - create user on first external login when email is not present
+  - reject mismatched email for already-linked provider/subject
+- Wired external login endpoint:
+  - `POST /api/auth/external/login` accepting `{ "assertion": "<signed-assertion>" }`
+- Extended health/runtime diagnostics and startup logs:
+  - external auth enablement + issuer shown in `/health` runtime payload
+- Added regression coverage for assertion verification, startup config parsing, and auth external login flows.
+
+Sources:
+
+- `apps/server/src/external-auth.ts`
+- `apps/server/src/external-auth.test.ts`
+- `apps/server/src/auth-wallet-service.ts`
+- `apps/server/src/auth-wallet-service.test.ts`
+- `apps/server/src/index.ts`
+- `apps/server/src/startup-config.ts`
+- `apps/server/src/startup-config.test.ts`
+- `apps/server/.env.example`
+- `apps/server/README.md`
+- `docs/developer-setup.md`
+- `docs/deployment-runbook.md`

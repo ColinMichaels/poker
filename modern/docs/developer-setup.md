@@ -66,6 +66,14 @@ Server env template:
 
 If demo users are disabled (`POKER_AUTH_ALLOW_DEMO_USERS=0`), set `POKER_AUTH_BOOTSTRAP_USERS_FILE` to a valid JSON seed file first (see `apps/server/bootstrap-users.example.json`).
 
+External auth smoke check (optional):
+
+1. Enable external auth in env:
+   `POKER_EXTERNAL_AUTH_ENABLED=1`, `POKER_EXTERNAL_AUTH_ISSUER=<issuer>`, `POKER_EXTERNAL_AUTH_SHARED_SECRET=<secret>`
+2. Create a signed assertion using `createExternalAuthAssertion` in `apps/server/src/external-auth.ts` (or any equivalent HMAC-SHA256 signer that matches the payload format).
+3. Login with assertion:
+   `curl -s -X POST http://127.0.0.1:8787/api/auth/external/login -H 'content-type: application/json' -d '{"assertion":"<ASSERTION>"}'`
+
 ## CI Parity
 
 GitHub Actions workflow: `.github/workflows/modern-ci.yml`

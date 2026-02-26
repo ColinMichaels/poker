@@ -29,6 +29,9 @@ Environment variables:
 - `POKER_STATE_FILE` (default: `apps/server/.data/runtime-state.json`)
 - `POKER_AUTH_TOKEN_SECRET` (required for non-dev deployments; signs bearer session tokens)
 - `POKER_SESSION_TTL_MS` (default: `28800000`)
+- `POKER_EXTERNAL_AUTH_ENABLED` (`1`/`0`, default: `0`)
+- `POKER_EXTERNAL_AUTH_ISSUER` (expected issuer for signed assertion exchange, default: `external-idp`)
+- `POKER_EXTERNAL_AUTH_SHARED_SECRET` (required when external auth is enabled)
 - `POKER_AUTH_ALLOW_DEMO_USERS` (`1`/`0`, default: `0` when `NODE_ENV=production`)
 - `POKER_AUTH_BOOTSTRAP_USERS_FILE` (JSON seed file used when no persisted auth state exists)
 - `POKER_ENABLE_LEGACY_WALLET_ROUTES` (`1`/`0`, default: `0` when `NODE_ENV=production`)
@@ -40,7 +43,7 @@ Template reference:
 ## Health + Readiness Checks
 
 - `GET /health` (liveness)
-  - includes runtime flags for persistence/demo-users/legacy-wallet-route modes
+  - includes runtime flags for persistence/demo-users/legacy-wallet-route/external-auth modes
 - `GET /api/table/state` (authoritative table snapshot)
 
 Auth/wallet sanity checks:
@@ -61,4 +64,5 @@ Auth/wallet sanity checks:
 - If production overrides enable demo users or legacy wallet routes, server startup logs explicit warnings.
 - Bootstrap file format accepts either a JSON array of user records or `{ "users": [...] }`. Each user requires `email` and `password` (or `passwordHash` in `scrypt$<salt-hex>$<digest-hex>` format).
 - Current auth API supports session revocation (`/api/auth/revoke-others`) and per-user audit logs.
-- Remaining production hardening: external identity provider and secret management/rotation.
+- External identity login is available via `POST /api/auth/external/login` (signed assertion exchange).
+- Remaining production hardening: external auth secret management/rotation.

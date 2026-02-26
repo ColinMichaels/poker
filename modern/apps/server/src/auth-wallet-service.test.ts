@@ -235,6 +235,74 @@ function testRejectsInvalidUserRoleValues(): void {
   );
 }
 
+function testExternalLoginCreatesAndReusesLinkedUser(): void {
+  const service = new AuthWalletService({
+    allowDefaultUsers: false,
+    users: [
+      {
+        id: 200,
+        email: 'seed@example.com',
+        password: 'demo',
+      },
+    ],
+  });
+
+  const first = service.loginWithExternalIdentity({
+    provider: 'oidc-demo',
+    subject: 'ext-123',
+    email: 'external.user@example.com',
+    firstName: 'External',
+    lastName: 'User',
+    role: 'PLAYER',
+  });
+  const second = service.loginWithExternalIdentity({
+    provider: 'oidc-demo',
+    subject: 'ext-123',
+    email: 'external.user@example.com',
+  });
+
+  assertEqual(first.session.user.email, 'external.user@example.com', 'Expected external login to create new user.');
+  assertEqual(second.session.user.id, first.session.user.id, 'Expected repeated external login to reuse linked user.');
+  assertEqual(second.session.user.role, 'PLAYER', 'Expected created external user role to persist.');
+}
+
+function testExternalLoginLinksExistingEmailUser(): void {
+  const service = new AuthWalletService();
+  const first = service.loginWithExternalIdentity({
+    provider: 'oidc-demo',
+    subject: 'colin-sub',
+    email: 'colin@example.com',
+  });
+  const second = service.loginWithExternalIdentity({
+    provider: 'oidc-demo',
+    subject: 'colin-sub',
+    email: 'colin@example.com',
+  });
+
+  assertEqual(first.session.user.id, 1, 'Expected external login to link to existing email user.');
+  assertEqual(second.session.user.id, 1, 'Expected linked external identity to reuse same user.');
+}
+
+function testExternalLoginRejectsEmailMismatchOnLinkedIdentity(): void {
+  const service = new AuthWalletService();
+  service.loginWithExternalIdentity({
+    provider: 'oidc-demo',
+    subject: 'stable-subject',
+    email: 'colin@example.com',
+  });
+
+  assertThrows(
+    () =>
+      service.loginWithExternalIdentity({
+        provider: 'oidc-demo',
+        subject: 'stable-subject',
+        email: 'luna@example.com',
+      }),
+    /email does not match linked user/i,
+    'Expected external login to reject mismatched email for existing provider/subject link.',
+  );
+}
+
 function testRestoresLegacyPlaintextUserRecords(): void {
   const createdAt = new Date().toISOString();
   const legacyUserRecord = {
@@ -347,6 +415,9 @@ function runAll(): void {
   testBootstrapsUsersFromSeedRecords();
   testDefaultDemoUserRoles();
   testRejectsInvalidUserRoleValues();
+  testExternalLoginCreatesAndReusesLinkedUser();
+  testExternalLoginLinksExistingEmailUser();
+  testExternalLoginRejectsEmailMismatchOnLinkedIdentity();
   testRestoresLegacyPlaintextUserRecords();
   testRestoresLegacyPlaintextPasswordHashField();
   testRejectsUnsupportedPasswordHashFormat();

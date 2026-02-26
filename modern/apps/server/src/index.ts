@@ -3,6 +3,7 @@ import type { LoginRequestDTO, UpdateProfileRequestDTO, UserRole, WalletAdjustme
 import type { TableCommand } from '@poker/poker-engine';
 import { AuthWalletService } from './auth-wallet-service.ts';
 import { resolveAuditScopeUserId } from './auth-authorization.ts';
+import { verifyExternalAuthAssertion } from './external-auth.ts';
 import { RuntimeStateStore, type RuntimeStateSnapshot } from './runtime-state-store.ts';
 import { loadStartupConfig } from './startup-config.ts';
 import { TableService, createDefaultTableState } from './table-service.ts';
@@ -197,6 +198,17 @@ function parseLoginRequest(body: unknown): LoginRequestDTO {
   };
 }
 
+function parseExternalAuthLoginRequest(body: unknown): { assertion: string } {
+  const record = requireObject(body, 'body');
+  if (typeof record.assertion !== 'string' || record.assertion.trim().length === 0) {
+    throw new HttpError(400, 'BAD_REQUEST', 'assertion is required.');
+  }
+
+  return {
+    assertion: record.assertion.trim(),
+  };
+}
+
 function parseProfileUpdate(body: unknown): UpdateProfileRequestDTO {
   const record = requireObject(body, 'body');
   const result: UpdateProfileRequestDTO = {};
@@ -269,6 +281,10 @@ function mapToHttpError(error: unknown): HttpError {
     return new HttpError(401, 'INVALID_CREDENTIALS', message);
   }
 
+  if (message.startsWith('External auth assertion')) {
+    return new HttpError(401, 'INVALID_EXTERNAL_ASSERTION', message);
+  }
+
   if (message.includes('was not found')) {
     return new HttpError(404, 'NOT_FOUND', message);
   }
@@ -300,6 +316,9 @@ async function handleRequest(
     persistenceEnabled: boolean;
     authAllowDemoUsers: boolean;
     allowLegacyWalletRoutes: boolean;
+    externalAuthEnabled: boolean;
+    externalAuthIssuer: string;
+    externalAuthSharedSecret: string | undefined;
   },
   allowLegacyWalletRoutes: boolean,
   persistRuntimeState: () => void,
@@ -328,6 +347,8 @@ async function handleRequest(
           persistenceEnabled: runtimeInfo.persistenceEnabled,
           authDemoUsersEnabled: runtimeInfo.authAllowDemoUsers,
           legacyWalletRoutesEnabled: runtimeInfo.allowLegacyWalletRoutes,
+          externalAuthEnabled: runtimeInfo.externalAuthEnabled,
+          externalAuthIssuer: runtimeInfo.externalAuthIssuer,
         },
       });
       return;
@@ -337,6 +358,34 @@ async function handleRequest(
       const body = await readJsonBody(request);
       const loginRequest = parseLoginRequest(body);
       const loginResponse = authWalletService.login(loginRequest);
+      persistRuntimeState();
+      sendJson(response, 200, loginResponse);
+      return;
+    }
+
+    if (method === 'POST' && pathname === '/api/auth/external/login') {
+      if (!runtimeInfo.externalAuthEnabled) {
+        throw new HttpError(503, 'EXTERNAL_AUTH_DISABLED', 'External auth is not enabled.');
+      }
+
+      if (!runtimeInfo.externalAuthSharedSecret) {
+        throw new HttpError(500, 'SERVER_MISCONFIGURED', 'External auth shared secret is not configured.');
+      }
+
+      const body = await readJsonBody(request);
+      const { assertion } = parseExternalAuthLoginRequest(body);
+      const payload = verifyExternalAuthAssertion(assertion, {
+        sharedSecret: runtimeInfo.externalAuthSharedSecret,
+        expectedIssuer: runtimeInfo.externalAuthIssuer,
+      });
+      const loginResponse = authWalletService.loginWithExternalIdentity({
+        provider: payload.iss,
+        subject: payload.sub,
+        email: payload.email,
+        firstName: payload.firstName,
+        lastName: payload.lastName,
+        role: payload.role,
+      });
       persistRuntimeState();
       sendJson(response, 200, loginResponse);
       return;
@@ -522,6 +571,9 @@ const {
   authBootstrapUsersFile,
   authBootstrapUsers,
   allowLegacyWalletRoutes,
+  externalAuthEnabled,
+  externalAuthIssuer,
+  externalAuthSharedSecret,
 } = loadStartupConfig(process.env);
 const runtimeStateStore = persistenceEnabled ? new RuntimeStateStore(stateFilePath) : null;
 
@@ -603,6 +655,9 @@ const server = createServer((request, response) => {
       persistenceEnabled,
       authAllowDemoUsers,
       allowLegacyWalletRoutes,
+      externalAuthEnabled,
+      externalAuthIssuer,
+      externalAuthSharedSecret,
     },
     allowLegacyWalletRoutes,
     persistRuntimeState,
@@ -654,6 +709,9 @@ server.listen(port, host, () => {
   }
   console.info(`Auth demo users: ${authAllowDemoUsers ? 'enabled' : 'disabled'}`);
   console.info(`Legacy wallet routes: ${allowLegacyWalletRoutes ? 'enabled' : 'disabled'}`);
+  console.info(
+    `External auth: ${externalAuthEnabled ? `enabled (issuer: ${externalAuthIssuer})` : 'disabled'}`,
+  );
   if (isProduction && authAllowDemoUsers) {
     console.warn('Production mode warning: demo users are enabled.');
   }

@@ -48,6 +48,7 @@ export interface PersistedUserRecord {
   firstName: string;
   lastName: string;
   role: UserRole;
+  externalIdentities: ExternalIdentityLink[];
   walletBalance: number;
   wins: number;
   gamesPlayed: number;
@@ -75,11 +76,27 @@ export interface AuthUserSeedRecord {
   firstName?: string;
   lastName?: string;
   role?: UserRole;
+  externalIdentities?: ExternalIdentityLink[];
   walletBalance?: number;
   wins?: number;
   gamesPlayed?: number;
   walletUpdatedAt?: string;
   walletLedger?: WalletLedgerEntryDTO[];
+}
+
+export interface ExternalIdentityLink {
+  provider: string;
+  subject: string;
+  linkedAt: string;
+}
+
+export interface ExternalIdentityLoginRequest {
+  provider: string;
+  subject: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  role?: UserRole;
 }
 
 export interface AuthWalletStateSnapshot {
@@ -120,6 +137,18 @@ function normalizeEmail(value: string): string {
   return value.trim().toLowerCase();
 }
 
+function normalizeExternalIdentityProvider(value: string): string {
+  return value.trim().toLowerCase();
+}
+
+function normalizeExternalIdentitySubject(value: string): string {
+  return value.trim();
+}
+
+function toExternalIdentityKey(provider: string, subject: string): string {
+  return `${provider}\u0000${subject}`;
+}
+
 function isValidUserRole(value: unknown): value is UserRole {
   return typeof value === 'string' && ALLOWED_USER_ROLES.includes(value as UserRole);
 }
@@ -134,6 +163,53 @@ function normalizeUserRole(value: unknown): UserRole {
   }
 
   return value;
+}
+
+function normalizeExternalIdentityLink(rawLink: unknown): ExternalIdentityLink {
+  if (typeof rawLink !== 'object' || rawLink === null) {
+    throw new Error('External identity link must be an object.');
+  }
+
+  const record = rawLink as Record<string, unknown>;
+  const provider = normalizeExternalIdentityProvider(typeof record.provider === 'string' ? record.provider : '');
+  const subject = normalizeExternalIdentitySubject(typeof record.subject === 'string' ? record.subject : '');
+  const linkedAt = typeof record.linkedAt === 'string' && record.linkedAt.length > 0
+    ? record.linkedAt
+    : nowIso();
+
+  if (!provider) {
+    throw new Error('External identity link provider is required.');
+  }
+
+  if (!subject) {
+    throw new Error('External identity link subject is required.');
+  }
+
+  return {
+    provider,
+    subject,
+    linkedAt,
+  };
+}
+
+function normalizeExternalIdentityLinks(rawLinks: unknown): ExternalIdentityLink[] {
+  if (!Array.isArray(rawLinks) || rawLinks.length === 0) {
+    return [];
+  }
+
+  const seen = new Set<string>();
+  const normalized: ExternalIdentityLink[] = [];
+  for (const rawLink of rawLinks) {
+    const link = normalizeExternalIdentityLink(rawLink);
+    const key = toExternalIdentityKey(link.provider, link.subject);
+    if (seen.has(key)) {
+      throw new Error(`Duplicate external identity link detected: ${link.provider}/${link.subject}`);
+    }
+    seen.add(key);
+    normalized.push(link);
+  }
+
+  return normalized;
 }
 
 function requirePositiveInteger(value: number, label: string): void {
@@ -350,6 +426,7 @@ function normalizePersistedUserRecord(
     ? user.lastName.trim()
     : derivedName.lastName;
   const role = normalizeUserRole(user.role);
+  const externalIdentities = normalizeExternalIdentityLinks(user.externalIdentities);
 
   const walletBalance = Number.isInteger(user.walletBalance) && (user.walletBalance as number) >= 0
     ? (user.walletBalance as number)
@@ -366,6 +443,7 @@ function normalizePersistedUserRecord(
     firstName,
     lastName,
     role,
+    externalIdentities,
     walletBalance,
     wins,
     gamesPlayed,
@@ -387,6 +465,7 @@ function buildDefaultUsers(): PersistedUserRecord[] {
       firstName: 'Colin',
       lastName: 'Player',
       role: 'ADMIN',
+      externalIdentities: [],
       walletBalance: 500,
       wins: 0,
       gamesPlayed: 0,
@@ -400,6 +479,7 @@ function buildDefaultUsers(): PersistedUserRecord[] {
       firstName: 'Luna',
       lastName: 'Bot',
       role: 'PLAYER',
+      externalIdentities: [],
       walletBalance: 500,
       wins: 0,
       gamesPlayed: 0,
@@ -412,11 +492,13 @@ function buildDefaultUsers(): PersistedUserRecord[] {
 export class AuthWalletService {
   private readonly usersById: Map<number, PersistedUserRecord>;
   private readonly usersByEmail: Map<string, PersistedUserRecord>;
+  private readonly externalIdentityToUserId: Map<string, number>;
   private readonly sessionsByToken: Map<string, PersistedSessionRecord>;
   private readonly tokenSecret: string;
   private readonly sessionTtlMs: number;
   private readonly authAuditLog: AuthAuditEntry[];
   private authAuditSequence: number;
+  private nextUserId: number;
 
   public constructor(options: AuthWalletServiceOptions = {}) {
     const allowDefaultUsers = options.allowDefaultUsers ?? true;
@@ -431,11 +513,13 @@ export class AuthWalletService {
 
     this.usersById = new Map();
     this.usersByEmail = new Map();
+    this.externalIdentityToUserId = new Map();
     this.sessionsByToken = new Map();
     this.tokenSecret = requireTokenSecret(options.tokenSecret);
     this.sessionTtlMs = options.sessionTtlMs ?? DEFAULT_SESSION_TTL_MS;
     this.authAuditLog = auditLog;
     this.authAuditSequence = auditLog.length;
+    this.nextUserId = 1;
 
     requirePositiveInteger(this.sessionTtlMs, 'sessionTtlMs');
     if (users.length === 0) {
@@ -458,7 +542,10 @@ export class AuthWalletService {
 
       this.usersById.set(user.id, user);
       this.usersByEmail.set(normalizedEmail, user);
+      this.registerExternalIdentities(user);
     }
+
+    this.nextUserId = nextFallbackUserId;
 
     for (const rawSession of sessions) {
       const normalizedSession = this.normalizeSessionForRestore(rawSession);
@@ -506,28 +593,72 @@ export class AuthWalletService {
       throw new Error('Invalid credentials.');
     }
 
-    const issuedAtMs = Date.now();
-    const expiresAtMs = issuedAtMs + this.sessionTtlMs;
+    return this.createSessionForUser(user, null);
+  }
 
-    const session: PersistedSessionRecord = {
-      token: createSessionToken(user.id, issuedAtMs, expiresAtMs, this.tokenSecret),
-      userId: user.id,
-      issuedAt: toIso(issuedAtMs),
-      expiresAt: toIso(expiresAtMs),
+  public loginWithExternalIdentity(request: ExternalIdentityLoginRequest): LoginResponseDTO {
+    const provider = normalizeExternalIdentityProvider(request.provider);
+    if (!provider) {
+      throw new Error('External identity provider is required.');
+    }
+
+    const subject = normalizeExternalIdentitySubject(request.subject);
+    if (!subject) {
+      throw new Error('External identity subject is required.');
+    }
+
+    const email = normalizeEmail(request.email);
+    if (!email) {
+      throw new Error('External identity email is required.');
+    }
+
+    const linkKey = toExternalIdentityKey(provider, subject);
+    const linkedUserId = this.externalIdentityToUserId.get(linkKey);
+    if (linkedUserId !== undefined) {
+      const user = this.requireUser(linkedUserId);
+      if (email !== user.email) {
+        throw new Error('External identity email does not match linked user.');
+      }
+      return this.createSessionForUser(user, `external:${provider}`);
+    }
+
+    const userByEmail = this.usersByEmail.get(email);
+    if (userByEmail) {
+      this.linkExternalIdentity(userByEmail, provider, subject);
+      return this.createSessionForUser(userByEmail, `external:${provider}`);
+    }
+
+    const derivedName = deriveDefaultName(email);
+    const firstName = request.firstName?.trim() || derivedName.firstName;
+    const lastName = request.lastName?.trim() || derivedName.lastName;
+    const role = normalizeUserRole(request.role);
+    const createdAt = nowIso();
+    const user: PersistedUserRecord = {
+      id: this.nextUserId,
+      email,
+      passwordHash: hashPassword(randomBytes(PASSWORD_SALT_BYTES).toString('hex')),
+      firstName,
+      lastName,
+      role,
+      externalIdentities: [
+        {
+          provider,
+          subject,
+          linkedAt: createdAt,
+        },
+      ],
+      walletBalance: 500,
+      wins: 0,
+      gamesPlayed: 0,
+      walletUpdatedAt: createdAt,
+      walletLedger: [],
     };
+    this.nextUserId += 1;
+    this.usersById.set(user.id, user);
+    this.usersByEmail.set(user.email, user);
+    this.registerExternalIdentities(user);
 
-    this.sessionsByToken.set(session.token, session);
-    this.appendAuthAudit({
-      event: 'LOGIN_SUCCESS',
-      userId: user.id,
-      email: user.email,
-      tokenHint: toTokenHint(session.token),
-      reason: null,
-    });
-
-    return {
-      session: this.toSessionDTO(session),
-    };
+    return this.createSessionForUser(user, `external:${provider}`);
   }
 
   public logout(token: string): void {
@@ -679,6 +810,65 @@ export class AuthWalletService {
       )),
       auditLog: cloneDeep(this.authAuditLog),
     };
+  }
+
+  private createSessionForUser(user: PersistedUserRecord, reason: string | null): LoginResponseDTO {
+    const issuedAtMs = Date.now();
+    const expiresAtMs = issuedAtMs + this.sessionTtlMs;
+
+    const session: PersistedSessionRecord = {
+      token: createSessionToken(user.id, issuedAtMs, expiresAtMs, this.tokenSecret),
+      userId: user.id,
+      issuedAt: toIso(issuedAtMs),
+      expiresAt: toIso(expiresAtMs),
+    };
+
+    this.sessionsByToken.set(session.token, session);
+    this.appendAuthAudit({
+      event: 'LOGIN_SUCCESS',
+      userId: user.id,
+      email: user.email,
+      tokenHint: toTokenHint(session.token),
+      reason,
+    });
+
+    return {
+      session: this.toSessionDTO(session),
+    };
+  }
+
+  private linkExternalIdentity(user: PersistedUserRecord, provider: string, subject: string): void {
+    const key = toExternalIdentityKey(provider, subject);
+    const existingUserId = this.externalIdentityToUserId.get(key);
+    if (existingUserId !== undefined && existingUserId !== user.id) {
+      throw new Error('External identity is already linked to another user.');
+    }
+
+    const alreadyLinked = user.externalIdentities.some(
+      (link) => link.provider === provider && link.subject === subject,
+    );
+    if (alreadyLinked) {
+      return;
+    }
+
+    const linkedAt = nowIso();
+    user.externalIdentities.push({
+      provider,
+      subject,
+      linkedAt,
+    });
+    this.externalIdentityToUserId.set(key, user.id);
+  }
+
+  private registerExternalIdentities(user: PersistedUserRecord): void {
+    for (const link of user.externalIdentities) {
+      const key = toExternalIdentityKey(link.provider, link.subject);
+      const existingUserId = this.externalIdentityToUserId.get(key);
+      if (existingUserId !== undefined && existingUserId !== user.id) {
+        throw new Error(`External identity ${link.provider}/${link.subject} is linked to multiple users.`);
+      }
+      this.externalIdentityToUserId.set(key, user.id);
+    }
   }
 
   private normalizeSessionForRestore(rawSession: PersistedSessionRecord): PersistedSessionRecord | null {

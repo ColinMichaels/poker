@@ -20,7 +20,7 @@ Purpose: make `modern/` the primary codebase without losing reusable legacy func
 
 These are not extraction failures, but they are blockers to deleting the legacy app:
 
-1. External identity integration is still pending (current auth is local account/session management only).
+- No remaining extraction-adjacent blockers are open.
 
 ## Completed in PR A
 
@@ -586,6 +586,25 @@ These are not extraction failures, but they are blockers to deleting the legacy 
 - Added dedicated auth-authorization regression tests and integrated them into `test:server`.
 - Updated server bootstrap-user documentation/examples to include role fields.
 
+## Completed in PR BL
+
+- Added external identity assertion verification module for signed auth assertions:
+  - payload validation (`iss`, `sub`, `email`, `exp`)
+  - HMAC signature verification
+  - issuer and expiration enforcement
+- Added external identity login endpoint:
+  - `POST /api/auth/external/login`
+- Added external identity user linking in auth wallet service:
+  - links provider/subject to existing user when email matches
+  - creates new user when no match exists
+  - rejects provider/subject email mismatches for existing links
+- Added startup/env configuration controls:
+  - `POKER_EXTERNAL_AUTH_ENABLED`
+  - `POKER_EXTERNAL_AUTH_ISSUER`
+  - `POKER_EXTERNAL_AUTH_SHARED_SECRET`
+- Added runtime diagnostics for external auth in `/health` and startup logs.
+- Added regression coverage for external assertion verification and external identity login flows.
+
 ## Known Intentional Asset Exceptions
 
 - Non-canonical card extras remain excluded from canonical face set:
@@ -701,6 +720,7 @@ Exit criteria:
 61. PR BI: HowTo flip-card browser regression assertions.
 62. PR BJ: Winner-focused play-table UX and live win-chance mechanics.
 63. PR BK: Role-based auth audit visibility boundaries and contract role support.
+64. PR BL: External identity signed-assertion login integration.
 
 ## Cutover Go/No-Go Checklist
 

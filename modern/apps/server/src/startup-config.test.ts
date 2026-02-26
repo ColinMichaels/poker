@@ -39,6 +39,9 @@ function testLoadsDevelopmentDefaults(): void {
   assert(config.stateFilePath.includes('/.data/runtime-state.json'), 'Expected default state file path suffix.');
   assertEqual(config.authAllowDemoUsers, true, 'Expected demo users enabled by default outside production.');
   assertEqual(config.allowLegacyWalletRoutes, true, 'Expected legacy routes enabled by default outside production.');
+  assertEqual(config.externalAuthEnabled, false, 'Expected external auth disabled by default.');
+  assertEqual(config.externalAuthIssuer, 'external-idp', 'Expected default external auth issuer.');
+  assertEqual(config.externalAuthSharedSecret, undefined, 'Expected no external auth secret by default.');
   assertEqual(config.authBootstrapUsers, undefined, 'Expected no bootstrap users by default.');
 }
 
@@ -51,6 +54,7 @@ function testProductionDefaultsDisableCompatibilityModes(): void {
   assertEqual(config.isProduction, true, 'Expected production mode for NODE_ENV=production.');
   assertEqual(config.authAllowDemoUsers, false, 'Expected demo users disabled by default in production.');
   assertEqual(config.allowLegacyWalletRoutes, false, 'Expected legacy routes disabled by default in production.');
+  assertEqual(config.externalAuthEnabled, false, 'Expected external auth disabled by default in production.');
 }
 
 function testProductionRequiresExplicitTokenSecret(): void {
@@ -72,6 +76,9 @@ function testLoadsExplicitOverrides(): void {
     POKER_SESSION_TTL_MS: '60000',
     POKER_AUTH_ALLOW_DEMO_USERS: '1',
     POKER_ENABLE_LEGACY_WALLET_ROUTES: '0',
+    POKER_EXTERNAL_AUTH_ENABLED: '1',
+    POKER_EXTERNAL_AUTH_ISSUER: 'oidc-demo',
+    POKER_EXTERNAL_AUTH_SHARED_SECRET: 'external-secret-123456',
   });
 
   assertEqual(config.port, 9100, 'Expected PORT override.');
@@ -83,6 +90,9 @@ function testLoadsExplicitOverrides(): void {
   assertEqual(config.authSessionTtlMs, 60000, 'Expected session ttl override.');
   assertEqual(config.authAllowDemoUsers, true, 'Expected explicit demo users override.');
   assertEqual(config.allowLegacyWalletRoutes, false, 'Expected explicit legacy route override.');
+  assertEqual(config.externalAuthEnabled, true, 'Expected explicit external auth enablement.');
+  assertEqual(config.externalAuthIssuer, 'oidc-demo', 'Expected external auth issuer override.');
+  assertEqual(config.externalAuthSharedSecret, 'external-secret-123456', 'Expected external auth secret override.');
 }
 
 function testLoadsBootstrapUsersFromArrayAndWrapper(): void {
@@ -171,6 +181,27 @@ function testRejectsInvalidBootstrapUsersAndEnvValues(): void {
       () => loadStartupConfig({ POKER_ENABLE_LEGACY_WALLET_ROUTES: 'maybe' }),
       /Invalid POKER_ENABLE_LEGACY_WALLET_ROUTES value/,
       'Expected invalid boolean env values to fail.',
+    );
+
+    assertThrows(
+      () => loadStartupConfig({ POKER_EXTERNAL_AUTH_ENABLED: 'maybe' }),
+      /Invalid POKER_EXTERNAL_AUTH_ENABLED value/,
+      'Expected invalid external auth toggle value to fail.',
+    );
+
+    assertThrows(
+      () => loadStartupConfig({ POKER_EXTERNAL_AUTH_ENABLED: '1' }),
+      /POKER_EXTERNAL_AUTH_SHARED_SECRET is required/,
+      'Expected enabled external auth without shared secret to fail.',
+    );
+
+    assertThrows(
+      () =>
+        loadStartupConfig({
+          POKER_EXTERNAL_AUTH_SHARED_SECRET: 'short-secret',
+        }),
+      /must be at least 16 characters/,
+      'Expected short external auth shared secret values to fail.',
     );
 
     assertThrows(

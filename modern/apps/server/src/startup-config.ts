@@ -5,6 +5,7 @@ import type { AuthUserSeedRecord } from './auth-wallet-service.ts';
 const DEFAULT_HOST = '127.0.0.1';
 const DEFAULT_PORT = 8787;
 const DEFAULT_TABLE_ID = 'table-1';
+const DEFAULT_EXTERNAL_AUTH_ISSUER = 'external-idp';
 const ALLOWED_USER_ROLES: readonly UserRole[] = ['PLAYER', 'OPERATOR', 'ADMIN'];
 
 function parsePort(rawValue: string | undefined): number {
@@ -79,6 +80,14 @@ function parseAllowLegacyWalletRoutes(rawValue: string | undefined, nodeEnv: str
 
   const normalizedNodeEnv = nodeEnv?.trim().toLowerCase();
   return normalizedNodeEnv !== 'production';
+}
+
+function parseExternalAuthEnabled(rawValue: string | undefined): boolean {
+  if (rawValue === undefined) {
+    return false;
+  }
+
+  return parseBooleanEnv(rawValue, 'POKER_EXTERNAL_AUTH_ENABLED');
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -164,6 +173,9 @@ export interface StartupConfig {
   authBootstrapUsersFile: string | undefined;
   authBootstrapUsers: AuthUserSeedRecord[] | undefined;
   allowLegacyWalletRoutes: boolean;
+  externalAuthEnabled: boolean;
+  externalAuthIssuer: string;
+  externalAuthSharedSecret: string | undefined;
 }
 
 export function loadStartupConfig(env: Record<string, string | undefined>): StartupConfig {
@@ -171,9 +183,20 @@ export function loadStartupConfig(env: Record<string, string | undefined>): Star
   const isProduction = normalizedNodeEnv === 'production';
   const authBootstrapUsersFile = env.POKER_AUTH_BOOTSTRAP_USERS_FILE?.trim();
   const authTokenSecret = env.POKER_AUTH_TOKEN_SECRET?.trim();
+  const externalAuthEnabled = parseExternalAuthEnabled(env.POKER_EXTERNAL_AUTH_ENABLED);
+  const externalAuthIssuer = env.POKER_EXTERNAL_AUTH_ISSUER?.trim() || DEFAULT_EXTERNAL_AUTH_ISSUER;
+  const externalAuthSharedSecret = env.POKER_EXTERNAL_AUTH_SHARED_SECRET?.trim() || undefined;
 
   if (isProduction && !authTokenSecret) {
     throw new Error('POKER_AUTH_TOKEN_SECRET is required when NODE_ENV=production.');
+  }
+
+  if (externalAuthEnabled && !externalAuthSharedSecret) {
+    throw new Error('POKER_EXTERNAL_AUTH_SHARED_SECRET is required when POKER_EXTERNAL_AUTH_ENABLED=1.');
+  }
+
+  if (externalAuthSharedSecret && externalAuthSharedSecret.length < 16) {
+    throw new Error('POKER_EXTERNAL_AUTH_SHARED_SECRET must be at least 16 characters when provided.');
   }
 
   return {
@@ -189,5 +212,8 @@ export function loadStartupConfig(env: Record<string, string | undefined>): Star
     authBootstrapUsersFile,
     authBootstrapUsers: loadBootstrapUsersFromFile(authBootstrapUsersFile),
     allowLegacyWalletRoutes: parseAllowLegacyWalletRoutes(env.POKER_ENABLE_LEGACY_WALLET_ROUTES, env.NODE_ENV),
+    externalAuthEnabled,
+    externalAuthIssuer,
+    externalAuthSharedSecret,
   };
 }
