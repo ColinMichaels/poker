@@ -689,3 +689,22 @@ Sources:
 
 - `apps/client/src/main.ts`
 - `apps/client/src/styles.css`
+
+## PR AL Progress: Mobile Dock Hardening + Motion Accessibility
+
+- Fixed mobile dock auto-open behavior so it opens on meaningful transitions only:
+  - user turn start
+  - new hand transition
+  - entering play view
+- Prevented forced reopen loops during a user turn, so manual collapse is now respected.
+- Added responsive viewport handling:
+  - client now re-renders on resize/orientation changes to immediately apply mobile vs desktop dock mode.
+- Added accessibility/responsiveness styling support:
+  - `env(safe-area-inset-bottom)` spacing for the mobile dock
+  - `prefers-reduced-motion: reduce` support to reduce animation/transition intensity
+- Added `aria-controls` wiring on the dock toggle button for clearer control semantics.
+
+Sources:
+
+- `apps/client/src/main.ts`
+- `apps/client/src/styles.css`

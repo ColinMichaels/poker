@@ -811,7 +811,7 @@ body {
 
 .controls-panel {
   backdrop-filter: blur(2px);
-  bottom: 0.45rem;
+  bottom: calc(0.45rem + env(safe-area-inset-bottom));
   box-shadow: 0 12px 28px rgb(0 0 0 / 16%);
   position: sticky;
   transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
@@ -820,7 +820,7 @@ body {
 
 .controls-panel.is-mobile-dock {
   border-radius: 18px;
-  padding: 0.44rem 0.55rem 0.55rem;
+  padding: 0.44rem 0.55rem calc(0.55rem + env(safe-area-inset-bottom));
 }
 
 .controls-panel.is-live {
@@ -1362,6 +1362,17 @@ body {
   }
   100% {
     transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
   }
 }
 

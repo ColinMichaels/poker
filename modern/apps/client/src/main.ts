@@ -62,9 +62,13 @@ let selectedLobbyTableId = LOBBY_TABLES[0]?.id ?? '';
 let selectedLobbySeatId = 1;
 let previousPlaySnapshot: PlaySnapshot | null = null;
 let mobileActionDockExpanded = false;
+let lastRenderedModel: TableViewModel | null = null;
+let lastRenderedView: 'lobby' | 'play' | 'howto' | null = null;
+let resizeRenderQueued = false;
 const MOBILE_DOCK_SWIPE_DISTANCE = 46;
 const MOBILE_DOCK_SWIPE_DISTANCE_FAST = 20;
 const MOBILE_DOCK_FAST_GESTURE_MS = 220;
+const DESKTOP_DOCK_MEDIA_QUERY = '(min-width: 720px)';
 
 interface PlaySnapshot {
   handId: string;
@@ -85,6 +89,20 @@ interface PlayTransitionState {
 }
 
 mountControllerForSeat(selectedLobbySeatId);
+window.addEventListener('resize', () => {
+  if (!lastRenderedModel || resizeRenderQueued) {
+    return;
+  }
+
+  resizeRenderQueued = true;
+  window.requestAnimationFrame(() => {
+    resizeRenderQueued = false;
+    if (!lastRenderedModel) {
+      return;
+    }
+    render(appRoot, lastRenderedModel);
+  });
+});
 
 function mountControllerForSeat(userSeatId: number): void {
   previousPlaySnapshot = null;
@@ -96,14 +114,22 @@ function mountControllerForSeat(userSeatId: number): void {
 }
 
 function render(container: HTMLElement, model: TableViewModel): void {
+  lastRenderedModel = model;
+
   const userSeatAction = model.actionState.seats.find((seat) => seat.seatId === model.userSeatId);
   const isUserTurn = model.state.actingSeatId === model.userSeatId && isBettingPhase(model.state.phase);
   const allowedActions = userSeatAction?.actions.filter((option) => option.allowed) ?? [];
   const amountOption = allowedActions.find((option) => option.amountSemantics === 'TARGET_BET') ?? null;
   const defaultAmount = amountOption?.minAmount ?? 0;
   const transitionState = buildPlayTransitionState(model, isUserTurn);
-  const isDesktopViewport = window.matchMedia('(min-width: 720px)').matches;
-  if (!isDesktopViewport && isUserTurn) {
+  const enteringPlayView = activeView === 'play' && lastRenderedView !== 'play';
+  lastRenderedView = activeView;
+  const isDesktopViewport = isDesktopDockViewport();
+  if (
+    !isDesktopViewport &&
+    isUserTurn &&
+    (transitionState.userTurnChanged || transitionState.handAdvanced || enteringPlayView)
+  ) {
     mobileActionDockExpanded = true;
   }
   const dockExpanded = isDesktopViewport || mobileActionDockExpanded;
@@ -354,6 +380,7 @@ function renderPlayView(
   isDesktopViewport: boolean,
   dockExpanded: boolean,
 ): string {
+  const dockContentId = 'action-dock-content';
   const quickAmounts = buildQuickAmountPresets(amountOption, defaultAmount, model.state.pot);
   const actingSeatLabel = model.state.actingSeatId > 0 ? `Seat ${model.state.actingSeatId}` : 'No active seat';
   const metricsClass = transitionState.handAdvanced ? 'table-metrics is-refresh' : 'table-metrics';
@@ -420,12 +447,12 @@ function renderPlayView(
     '    </div>',
     '    <aside class="play-side">',
     `      <section class="${controlsPanelClasses}">`,
-    `        <button class="${dockToggleClasses}" type="button" data-role="dock-toggle" aria-expanded="${dockExpanded ? 'true' : 'false'}">`,
+    `        <button class="${dockToggleClasses}" type="button" data-role="dock-toggle" aria-controls="${dockContentId}" aria-expanded="${dockExpanded ? 'true' : 'false'}">`,
     '          <span class="dock-grip" aria-hidden="true"></span>',
     `          <span class="dock-summary">${escapeHtml(dockSummary)}</span>`,
     `          <span class="dock-chevron">${dockExpanded ? 'Hide' : 'Swipe'}</span>`,
     '        </button>',
-    `        <div class="${dockExpanded ? 'dock-content is-open' : 'dock-content'}">`,
+    `        <div id="${dockContentId}" class="${dockExpanded ? 'dock-content is-open' : 'dock-content'}">`,
     '        <div class="controls-head">',
     '          <h2>Action Dock</h2>',
     `          <p>${escapeHtml(isUserTurn ? 'Tap an action to keep the hand moving.' : 'The dock updates as soon as it is your turn.')}</p>`,
@@ -861,6 +888,10 @@ function buildPlayTransitionState(model: TableViewModel, isUserTurn: boolean): P
 
 function countBoardCards(model: TableViewModel): number {
   return model.state.board.reduce((count, card) => (card ? count + 1 : count), 0);
+}
+
+function isDesktopDockViewport(): boolean {
+  return window.matchMedia(DESKTOP_DOCK_MEDIA_QUERY).matches;
 }
 
 function applyMobileDockSwipe(deltaY: number, durationMs: number): boolean {

@@ -618,7 +618,6 @@ function beginShutdown(signal: 'SIGINT' | 'SIGTERM'): void {
     console.error('Shutdown timeout reached; forcing process exit.');
     process.exit(1);
   }, 10_000);
-  forceExitTimer.unref();
 
   server.close((error) => {
     clearTimeout(forceExitTimer);

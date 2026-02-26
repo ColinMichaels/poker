@@ -7,12 +7,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1eee6476-c5d8-4dc1-b068-da2be4a7c407" name="Default Changelist" comment="feat: add auth bootstrap and demo user controls&#10;&#10;Add `POKER_AUTH_BOOTSTRAP_USERS_FILE` for JSON-based seed user initialization and `POKER_AUTH_ALLOW_DEMO_USERS` to control demo user access. Update docs, tests, and examples for auth bootstrap and production guardrails.">
+    <list default="true" id="1eee6476-c5d8-4dc1-b068-da2be4a7c407" name="Default Changelist" comment="chore: document mobile-first engine progress and client updates">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/apps/client/src/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/src/main.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/apps/client/src/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/src/styles.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/server/tsconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/tsconfig.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/docs/legacy-decommission-plan.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/docs/legacy-decommission-plan.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/docs/phase-2-engine-progress.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/docs/phase-2-engine-progress.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/modern/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -77,12 +79,22 @@
     &quot;assignee&quot;: &quot;ColinMichaels&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/ColinMichaels/poker.git&quot;,
-    &quot;accountId&quot;: &quot;766fa723-3ebb-47d4-b69b-294d9a253afa&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/ColinMichaels/poker.git",
+    "accountId": "766fa723-3ebb-47d4-b69b-294d9a253afa"
+  },
+  "recentNewPullRequestHead": {
+    "server": {
+      "useHttp": false,
+      "host": "github.com",
+      "port": null,
+      "suffix": null
+    },
+    "owner": "ColinMichaels",
+    "repository": "poker"
   }
-}</component>
+}]]></component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/app/Poker/Game.php" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" />
   </component>
@@ -191,7 +203,7 @@
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "feature/modernizing",
+    "git-widget-placeholder": "#348 on feature/modernizing",
     "javascript.preferred.runtime.type.id": "node",
     "junie.onboarding.icon.badge.shown": "true",
     "last_opened_file_path": "/Users/colin/Projects/poker",
@@ -417,7 +429,15 @@
       <option name="project" value="LOCAL" />
       <updated>1772096727497</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="chore: document mobile-first engine progress and client updates">
+      <option name="closed" value="true" />
+      <created>1772102346154</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1772102346154</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -443,7 +463,8 @@
     <MESSAGE value="Add Poker Server MVP with hand lifecycle, deterministic replay, and lifecycle/replay tests." />
     <MESSAGE value="chore: update `.idea/workspace.xml` with extended legacy file references and default changelist adjustments" />
     <MESSAGE value="feat: add auth bootstrap and demo user controls&#10;&#10;Add `POKER_AUTH_BOOTSTRAP_USERS_FILE` for JSON-based seed user initialization and `POKER_AUTH_ALLOW_DEMO_USERS` to control demo user access. Update docs, tests, and examples for auth bootstrap and production guardrails." />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: add auth bootstrap and demo user controls&#10;&#10;Add `POKER_AUTH_BOOTSTRAP_USERS_FILE` for JSON-based seed user initialization and `POKER_AUTH_ALLOW_DEMO_USERS` to control demo user access. Update docs, tests, and examples for auth bootstrap and production guardrails." />
+    <MESSAGE value="chore: document mobile-first engine progress and client updates" />
+    <option name="LAST_COMMIT_MESSAGE" value="chore: document mobile-first engine progress and client updates" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
