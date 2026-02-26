@@ -315,6 +315,17 @@ These are not extraction failures, but they are blockers to deleting the legacy 
 - Added fast-gesture thresholds and click suppression so swipe gestures do not trigger accidental double-toggles.
 - Added swipe affordance polish to the handle (`Swipe` label + animated grip hint in collapsed mobile state).
 
+## Completed in PR AL
+
+- Hardened mobile tray auto-open behavior:
+  - now auto-opens on meaningful transitions (user turn starts, new hand, or entering play view)
+  - no longer force-opens on every render, allowing manual collapse while still on turn
+- Added viewport/orientation responsiveness for dock behavior:
+  - client now re-renders on resize/orientation changes so mobile/desktop dock mode updates immediately
+- Added motion/accessibility polish:
+  - safe-area bottom inset support for mobile dock spacing
+  - reduced-motion media-query support to minimize animation/transition intensity
+
 ## Known Intentional Asset Exceptions
 
 - Non-canonical card extras remain excluded from canonical face set:
@@ -404,6 +415,7 @@ Exit criteria:
 35. PR AI: Lobby shell and seat-based table entry flow.
 36. PR AJ: Mobile bottom-sheet action tray interaction.
 37. PR AK: Touch-swipe gesture controls for mobile action tray.
+38. PR AL: Mobile tray auto-open/resize hardening + reduced-motion/safe-area support.
 
 ## Cutover Go/No-Go Checklist
 
