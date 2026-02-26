@@ -268,6 +268,53 @@ These are not extraction failures, but they are blockers to deleting the legacy 
   - `scripts/audit-legacy-references.mjs`
 - Linked command from root and legacy-removal execution docs.
 
+## Completed in PR AF
+
+- Started the mobile-first modern client redesign for post-cutover gameplay UX:
+  - refactored the play table into a felt-table stage, turn summary panel, and action dock
+  - added quick amount presets for target-bet actions
+- Replaced client styling with a mobile-first responsive table theme and desktop breakpoints.
+
+## Completed in PR AG
+
+- Added a mobile-first in-hand HUD pass in the modern client:
+  - player seat HUD with visible hole cards, stack/commit metrics, and legal-action summary
+  - felt-table seat radar overlay for at-a-glance opponent state and turn position
+- Restructured play layout into `play-main` + `play-side` regions for clearer desktop/tablet composition.
+
+## Completed in PR AH
+
+- Added state-driven gameplay motion in the modern client play view:
+  - phase and board transition animations during hand progression
+  - acting-seat transition emphasis for both radar and seat cards
+  - live/waiting action-dock state styling for faster mobile turn recognition
+- Added transition snapshot tracking in client rendering to animate only on real game-state changes.
+
+## Completed in PR AI
+
+- Added a first-pass modern client lobby shell in front of table gameplay:
+  - table list with selectable table cards
+  - seat selection panel and explicit enter-table action
+- Added seat-based session handoff: entering with a different seat now remounts the local table controller for that user seat.
+- Updated client styling with responsive lobby layouts for mobile/tablet/desktop.
+
+## Completed in PR AJ
+
+- Added mobile bottom-sheet action tray behavior for in-hand controls:
+  - explicit show/hide tray handle with swipe-up hint when collapsed
+  - collapsed/expanded dock content transitions for action controls
+- Added viewport-aware dock state handling:
+  - mobile uses toggleable tray state
+  - tablet/desktop keeps dock content persistently open.
+
+## Completed in PR AK
+
+- Added touch-swipe gesture support on the action tray handle:
+  - swipe up opens the tray
+  - swipe down closes the tray
+- Added fast-gesture thresholds and click suppression so swipe gestures do not trigger accidental double-toggles.
+- Added swipe affordance polish to the handle (`Swipe` label + animated grip hint in collapsed mobile state).
+
 ## Known Intentional Asset Exceptions
 
 - Non-canonical card extras remain excluded from canonical face set:
@@ -351,6 +398,12 @@ Exit criteria:
 29. PR AC: Production compatibility-override startup warnings.
 30. PR AD: Legacy cutover readiness command.
 31. PR AE: Legacy-reference inventory command for cutover planning.
+32. PR AF: Mobile-first client table redesign kickoff.
+33. PR AG: Mobile HUD and felt-radar layout pass.
+34. PR AH: State-driven gameplay transitions and action-dock emphasis.
+35. PR AI: Lobby shell and seat-based table entry flow.
+36. PR AJ: Mobile bottom-sheet action tray interaction.
+37. PR AK: Touch-swipe gesture controls for mobile action tray.
 
 ## Cutover Go/No-Go Checklist
 

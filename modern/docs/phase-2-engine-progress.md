@@ -606,3 +606,86 @@ Sources:
 - `scripts/audit-legacy-references.mjs`
 - `package.json`
 - `README.md`
+
+## PR AF Progress: Mobile-First Client Table Redesign Kickoff
+
+- Reworked modern client play-view markup for clearer in-hand flow on small screens:
+  - felt-table stage for board + pot + phase
+  - hand-flow summary panel
+  - action dock with quick amount presets for target-bet actions
+- Replaced client stylesheet with a mobile-first responsive poker-table theme and desktop breakpoints.
+- Added semantic action button intents (`neutral`, `aggressive`, `caution`, `danger`) for clearer decision affordance.
+
+Sources:
+
+- `apps/client/src/main.ts`
+- `apps/client/src/styles.css`
+
+## PR AG Progress: Mobile HUD + Felt Radar Layout
+
+- Added player-facing HUD content to the modern play view:
+  - visible user hole cards
+  - stack/street-bet/to-call summary
+  - legal-action summary line
+- Added a felt-table seat radar overlay to show each seat's live status around the board.
+- Split play view rendering into `play-main` and `play-side` regions to support stronger desktop composition while preserving mobile-first behavior.
+
+Sources:
+
+- `apps/client/src/main.ts`
+- `apps/client/src/styles.css`
+
+## PR AH Progress: State-Driven Gameplay Motion
+
+- Added render-level transition snapshot tracking (`handId`, phase, board count, acting seat, user-turn state) to detect meaningful state transitions.
+- Added targeted UI motion classes for:
+  - board-deal and phase-change transitions
+  - acting-seat emphasis in radar + seat cards
+  - action-dock live/waiting turn states
+- Updated play-view rendering to apply animation classes only when the underlying game state actually changes.
+
+Sources:
+
+- `apps/client/src/main.ts`
+- `apps/client/src/styles.css`
+
+## PR AI Progress: Lobby Shell + Seat Entry Flow
+
+- Added a modern client lobby-first flow with:
+  - table selection cards
+  - seat selection controls
+  - explicit enter-table action
+- Added controller remount behavior when entering the table with a different selected seat to align gameplay state with chosen user seat.
+- Added responsive lobby styling for mobile/tablet/desktop breakpoints.
+
+Sources:
+
+- `apps/client/src/main.ts`
+- `apps/client/src/styles.css`
+
+## PR AJ Progress: Mobile Bottom-Sheet Action Tray
+
+- Added client-side dock state for mobile action controls:
+  - collapsed/expanded bottom-sheet behavior
+  - dock toggle/handle UI with swipe-up summary hint when collapsed
+- Added viewport-aware rendering behavior so desktop/tablet always render the dock fully expanded while mobile can collapse it.
+- Added dock transition styling for smoother open/close interaction and clearer action availability.
+
+Sources:
+
+- `apps/client/src/main.ts`
+- `apps/client/src/styles.css`
+
+## PR AK Progress: Touch Swipe Support for Action Tray
+
+- Added touch gesture handling on the dock handle in the modern client:
+  - upward swipe opens mobile action tray
+  - downward swipe closes mobile action tray
+- Added gesture timing/distance thresholds to support both deliberate drags and fast flicks.
+- Added swipe-trigger click suppression to avoid double toggling when touch events synthesize click events.
+- Updated tray affordance copy and grip animation to reinforce swipe interaction in collapsed state.
+
+Sources:
+
+- `apps/client/src/main.ts`
+- `apps/client/src/styles.css`
