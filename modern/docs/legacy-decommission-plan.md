@@ -170,6 +170,14 @@ These are not extraction failures, but they are blockers to deleting the legacy 
 - Default behavior is now production-safe (`NODE_ENV=production` disables legacy wallet routes unless explicitly enabled).
 - Updated server/deployment docs for legacy wallet route toggles.
 
+## Completed in PR R
+
+- Extracted server startup/env parsing into dedicated module:
+  - `apps/server/src/startup-config.ts`
+- Added startup config regression tests:
+  - `apps/server/src/startup-config.test.ts`
+- Wired server test script to run startup config checks in CI/local verification.
+
 ## Known Intentional Asset Exceptions
 
 - Non-canonical card extras remain excluded from canonical face set:
@@ -239,6 +247,7 @@ Exit criteria:
 15. PR O: Legacy removal execution runbook and doc linkage.
 16. PR P: Password-hash format validation and legacy credential migration hardening.
 17. PR Q: Legacy wallet route toggle with production-safe defaults.
+18. PR R: Extracted startup config parsing + dedicated regression tests.
 
 ## Cutover Go/No-Go Checklist
 

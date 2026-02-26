@@ -418,3 +418,20 @@ Sources:
 - `apps/server/src/index.ts`
 - `apps/server/README.md`
 - `docs/deployment-runbook.md`
+
+## PR R Progress: Startup Config Module + Tests
+
+- Extracted startup/env parsing and bootstrap-user file validation from server entrypoint into:
+  - `apps/server/src/startup-config.ts`
+- Added focused regression tests for:
+  - default/prod-safe toggles
+  - env override parsing
+  - bootstrap users file parsing/validation failures
+- Updated server test script to include startup-config tests.
+
+Sources:
+
+- `apps/server/src/startup-config.ts`
+- `apps/server/src/startup-config.test.ts`
+- `apps/server/src/index.ts`
+- `apps/server/package.json`
