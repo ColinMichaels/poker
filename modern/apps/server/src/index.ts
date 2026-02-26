@@ -2,6 +2,7 @@ import { createServer, type IncomingMessage, type ServerResponse } from 'node:ht
 import type { LoginRequestDTO, UpdateProfileRequestDTO, WalletAdjustmentRequestDTO } from '@poker/game-contracts';
 import type { TableCommand } from '@poker/poker-engine';
 import { AuthWalletService } from './auth-wallet-service.ts';
+import { RuntimeStateStore, type RuntimeStateSnapshot } from './runtime-state-store.ts';
 import { TableService, createDefaultTableState } from './table-service.ts';
 
 const DEFAULT_HOST = '127.0.0.1';
@@ -31,6 +32,27 @@ function parsePort(rawValue: string | undefined): number {
   }
 
   return parsed;
+}
+
+function parsePersistenceEnabled(rawValue: string | undefined): boolean {
+  if (rawValue === undefined) {
+    return true;
+  }
+
+  const normalized = rawValue.trim().toLowerCase();
+  if (['1', 'true', 'yes', 'on'].includes(normalized)) {
+    return true;
+  }
+
+  if (['0', 'false', 'no', 'off'].includes(normalized)) {
+    return false;
+  }
+
+  throw new Error(`Invalid POKER_STATE_PERSIST value: ${rawValue}`);
+}
+
+function defaultStateFilePath(): string {
+  return decodeURIComponent(new URL('../.data/runtime-state.json', import.meta.url).pathname);
 }
 
 function jsonHeaders(): Record<string, string> {
@@ -292,6 +314,7 @@ async function handleRequest(
   response: ServerResponse,
   tableService: TableService,
   authWalletService: AuthWalletService,
+  persistRuntimeState: () => void,
 ): Promise<void> {
   const method = request.method ?? 'GET';
   const host = getHeaderValue(request, 'host') ?? `${DEFAULT_HOST}:${DEFAULT_PORT}`;
@@ -320,13 +343,16 @@ async function handleRequest(
     if (method === 'POST' && pathname === '/api/auth/login') {
       const body = await readJsonBody(request);
       const loginRequest = parseLoginRequest(body);
-      sendJson(response, 200, authWalletService.login(loginRequest));
+      const loginResponse = authWalletService.login(loginRequest);
+      persistRuntimeState();
+      sendJson(response, 200, loginResponse);
       return;
     }
 
     if (method === 'POST' && pathname === '/api/auth/logout') {
       const { token } = requireAuthenticatedContext(request, authWalletService);
       authWalletService.logout(token);
+      persistRuntimeState();
       sendNoContent(response);
       return;
     }
@@ -351,8 +377,10 @@ async function handleRequest(
       const { userId } = requireAuthenticatedContext(request, authWalletService);
       const body = await readJsonBody(request);
       const update = parseProfileUpdate(body);
+      const user = authWalletService.updateUserProfile(userId, update);
+      persistRuntimeState();
       sendJson(response, 200, {
-        user: authWalletService.updateUserProfile(userId, update),
+        user,
       });
       return;
     }
@@ -368,7 +396,9 @@ async function handleRequest(
     if (method === 'PATCH' && pathname === '/api/wallet') {
       const { userId } = requireAuthenticatedContext(request, authWalletService);
       const body = await readJsonBody(request);
-      sendJson(response, 200, authWalletService.adjustWallet(userId, parseWalletAdjustment(body)));
+      const result = authWalletService.adjustWallet(userId, parseWalletAdjustment(body));
+      persistRuntimeState();
+      sendJson(response, 200, result);
       return;
     }
 
@@ -392,6 +422,7 @@ async function handleRequest(
       const { userId } = requireAuthenticatedContext(request, authWalletService);
       const body = await readJsonBody(request);
       const result = authWalletService.adjustWallet(userId, parseWalletAdjustment(body));
+      persistRuntimeState();
       sendJson(response, 200, result.wallet.balance);
       return;
     }
@@ -445,6 +476,7 @@ async function handleRequest(
       const body = await readJsonBody(request);
       const command = extractCommand(body);
       const result = tableService.applyCommand(command);
+      persistRuntimeState();
       sendJson(response, 200, result);
       return;
     }
@@ -462,20 +494,80 @@ async function handleRequest(
 const port = parsePort(process.env.PORT);
 const host = process.env.HOST ?? DEFAULT_HOST;
 const tableId = process.env.TABLE_ID ?? DEFAULT_TABLE_ID;
+const persistenceEnabled = parsePersistenceEnabled(process.env.POKER_STATE_PERSIST);
+const stateFilePath = process.env.POKER_STATE_FILE ?? defaultStateFilePath();
+const runtimeStateStore = persistenceEnabled ? new RuntimeStateStore(stateFilePath) : null;
 
-const tableService = new TableService({
-  tableId,
-  initialState: createDefaultTableState(),
-});
+let persistedRuntimeState: RuntimeStateSnapshot | null = null;
+if (runtimeStateStore) {
+  try {
+    persistedRuntimeState = runtimeStateStore.load();
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.warn(`Unable to load persisted runtime state: ${message}`);
+  }
+}
 
-const authWalletService = new AuthWalletService();
+const tableService = (() => {
+  if (!persistedRuntimeState) {
+    return new TableService({
+      tableId,
+      initialState: createDefaultTableState(),
+    });
+  }
+
+  if (persistedRuntimeState.table.tableId !== tableId) {
+    console.warn(
+      `Ignoring persisted table state for ${persistedRuntimeState.table.tableId}; configured table id is ${tableId}.`,
+    );
+    return new TableService({
+      tableId,
+      initialState: createDefaultTableState(),
+    });
+  }
+
+  return new TableService({
+    tableId,
+    restoredState: persistedRuntimeState.table,
+  });
+})();
+
+const authWalletService = persistedRuntimeState
+  ? new AuthWalletService({
+    users: persistedRuntimeState.auth.users,
+    sessions: persistedRuntimeState.auth.sessions,
+  })
+  : new AuthWalletService();
+
+function persistRuntimeState(): void {
+  if (!runtimeStateStore) {
+    return;
+  }
+
+  try {
+    runtimeStateStore.save({
+      version: 1,
+      updatedAt: new Date().toISOString(),
+      table: tableService.exportState(),
+      auth: authWalletService.exportState(),
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.warn(`Unable to persist runtime state: ${message}`);
+  }
+}
 
 const server = createServer((request, response) => {
-  void handleRequest(request, response, tableService, authWalletService);
+  void handleRequest(request, response, tableService, authWalletService, persistRuntimeState);
 });
 
 server.listen(port, host, () => {
   const address = `http://${host}:${port}`;
   console.info(`Poker server listening at ${address}`);
   console.info('Endpoints: /health, /api/auth/*, /api/users/me, /api/wallet*, /api/table/*');
+  if (runtimeStateStore) {
+    console.info(`Runtime persistence: enabled (${runtimeStateStore.getFilePath()})`);
+  } else {
+    console.info('Runtime persistence: disabled');
+  }
 });

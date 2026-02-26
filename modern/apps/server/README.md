@@ -4,7 +4,7 @@ This service is the PR B/PR C runtime for `modern/` (authoritative table + minim
 
 ## What It Does
 
-- Owns one in-memory table state (`@poker/poker-engine`)
+- Owns one authoritative table state (`@poker/poker-engine`) with file-backed persistence
 - Applies only validated `TableCommand` inputs
 - Records command/event logs with sequence numbers
 - Stores per-hand snapshots and replay history
@@ -29,6 +29,14 @@ Environment overrides:
 - `HOST`
 - `PORT`
 - `TABLE_ID`
+- `POKER_STATE_PERSIST` (`1`/`0`, default `1`)
+- `POKER_STATE_FILE` (absolute path to JSON runtime state file)
+
+Runtime persistence:
+
+- Enabled by default.
+- Persists table/auth state after mutating requests.
+- Default file: `modern/apps/server/.data/runtime-state.json`
 
 ## HTTP API
 

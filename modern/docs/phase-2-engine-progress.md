@@ -218,3 +218,21 @@ Sources:
 - `legacy/README.md`
 - `modern/scripts/generate-howto-content.mjs`
 - `modern/packages/asset-manifest/scripts/generate-manifest.mjs`
+
+## PR F Progress: Server Runtime Persistence
+
+- Added file-backed runtime state persistence for `apps/server`:
+  - table snapshot/logs/hand-history persistence
+  - auth/wallet user/session/ledger persistence
+  - restore-on-boot behavior for persisted state
+- Added runtime persistence store tests:
+  - `apps/server/src/runtime-state-store.test.ts`
+- Added server env controls:
+  - `POKER_STATE_PERSIST`
+  - `POKER_STATE_FILE`
+
+Sources:
+
+- `apps/server/src/runtime-state-store.ts`
+- `apps/server/src/index.ts`
+- `apps/server/src/runtime-state-store.test.ts`

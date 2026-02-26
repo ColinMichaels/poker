@@ -72,6 +72,17 @@ export interface HandReplayResult {
 export interface TableServiceOptions {
   tableId: string;
   initialState?: TexasHoldemState;
+  restoredState?: TableServiceStateSnapshot;
+}
+
+export interface TableServiceStateSnapshot {
+  tableId: string;
+  state: TexasHoldemState;
+  commandSequence: number;
+  eventSequence: number;
+  commandLog: CommandRecord[];
+  eventLog: EventRecord[];
+  handHistory: HandHistory[];
 }
 
 export interface DefaultTableStateOptions {
@@ -145,12 +156,33 @@ export class TableService {
 
   public constructor(options: TableServiceOptions) {
     this.tableId = options.tableId;
-    this.state = cloneDeep(options.initialState ?? createDefaultTableState());
-    this.commandSequence = 0;
-    this.eventSequence = 0;
     this.commandLog = [];
     this.eventLog = [];
     this.handHistoryById = new Map();
+
+    if (options.restoredState) {
+      if (options.restoredState.tableId !== this.tableId) {
+        throw new Error(
+          `Restored table id ${options.restoredState.tableId} does not match configured table id ${this.tableId}.`,
+        );
+      }
+
+      this.state = cloneDeep(options.restoredState.state);
+      this.commandSequence = options.restoredState.commandSequence;
+      this.eventSequence = options.restoredState.eventSequence;
+      this.commandLog.push(...cloneDeep(options.restoredState.commandLog));
+      this.eventLog.push(...cloneDeep(options.restoredState.eventLog));
+
+      for (const history of options.restoredState.handHistory) {
+        this.handHistoryById.set(history.handId, cloneDeep(history));
+      }
+
+      return;
+    }
+
+    this.state = cloneDeep(options.initialState ?? createDefaultTableState());
+    this.commandSequence = 0;
+    this.eventSequence = 0;
   }
 
   public getSnapshot(): TableSnapshot {
@@ -210,6 +242,20 @@ export class TableService {
       eventCount: history.events.length,
       replayedFinalState: replayState,
       matchesRecordedFinalState: history.finalSnapshot ? statesMatch(history.finalSnapshot, replayState) : null,
+    };
+  }
+
+  public exportState(): TableServiceStateSnapshot {
+    return {
+      tableId: this.tableId,
+      state: cloneDeep(this.state),
+      commandSequence: this.commandSequence,
+      eventSequence: this.eventSequence,
+      commandLog: cloneDeep(this.commandLog),
+      eventLog: cloneDeep(this.eventLog),
+      handHistory: cloneDeep(Array.from(this.handHistoryById.values()).sort((left, right) =>
+        left.startedAt.localeCompare(right.startedAt),
+      )),
     };
   }
 

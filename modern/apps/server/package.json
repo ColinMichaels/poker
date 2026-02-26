@@ -8,7 +8,7 @@
     "start": "node ./dist/index.js",
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "node --experimental-strip-types ./src/table-service.test.ts && node --experimental-strip-types ./src/auth-wallet-service.test.ts"
+    "test": "node --experimental-strip-types ./src/table-service.test.ts && node --experimental-strip-types ./src/auth-wallet-service.test.ts && node --experimental-strip-types ./src/runtime-state-store.test.ts"
   },
   "dependencies": {
     "@poker/game-contracts": "file:../../packages/game-contracts",

@@ -10,7 +10,7 @@ import type {
   WalletLedgerEntryDTO,
 } from '@poker/game-contracts';
 
-interface UserRecord {
+export interface PersistedUserRecord {
   id: number;
   email: string;
   password: string;
@@ -23,15 +23,21 @@ interface UserRecord {
   walletLedger: WalletLedgerEntryDTO[];
 }
 
-interface SessionRecord {
+export interface PersistedSessionRecord {
   token: string;
   userId: number;
   issuedAt: string;
   expiresAt: string | null;
 }
 
+export interface AuthWalletStateSnapshot {
+  users: PersistedUserRecord[];
+  sessions: PersistedSessionRecord[];
+}
+
 export interface AuthWalletServiceOptions {
-  users?: UserRecord[];
+  users?: PersistedUserRecord[];
+  sessions?: PersistedSessionRecord[];
 }
 
 export interface AuthContext {
@@ -62,7 +68,7 @@ function createSessionToken(userId: number): string {
   return `sess_${userId}_${Date.now()}_${entropy}`;
 }
 
-function buildDefaultUsers(): UserRecord[] {
+function buildDefaultUsers(): PersistedUserRecord[] {
   const createdAt = nowIso();
 
   return [
@@ -94,20 +100,38 @@ function buildDefaultUsers(): UserRecord[] {
 }
 
 export class AuthWalletService {
-  private readonly usersById: Map<number, UserRecord>;
-  private readonly usersByEmail: Map<string, UserRecord>;
-  private readonly sessionsByToken: Map<string, SessionRecord>;
+  private readonly usersById: Map<number, PersistedUserRecord>;
+  private readonly usersByEmail: Map<string, PersistedUserRecord>;
+  private readonly sessionsByToken: Map<string, PersistedSessionRecord>;
 
   public constructor(options: AuthWalletServiceOptions = {}) {
     const users = options.users ? cloneDeep(options.users) : buildDefaultUsers();
+    const sessions = options.sessions ? cloneDeep(options.sessions) : [];
 
     this.usersById = new Map();
     this.usersByEmail = new Map();
     this.sessionsByToken = new Map();
 
     for (const user of users) {
+      if (this.usersById.has(user.id)) {
+        throw new Error(`Duplicate user id detected during auth restore: ${user.id}`);
+      }
+
+      const normalizedEmail = normalizeEmail(user.email);
+      if (this.usersByEmail.has(normalizedEmail)) {
+        throw new Error(`Duplicate email detected during auth restore: ${user.email}`);
+      }
+
       this.usersById.set(user.id, user);
-      this.usersByEmail.set(normalizeEmail(user.email), user);
+      this.usersByEmail.set(normalizedEmail, user);
+    }
+
+    for (const session of sessions) {
+      if (!this.usersById.has(session.userId)) {
+        throw new Error(`Session ${session.token} references missing user ${session.userId}.`);
+      }
+
+      this.sessionsByToken.set(session.token, session);
     }
   }
 
@@ -125,7 +149,7 @@ export class AuthWalletService {
       throw new Error('Invalid credentials.');
     }
 
-    const session: SessionRecord = {
+    const session: PersistedSessionRecord = {
       token: createSessionToken(user.id),
       userId: user.id,
       issuedAt: nowIso(),
@@ -245,7 +269,16 @@ export class AuthWalletService {
     return this.requireUser(userId).walletBalance;
   }
 
-  private requireUser(userId: number): UserRecord {
+  public exportState(): AuthWalletStateSnapshot {
+    return {
+      users: cloneDeep(Array.from(this.usersById.values()).sort((left, right) => left.id - right.id)),
+      sessions: cloneDeep(Array.from(this.sessionsByToken.values()).sort((left, right) =>
+        left.issuedAt.localeCompare(right.issuedAt),
+      )),
+    };
+  }
+
+  private requireUser(userId: number): PersistedUserRecord {
     const user = this.usersById.get(userId);
     if (!user) {
       throw new Error(`User ${userId} was not found.`);
@@ -254,7 +287,7 @@ export class AuthWalletService {
     return user;
   }
 
-  private toWalletDTO(user: UserRecord): PlayerWalletDTO {
+  private toWalletDTO(user: PersistedUserRecord): PlayerWalletDTO {
     return {
       userId: user.id,
       balance: user.walletBalance,
@@ -264,7 +297,7 @@ export class AuthWalletService {
     };
   }
 
-  private toUserProfileDTO(user: UserRecord): UserProfileDTO {
+  private toUserProfileDTO(user: PersistedUserRecord): UserProfileDTO {
     return {
       id: user.id,
       email: user.email,
@@ -275,7 +308,7 @@ export class AuthWalletService {
     };
   }
 
-  private toSessionDTO(session: SessionRecord): AuthSessionDTO {
+  private toSessionDTO(session: PersistedSessionRecord): AuthSessionDTO {
     return {
       token: session.token,
       issuedAt: session.issuedAt,

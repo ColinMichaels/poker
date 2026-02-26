@@ -2,6 +2,7 @@
 /modern/node_modules
 /modern/apps/*/node_modules
 /modern/apps/*/dist
+/modern/apps/server/.data
 /modern/packages/*/dist
 /legacy/node_modules
 /legacy/public/hot

@@ -155,9 +155,43 @@ function testRejectsStartHandInProgress(): void {
   );
 }
 
+function testStateRoundTripRestore(): void {
+  const original = new TableService({
+    tableId: 'table-test',
+    initialState: createDefaultTableState({ handId: 'boot-hand', seed: 300 }),
+  });
+
+  runHandToCompletion(original, 'hand-0001', 301);
+
+  const restored = new TableService({
+    tableId: 'table-test',
+    restoredState: original.exportState(),
+  });
+
+  const originalSnapshot = original.getSnapshot();
+  const restoredSnapshot = restored.getSnapshot();
+
+  assertEqual(
+    restoredSnapshot.commandSequence,
+    originalSnapshot.commandSequence,
+    'Expected restored command sequence to match.',
+  );
+  assertEqual(
+    restoredSnapshot.eventSequence,
+    originalSnapshot.eventSequence,
+    'Expected restored event sequence to match.',
+  );
+  assertEqual(restoredSnapshot.state.phase, 'HAND_COMPLETE', 'Expected restored phase to be HAND_COMPLETE.');
+  assertEqual(restored.listHandSummaries().length, 1, 'Expected restored hand history to be present.');
+
+  const replay = restored.replayHand('hand-0001');
+  assertEqual(replay.matchesRecordedFinalState, true, 'Expected restored replay to match final snapshot.');
+}
+
 function runAll(): void {
   testRunsFullHandAndReplayMatches();
   testRejectsStartHandInProgress();
+  testStateRoundTripRestore();
   console.info('Server tests passed (table lifecycle + replay + lifecycle guard).');
 }
 

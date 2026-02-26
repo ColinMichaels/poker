@@ -20,7 +20,7 @@ Purpose: make `modern/` the primary codebase without losing reusable legacy func
 
 These are not extraction failures, but they are blockers to deleting the legacy app:
 
-1. Server/runtime persistence and real auth hardening are not yet implemented (current auth/wallet parity is in-memory MVP).
+1. Real auth hardening is not yet implemented (current auth/session uses demo credentials and unsigned bearer tokens).
 
 ## Completed in PR A
 
@@ -69,6 +69,18 @@ These are not extraction failures, but they are blockers to deleting the legacy 
   - `modern/scripts/generate-howto-content.mjs`
   - `modern/packages/asset-manifest/scripts/generate-manifest.mjs`
 - Updated root + modern docs to reflect new archive location and modern-first defaults.
+
+## Completed in PR F
+
+- Added durable runtime persistence for modern server:
+  - table state/logs/history snapshot persistence
+  - auth/wallet users + sessions + ledger persistence
+  - restore-on-boot from persisted runtime snapshot
+- Added persistence regression tests:
+  - `modern/apps/server/src/runtime-state-store.test.ts`
+- Added persistence environment controls:
+  - `POKER_STATE_PERSIST` (default enabled)
+  - `POKER_STATE_FILE`
 
 ## Known Intentional Asset Exceptions
 
@@ -127,6 +139,7 @@ Exit criteria:
 3. PR C: Minimal auth/wallet parity and contracts.
 4. PR D: Root documentation + deployment cutover.
 5. PR E: Legacy archive/removal.
+6. PR F: Server runtime persistence.
 
 ## Cutover Go/No-Go Checklist
 

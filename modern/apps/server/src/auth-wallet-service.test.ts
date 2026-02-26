@@ -93,10 +93,33 @@ function testInsufficientBalanceAndProfileUpdate(): void {
   assertEqual(updatedProfile.displayName, 'Colin-Updated Player-Updated', 'Expected display name to reflect updates.');
 }
 
+function testStateRoundTripRestore(): void {
+  const service = new AuthWalletService();
+  const login = service.login({ email: 'colin@example.com', password: 'demo' });
+  const userId = login.session.user.id;
+
+  service.adjustWallet(userId, {
+    method: 'add',
+    amount: 30,
+    reason: 'restore-test',
+  });
+
+  const restored = new AuthWalletService(service.exportState());
+  const restoredSession = restored.getSession(login.session.token);
+  const restoredWallet = restored.getWallet(userId);
+  const restoredLedger = restored.getWalletLedger(userId, 10);
+
+  assertEqual(restoredSession.user.id, userId, 'Expected restored session to resolve original user.');
+  assertEqual(restoredWallet.balance, 530, 'Expected restored wallet balance to persist.');
+  assertEqual(restoredLedger.length, 1, 'Expected restored wallet ledger to persist.');
+  assertEqual(restoredLedger[0]?.reason, 'restore-test', 'Expected restored ledger reason to persist.');
+}
+
 function runAll(): void {
   testLoginSessionAndLogoutFlow();
   testWalletAdjustmentsAndLedger();
   testInsufficientBalanceAndProfileUpdate();
+  testStateRoundTripRestore();
   console.info('Auth/wallet tests passed (session + wallet + profile flows).');
 }
 

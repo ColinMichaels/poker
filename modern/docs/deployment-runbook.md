@@ -28,6 +28,8 @@ Environment variables:
 - `HOST` (default: `127.0.0.1`)
 - `PORT` (default: `8787`)
 - `TABLE_ID` (default: `table-1`)
+- `POKER_STATE_PERSIST` (`1`/`0`, default: `1`)
+- `POKER_STATE_FILE` (default: `apps/server/.data/runtime-state.json`)
 
 ## Health + Readiness Checks
 
@@ -42,5 +44,5 @@ Auth/wallet sanity checks:
 
 ## Deployment Notes
 
-- Current auth/wallet service is intentionally in-memory MVP parity for migration continuity.
-- For production hardening, replace in-memory auth/session/wallet data with persistent storage and real auth controls.
+- Current runtime persists table/auth/wallet state to local JSON for restart continuity.
+- For production hardening, replace demo auth/session flows with real identity, signed/rotating tokens, and encrypted credential storage.
