@@ -2,6 +2,8 @@
 
 interface ImportMetaEnv {
   readonly VITE_API_BASE_URL?: string;
+  readonly VITE_TABLE_RUNTIME_MODE?: string;
+  readonly VITE_TABLE_POLL_INTERVAL_MS?: string;
   readonly VITE_EXTERNAL_AUTH_MODE?: string;
   readonly VITE_EXTERNAL_AUTH_LOGIN_PATH?: string;
   readonly VITE_FIREBASE_API_KEY?: string;

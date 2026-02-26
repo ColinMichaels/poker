@@ -694,6 +694,36 @@ These are not extraction failures, but they are blockers to deleting the legacy 
   - `VITE_EXTERNAL_AUTH_MODE`, `VITE_EXTERNAL_AUTH_LOGIN_PATH`
 - Added client regression coverage for runtime config parsing and external auth session bridge lifecycle.
 
+## Completed in PR BS
+
+- Added client runtime mode switching for table control:
+  - `VITE_TABLE_RUNTIME_MODE=local|server`
+  - `VITE_TABLE_POLL_INTERVAL_MS`
+- Added server-backed table controller implementing the same interface used by local simulation:
+  - polls `/api/table/state`
+  - submits commands to `/api/table/command`
+  - executes deterministic auto-progression for deal streets/showdown and non-user acting seats
+- Wired play-view controller mounting through runtime factory so local and server modes are swappable without UI rewrite.
+- Added regression tests for server-controller automation command selection and runtime config parsing.
+- Updated developer/deployment docs and env templates for server-mode client runtime.
+
+## Completed in PR BT
+
+- Added server-side seat ownership state to authoritative table runtime:
+  - persisted seat-claim map in table runtime export/snapshot
+  - seat-claim lifecycle helpers in `TableService` (`claimSeat`, `releaseSeatForUser`, claim lookups)
+- Added authenticated seat-claim routes:
+  - `GET /api/table/seat`
+  - `POST /api/table/seat`
+  - `DELETE /api/table/seat`
+- Enforced table command authorization for `PLAYER_ACTION`:
+  - unauthenticated requests can only act on unclaimed seats
+  - `PLAYER` sessions must claim a seat and may only act on that seat
+  - logout now releases the authenticated user seat claim
+- Added client server-runtime seat-claim wiring:
+  - authenticated server-mode controller auto-claims selected seat via `/api/table/seat`
+- Added server regression coverage for seat-claim authorization and conflict behavior.
+
 ## Known Intentional Asset Exceptions
 
 - Non-canonical card extras remain excluded from canonical face set:
@@ -816,6 +846,8 @@ Exit criteria:
 68. PR BP: Firebase ID token provider mode wiring.
 69. PR BQ: Firebase Admin SDK adapter behind pluggable verifier interface.
 70. PR BR: Firebase deploy scripts and client external-auth bridge wiring.
+71. PR BS: Client server-runtime table controller integration pass.
+72. PR BT: Server seat ownership enforcement + client seat-claim integration.
 
 ## Cutover Go/No-Go Checklist
 

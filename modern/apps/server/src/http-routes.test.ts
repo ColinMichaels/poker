@@ -95,30 +95,58 @@ function createServices(): {
   };
 }
 
+type RouteRuntimeInfo = {
+  persistenceEnabled: boolean;
+  authAllowDemoUsers: boolean;
+  allowLegacyWalletRoutes: boolean;
+  externalAuthEnabled: boolean;
+  externalAuthMode: ExternalAuthMode;
+  externalAuthIssuer: string;
+  externalAuthProxySharedSecret: string | undefined;
+  externalAuthFirebaseProjectId: string | undefined;
+  externalAuthFirebaseAudience: string | undefined;
+  externalAuthFirebaseIssuer: string | undefined;
+  externalAuthFirebaseCertsUrl: string;
+  externalAuthFirebaseVerifier: FirebaseVerifierMode;
+  externalAuthVerificationSecrets: readonly string[];
+  verifyFirebaseIdTokenFn: (
+    idToken: string,
+    options: FirebaseIdTokenVerificationOptions,
+  ) => Promise<FirebaseExternalIdentity>;
+};
+
+function createRuntimeInfo(overrides: Partial<RouteRuntimeInfo> = {}): RouteRuntimeInfo {
+  return {
+    persistenceEnabled: false,
+    authAllowDemoUsers: true,
+    allowLegacyWalletRoutes: false,
+    externalAuthEnabled: false,
+    externalAuthMode: 'signed_assertion',
+    externalAuthIssuer: 'oidc-route-test',
+    externalAuthProxySharedSecret: undefined,
+    externalAuthFirebaseProjectId: undefined,
+    externalAuthFirebaseAudience: undefined,
+    externalAuthFirebaseIssuer: undefined,
+    externalAuthFirebaseCertsUrl: 'https://example.test/certs',
+    externalAuthFirebaseVerifier: 'jwt',
+    externalAuthVerificationSecrets: [],
+    verifyFirebaseIdTokenFn: async () => {
+      throw new Error('firebase verifier should not be called in default runtime mode');
+    },
+    ...overrides,
+  };
+}
+
 async function invokeRoute(options: {
   request: MockIncomingMessage;
-  runtimeInfo: {
-    persistenceEnabled: boolean;
-    authAllowDemoUsers: boolean;
-    allowLegacyWalletRoutes: boolean;
-    externalAuthEnabled: boolean;
-    externalAuthMode: ExternalAuthMode;
-    externalAuthIssuer: string;
-    externalAuthProxySharedSecret: string | undefined;
-    externalAuthFirebaseProjectId: string | undefined;
-    externalAuthFirebaseAudience: string | undefined;
-    externalAuthFirebaseIssuer: string | undefined;
-    externalAuthFirebaseCertsUrl: string;
-    externalAuthFirebaseVerifier: FirebaseVerifierMode;
-    externalAuthVerificationSecrets: readonly string[];
-    verifyFirebaseIdTokenFn: (
-      idToken: string,
-      options: FirebaseIdTokenVerificationOptions,
-    ) => Promise<FirebaseExternalIdentity>;
-  };
+  runtimeInfo: RouteRuntimeInfo;
   allowLegacyWalletRoutes: boolean;
+  services?: {
+    tableService: TableService;
+    authWalletService: AuthWalletService;
+  };
 }): Promise<MockServerResponse> {
-  const { tableService, authWalletService } = createServices();
+  const { tableService, authWalletService } = options.services ?? createServices();
   const response = new MockServerResponse();
 
   await handleRequest(
@@ -440,6 +468,191 @@ async function testFirebaseIdTokenModeExternalLoginFlow(): Promise<void> {
   );
 }
 
+async function testClaimedSeatRejectsAnonymousPlayerAction(): Promise<void> {
+  const services = createServices();
+  services.tableService.claimSeat(999, 1);
+
+  const response = await invokeRoute({
+    request: new MockIncomingMessage({
+      method: 'POST',
+      url: '/api/table/command',
+      headers: {
+        host: '127.0.0.1:8787',
+        'content-type': 'application/json',
+      },
+      body: {
+        type: 'PLAYER_ACTION',
+        seatId: 1,
+        action: 'FOLD',
+      },
+    }),
+    runtimeInfo: createRuntimeInfo(),
+    allowLegacyWalletRoutes: false,
+    services,
+  });
+
+  assertEqual(response.statusCode, 401, 'Expected claimed-seat anonymous action to return HTTP 401.');
+  const payload = response.json() as {
+    error: string;
+  };
+  assertEqual(payload.error, 'UNAUTHORIZED', 'Expected claimed-seat anonymous action to be unauthorized.');
+}
+
+async function testAuthenticatedPlayerActionRequiresSeatClaim(): Promise<void> {
+  const services = createServices();
+  const session = services.authWalletService.login({ email: 'luna@example.com', password: 'demo' }).session;
+
+  const response = await invokeRoute({
+    request: new MockIncomingMessage({
+      method: 'POST',
+      url: '/api/table/command',
+      headers: {
+        host: '127.0.0.1:8787',
+        'content-type': 'application/json',
+        authorization: `Bearer ${session.token}`,
+      },
+      body: {
+        type: 'PLAYER_ACTION',
+        seatId: 1,
+        action: 'FOLD',
+      },
+    }),
+    runtimeInfo: createRuntimeInfo(),
+    allowLegacyWalletRoutes: false,
+    services,
+  });
+
+  assertEqual(response.statusCode, 403, 'Expected unclaimed authenticated seat action to return HTTP 403.');
+  const payload = response.json() as {
+    error: string;
+  };
+  assertEqual(payload.error, 'SEAT_UNCLAIMED', 'Expected seat claim requirement error.');
+}
+
+async function testSeatClaimRoutesAndOwnershipEnforcement(): Promise<void> {
+  const services = createServices();
+  const lunaSession = services.authWalletService.login({ email: 'luna@example.com', password: 'demo' }).session;
+  const colinSession = services.authWalletService.login({ email: 'colin@example.com', password: 'demo' }).session;
+
+  const claimResponse = await invokeRoute({
+    request: new MockIncomingMessage({
+      method: 'POST',
+      url: '/api/table/seat',
+      headers: {
+        host: '127.0.0.1:8787',
+        authorization: `Bearer ${lunaSession.token}`,
+        'content-type': 'application/json',
+      },
+      body: {
+        seatId: 2,
+      },
+    }),
+    runtimeInfo: createRuntimeInfo(),
+    allowLegacyWalletRoutes: false,
+    services,
+  });
+  assertEqual(claimResponse.statusCode, 200, 'Expected seat claim route to return HTTP 200.');
+  const claimPayload = claimResponse.json() as {
+    claim: {
+      seatId: number;
+    };
+  };
+  assertEqual(claimPayload.claim.seatId, 2, 'Expected claim response to return claimed seat id.');
+
+  const conflictResponse = await invokeRoute({
+    request: new MockIncomingMessage({
+      method: 'POST',
+      url: '/api/table/seat',
+      headers: {
+        host: '127.0.0.1:8787',
+        authorization: `Bearer ${colinSession.token}`,
+        'content-type': 'application/json',
+      },
+      body: {
+        seatId: 2,
+      },
+    }),
+    runtimeInfo: createRuntimeInfo(),
+    allowLegacyWalletRoutes: false,
+    services,
+  });
+  assertEqual(conflictResponse.statusCode, 409, 'Expected conflicting seat claim to return HTTP 409.');
+  const conflictPayload = conflictResponse.json() as {
+    error: string;
+  };
+  assertEqual(conflictPayload.error, 'SEAT_CONFLICT', 'Expected seat conflict error code.');
+
+  const forbiddenResponse = await invokeRoute({
+    request: new MockIncomingMessage({
+      method: 'POST',
+      url: '/api/table/command',
+      headers: {
+        host: '127.0.0.1:8787',
+        'content-type': 'application/json',
+        authorization: `Bearer ${lunaSession.token}`,
+      },
+      body: {
+        type: 'PLAYER_ACTION',
+        seatId: 1,
+        action: 'FOLD',
+      },
+    }),
+    runtimeInfo: createRuntimeInfo(),
+    allowLegacyWalletRoutes: false,
+    services,
+  });
+  assertEqual(forbiddenResponse.statusCode, 403, 'Expected action on non-owned seat to return HTTP 403.');
+  const forbiddenPayload = forbiddenResponse.json() as {
+    error: string;
+  };
+  assertEqual(forbiddenPayload.error, 'SEAT_FORBIDDEN', 'Expected seat ownership error code.');
+}
+
+async function testLogoutReleasesSeatClaim(): Promise<void> {
+  const services = createServices();
+  const lunaSession = services.authWalletService.login({ email: 'luna@example.com', password: 'demo' }).session;
+
+  const claimResponse = await invokeRoute({
+    request: new MockIncomingMessage({
+      method: 'POST',
+      url: '/api/table/seat',
+      headers: {
+        host: '127.0.0.1:8787',
+        authorization: `Bearer ${lunaSession.token}`,
+        'content-type': 'application/json',
+      },
+      body: {
+        seatId: 3,
+      },
+    }),
+    runtimeInfo: createRuntimeInfo(),
+    allowLegacyWalletRoutes: false,
+    services,
+  });
+  assertEqual(claimResponse.statusCode, 200, 'Expected seat claim to succeed before logout.');
+
+  const logoutResponse = await invokeRoute({
+    request: new MockIncomingMessage({
+      method: 'POST',
+      url: '/api/auth/logout',
+      headers: {
+        host: '127.0.0.1:8787',
+        authorization: `Bearer ${lunaSession.token}`,
+      },
+    }),
+    runtimeInfo: createRuntimeInfo(),
+    allowLegacyWalletRoutes: false,
+    services,
+  });
+
+  assertEqual(logoutResponse.statusCode, 204, 'Expected logout to return HTTP 204.');
+  assertEqual(
+    services.tableService.getSeatClaimForUser(lunaSession.user.id),
+    null,
+    'Expected logout to release the authenticated user seat claim.',
+  );
+}
+
 async function runAll(): Promise<void> {
   await testHealthRouteIncludesExternalAuthRotationFlag();
   await testExternalLoginAcceptsPreviousRotationSecret();
@@ -447,7 +660,11 @@ async function runAll(): Promise<void> {
   await testTrustedHeaderModeExternalLoginFlow();
   await testTrustedHeaderModeRejectsInvalidProxySecret();
   await testFirebaseIdTokenModeExternalLoginFlow();
-  console.info('HTTP route tests passed (external auth login + health runtime diagnostics).');
+  await testClaimedSeatRejectsAnonymousPlayerAction();
+  await testAuthenticatedPlayerActionRequiresSeatClaim();
+  await testSeatClaimRoutesAndOwnershipEnforcement();
+  await testLogoutReleasesSeatClaim();
+  console.info('HTTP route tests passed (external auth login + health runtime diagnostics + table seat auth).');
 }
 
 await runAll();

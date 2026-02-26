@@ -188,11 +188,57 @@ function testStateRoundTripRestore(): void {
   assertEqual(replay.matchesRecordedFinalState, true, 'Expected restored replay to match final snapshot.');
 }
 
+function testSeatClaimLifecycleAndConflicts(): void {
+  const table = new TableService({
+    tableId: 'table-test',
+    initialState: createDefaultTableState({ handId: 'boot-hand', seed: 400 }),
+  });
+
+  const firstClaim = table.claimSeat(101, 1);
+  assertEqual(firstClaim.seatId, 1, 'Expected claimed seat to match requested seat.');
+  assertEqual(table.getSeatClaimForUser(101)?.seatId, 1, 'Expected user claim lookup to return claimed seat.');
+  assertEqual(table.getSeatClaimBySeatId(1)?.userId, 101, 'Expected seat claim lookup to return claiming user.');
+
+  const movedClaim = table.claimSeat(101, 2);
+  assertEqual(movedClaim.seatId, 2, 'Expected re-claim to move seat ownership.');
+  assertEqual(table.getSeatClaimBySeatId(1), null, 'Expected previous seat to be released when moving claim.');
+
+  assertThrows(
+    () => table.claimSeat(202, 2),
+    /already claimed by another user/,
+    'Expected conflicting seat claim to be rejected.',
+  );
+
+  const released = table.releaseSeatForUser(101);
+  assertEqual(released?.seatId, 2, 'Expected release to return the final claimed seat.');
+  assertEqual(table.getSeatClaimForUser(101), null, 'Expected user claim to be cleared after release.');
+  assertEqual(table.getSeatClaimBySeatId(2), null, 'Expected seat claim to be cleared after release.');
+}
+
+function testSeatClaimPersistsAcrossExportRestore(): void {
+  const original = new TableService({
+    tableId: 'table-test',
+    initialState: createDefaultTableState({ handId: 'boot-hand', seed: 500 }),
+  });
+  original.claimSeat(333, 3);
+
+  const restored = new TableService({
+    tableId: 'table-test',
+    restoredState: original.exportState(),
+  });
+
+  const claim = restored.getSeatClaimForUser(333);
+  assertEqual(claim?.seatId, 3, 'Expected restored claim to preserve user seat mapping.');
+  assertEqual(restored.getSnapshot().seatClaims.length, 1, 'Expected restored snapshot to expose persisted seat claims.');
+}
+
 function runAll(): void {
   testRunsFullHandAndReplayMatches();
   testRejectsStartHandInProgress();
   testStateRoundTripRestore();
-  console.info('Server tests passed (table lifecycle + replay + lifecycle guard).');
+  testSeatClaimLifecycleAndConflicts();
+  testSeatClaimPersistsAcrossExportRestore();
+  console.info('Server tests passed (table lifecycle + replay + lifecycle guard + seat claims).');
 }
 
 runAll();

@@ -62,3 +62,4 @@ From `modern/`:
 - Server env template: `apps/server/.env.example`.
 - Client env template: `apps/client/.env.example`.
 - Firebase Hosting config: `firebase.json` (`.firebaserc.example` template).
+- To run play view against authoritative server runtime, set `VITE_TABLE_RUNTIME_MODE=server` in `apps/client/.env.local`.

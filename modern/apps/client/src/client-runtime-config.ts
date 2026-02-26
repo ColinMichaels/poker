@@ -1,4 +1,5 @@
 export type ExternalAuthMode = 'disabled' | 'firebase_id_token';
+export type TableRuntimeMode = 'local' | 'server';
 
 export interface FirebaseClientRuntimeConfig {
   apiKey: string;
@@ -16,6 +17,8 @@ export interface ClientRuntimeConfig {
   apiBaseUrl: string;
   externalAuthMode: ExternalAuthMode;
   externalAuthLoginPath: string;
+  tableRuntimeMode: TableRuntimeMode;
+  tablePollIntervalMs: number;
   firebase: FirebaseClientRuntimeConfig | null;
 }
 
@@ -44,6 +47,19 @@ function normalizePath(value: string | undefined, fallback: string): string {
 function normalizeOptional(value: string | undefined): string | undefined {
   const trimmed = value?.trim();
   return trimmed ? trimmed : undefined;
+}
+
+function parsePositiveInteger(rawValue: string | undefined, fallback: number): number {
+  if (!rawValue || rawValue.trim().length === 0) {
+    return fallback;
+  }
+
+  const parsed = Number.parseInt(rawValue, 10);
+  if (!Number.isInteger(parsed) || parsed <= 0) {
+    return fallback;
+  }
+
+  return parsed;
 }
 
 function resolveExternalAuthMode(env: ImportMetaEnv, firebaseConfig: FirebaseClientRuntimeConfig | null): ExternalAuthMode {
@@ -82,12 +98,19 @@ function loadFirebaseConfig(env: ImportMetaEnv): FirebaseClientRuntimeConfig | n
   };
 }
 
+function resolveTableRuntimeMode(env: ImportMetaEnv): TableRuntimeMode {
+  const rawMode = normalizeOptional(env.VITE_TABLE_RUNTIME_MODE)?.toLowerCase();
+  return rawMode === 'server' ? 'server' : 'local';
+}
+
 export function loadClientRuntimeConfig(env: ImportMetaEnv = import.meta.env): ClientRuntimeConfig {
   const firebaseConfig = loadFirebaseConfig(env);
   return {
     apiBaseUrl: normalizeBaseUrl(env.VITE_API_BASE_URL),
     externalAuthMode: resolveExternalAuthMode(env, firebaseConfig),
     externalAuthLoginPath: normalizePath(env.VITE_EXTERNAL_AUTH_LOGIN_PATH, '/api/auth/external/login'),
+    tableRuntimeMode: resolveTableRuntimeMode(env),
+    tablePollIntervalMs: parsePositiveInteger(env.VITE_TABLE_POLL_INTERVAL_MS, 900),
     firebase: firebaseConfig,
   };
 }

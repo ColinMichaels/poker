@@ -39,6 +39,12 @@ export interface TableViewModel {
   logs: TableLogEntry[];
 }
 
+export interface TableController {
+  subscribe(listener: (model: TableViewModel) => void): () => void;
+  startNextHand(): void;
+  performUserAction(intent: UserActionIntent): void;
+}
+
 interface LocalTableControllerOptions {
   userSeatId?: number;
 }
@@ -746,7 +752,7 @@ function chooseDealerSeatId(seats: readonly SeatDefinition[], randomSource: Rand
   return eligibleSeatIds[index];
 }
 
-export class LocalTableController {
+export class LocalTableController implements TableController {
   private state: TexasHoldemState;
   private actionState: TableActionStateDTO;
   private handNumber: number;

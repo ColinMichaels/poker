@@ -114,6 +114,17 @@ Client Firebase auth bridge setup (automatic `/api/auth/external/login` exchange
 
 The Vite dev server proxies `/api` and `/health` to `http://127.0.0.1:8787` by default.
 
+Authoritative table runtime in client:
+
+1. Set `VITE_TABLE_RUNTIME_MODE=server` in `apps/client/.env.local` (default is `local`).
+2. Optional polling interval override: `VITE_TABLE_POLL_INTERVAL_MS=900`.
+3. Start both services:
+   - `npm run dev:server`
+   - `npm run dev:client`
+4. In server mode, play actions and hand progression are submitted through `/api/table/command` and snapshots are read from `/api/table/state`.
+5. When a server session is available, the client auto-claims the selected seat through `POST /api/table/seat`.
+6. Player sessions can only submit `PLAYER_ACTION` for their claimed seat; logout releases the current claim.
+
 Firebase hosting starter config:
 
 - `firebase.hosting.example.json` shows SPA hosting for `apps/client/dist` and `/api/**` rewrite to a Cloud Run backend.

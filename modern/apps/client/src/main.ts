@@ -1,7 +1,7 @@
 import type { ActionOptionDTO, PokerAction, SeatActionStateDTO, SeatState, TablePhase } from '@poker/poker-engine';
 import './styles.css';
 import { HOW_TO_GUIDES } from './content/howto-content';
-import { LocalTableController, type TableViewModel } from './table-controller';
+import { LocalTableController, type TableController, type TableViewModel } from './table-controller';
 import {
   getAvailableMultiTableActionIdsFromActionState,
   getPendingDecisionCountFromState,
@@ -14,6 +14,7 @@ import { executeMultiTableAction } from './multi-table-action-submit';
 import { buildWinOddsSnapshot, type SeatWinOdds, type WinOddsSnapshot } from './win-odds';
 import { createClientAuthBridge } from './client-auth.ts';
 import type { ExternalAuthSessionState } from './auth/external-auth-session-bridge.ts';
+import { createRuntimeTableController } from './table-controller-factory.ts';
 
 const root = document.getElementById('app');
 
@@ -174,7 +175,7 @@ let multiTableState: MultiTableUiState = {
   lastSubmittedAtMs: null,
 };
 
-let controller: LocalTableController | null = null;
+let controller: TableController | null = null;
 let removeControllerListener: (() => void) | null = null;
 let activeView: 'lobby' | 'play' | 'howto' | 'multitable' = 'lobby';
 let selectedGuideId = HOW_TO_GUIDES[0]?.id ?? '';
@@ -382,7 +383,7 @@ function mountControllerForSeat(userSeatId: number): void {
   draftTargetBetAmount = null;
   lastProcessedEventLogId = null;
   removeControllerListener?.();
-  controller = new LocalTableController({ userSeatId });
+  controller = createRuntimeTableController({ userSeatId });
   removeControllerListener = controller.subscribe((model) => {
     render(appRoot, model);
   });

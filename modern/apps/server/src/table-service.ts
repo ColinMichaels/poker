@@ -18,6 +18,7 @@ export interface TableSnapshot {
   eventSequence: number;
   state: TexasHoldemState;
   actionState: TableActionStateDTO;
+  seatClaims: SeatClaimRecord[];
 }
 
 export interface CommandRecord {
@@ -69,6 +70,12 @@ export interface HandReplayResult {
   matchesRecordedFinalState: boolean | null;
 }
 
+export interface SeatClaimRecord {
+  seatId: number;
+  userId: number;
+  claimedAt: string;
+}
+
 export interface TableServiceOptions {
   tableId: string;
   initialState?: TexasHoldemState;
@@ -83,6 +90,7 @@ export interface TableServiceStateSnapshot {
   commandLog: CommandRecord[];
   eventLog: EventRecord[];
   handHistory: HandHistory[];
+  seatClaims?: SeatClaimRecord[];
 }
 
 export interface DefaultTableStateOptions {
@@ -153,12 +161,16 @@ export class TableService {
   private readonly commandLog: CommandRecord[];
   private readonly eventLog: EventRecord[];
   private readonly handHistoryById: Map<string, HandHistory>;
+  private readonly seatClaimBySeatId: Map<number, SeatClaimRecord>;
+  private readonly seatClaimByUserId: Map<number, SeatClaimRecord>;
 
   public constructor(options: TableServiceOptions) {
     this.tableId = options.tableId;
     this.commandLog = [];
     this.eventLog = [];
     this.handHistoryById = new Map();
+    this.seatClaimBySeatId = new Map();
+    this.seatClaimByUserId = new Map();
 
     if (options.restoredState) {
       if (options.restoredState.tableId !== this.tableId) {
@@ -177,6 +189,10 @@ export class TableService {
         this.handHistoryById.set(history.handId, cloneDeep(history));
       }
 
+      for (const claim of options.restoredState.seatClaims ?? []) {
+        this.restoreSeatClaim(claim);
+      }
+
       return;
     }
 
@@ -193,6 +209,7 @@ export class TableService {
       eventSequence: this.eventSequence,
       state: cloneDeep(this.state),
       actionState: buildTableActionStateDTO(this.state),
+      seatClaims: this.listSeatClaims(),
     };
   }
 
@@ -256,7 +273,61 @@ export class TableService {
       handHistory: cloneDeep(Array.from(this.handHistoryById.values()).sort((left, right) =>
         left.startedAt.localeCompare(right.startedAt),
       )),
+      seatClaims: this.listSeatClaims(),
     };
+  }
+
+  public listSeatClaims(): SeatClaimRecord[] {
+    return cloneDeep(Array.from(this.seatClaimBySeatId.values()).sort((left, right) => left.seatId - right.seatId));
+  }
+
+  public getSeatClaimBySeatId(seatId: number): SeatClaimRecord | null {
+    const claim = this.seatClaimBySeatId.get(seatId);
+    return claim ? cloneDeep(claim) : null;
+  }
+
+  public getSeatClaimForUser(userId: number): SeatClaimRecord | null {
+    const claim = this.seatClaimByUserId.get(userId);
+    return claim ? cloneDeep(claim) : null;
+  }
+
+  public claimSeat(userId: number, seatId: number): SeatClaimRecord {
+    this.requireSeatExists(seatId);
+
+    const existingSeatClaim = this.seatClaimBySeatId.get(seatId);
+    if (existingSeatClaim && existingSeatClaim.userId !== userId) {
+      throw new Error(`Seat ${seatId} is already claimed by another user.`);
+    }
+
+    const existingUserClaim = this.seatClaimByUserId.get(userId);
+    if (existingUserClaim && existingUserClaim.seatId === seatId) {
+      return cloneDeep(existingUserClaim);
+    }
+
+    if (existingUserClaim) {
+      this.seatClaimBySeatId.delete(existingUserClaim.seatId);
+      this.seatClaimByUserId.delete(existingUserClaim.userId);
+    }
+
+    const claim: SeatClaimRecord = {
+      seatId,
+      userId,
+      claimedAt: nowIso(),
+    };
+    this.seatClaimBySeatId.set(claim.seatId, claim);
+    this.seatClaimByUserId.set(claim.userId, claim);
+    return cloneDeep(claim);
+  }
+
+  public releaseSeatForUser(userId: number): SeatClaimRecord | null {
+    const existing = this.seatClaimByUserId.get(userId);
+    if (!existing) {
+      return null;
+    }
+
+    this.seatClaimByUserId.delete(existing.userId);
+    this.seatClaimBySeatId.delete(existing.seatId);
+    return cloneDeep(existing);
   }
 
   public applyCommand(command: TableCommand): ApplyCommandResult {
@@ -324,5 +395,34 @@ export class TableService {
       events: cloneDeep(events),
       snapshot: this.getSnapshot(),
     };
+  }
+
+  private restoreSeatClaim(claim: SeatClaimRecord): void {
+    if (!Number.isInteger(claim.seatId) || !Number.isInteger(claim.userId) || typeof claim.claimedAt !== 'string') {
+      throw new Error('Restored seat claims contain invalid records.');
+    }
+
+    this.requireSeatExists(claim.seatId);
+
+    if (this.seatClaimBySeatId.has(claim.seatId)) {
+      throw new Error(`Restored seat claims contain duplicate seat id ${claim.seatId}.`);
+    }
+    if (this.seatClaimByUserId.has(claim.userId)) {
+      throw new Error(`Restored seat claims contain duplicate user id ${claim.userId}.`);
+    }
+
+    const normalized: SeatClaimRecord = {
+      seatId: claim.seatId,
+      userId: claim.userId,
+      claimedAt: claim.claimedAt,
+    };
+    this.seatClaimBySeatId.set(normalized.seatId, normalized);
+    this.seatClaimByUserId.set(normalized.userId, normalized);
+  }
+
+  private requireSeatExists(seatId: number): void {
+    if (!this.state.seats.some((seat) => seat.seatId === seatId)) {
+      throw new Error(`Seat ${seatId} was not found.`);
+    }
   }
 }

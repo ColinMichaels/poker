@@ -91,6 +91,9 @@ Auth/session behavior:
 - `GET /api/wallet/ledger?limit=50`
 - `GET /health`
 - `GET /api/table/state`
+- `GET /api/table/seat`
+- `POST /api/table/seat`
+- `DELETE /api/table/seat`
 - `POST /api/table/command`
 - `GET /api/table/logs/commands?limit=100`
 - `GET /api/table/logs/events?limit=200`
@@ -107,6 +110,17 @@ Legacy compatibility wallet routes:
 
 - `{ "command": { ...TableCommand } }`
 - `{ ...TableCommand }`
+
+Seat ownership and table command authorization:
+
+- `POST /api/table/seat` claims a seat for the authenticated session user.
+- `GET /api/table/seat` returns current authenticated user's claim (or `null`).
+- `DELETE /api/table/seat` releases current authenticated user's claim.
+- `PLAYER_ACTION` command rules:
+  - unauthenticated requests can only act on unclaimed seats
+  - `PLAYER` sessions must claim a seat and may only act for that claimed seat
+  - `OPERATOR`/`ADMIN` sessions bypass player-seat restriction for moderation/operations
+- seat claims are persisted with runtime state and cleared on logout for the active user.
 
 Default demo login users (when enabled):
 

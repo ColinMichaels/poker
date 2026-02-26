@@ -1397,3 +1397,62 @@ Sources:
 - `apps/client/tests/external-auth-session-bridge.test.ts`
 - `docs/developer-setup.md`
 - `docs/deployment-runbook.md`
+
+## PR BS Progress: Client Server-Runtime Table Controller Integration
+
+- Added client runtime mode controls for gameplay table controller:
+  - `VITE_TABLE_RUNTIME_MODE=local|server`
+  - `VITE_TABLE_POLL_INTERVAL_MS`
+- Added server-backed table controller implementation with the same client interface used by local simulation:
+  - snapshot polling from `/api/table/state`
+  - command submission to `/api/table/command`
+  - deterministic auto-progression for deal streets, showdown, and non-user acting seats
+- Added runtime factory to swap local vs server table controller without play-view markup rewrites.
+- Wired play-view mount path to runtime factory controller while retaining local controllers for multi-table simulation.
+- Added regression tests:
+  - server automation action-selection behavior
+  - runtime config parsing for table runtime mode and poll interval
+- Updated docs/env template with server-runtime client setup notes.
+
+Sources:
+
+- `apps/client/src/client-runtime-config.ts`
+- `apps/client/src/table-controller.ts`
+- `apps/client/src/server-table-controller.ts`
+- `apps/client/src/table-controller-factory.ts`
+- `apps/client/src/main.ts`
+- `apps/client/src/vite-env.d.ts`
+- `apps/client/.env.example`
+- `apps/client/tests/client-runtime-config.test.ts`
+- `apps/client/tests/server-table-controller.test.ts`
+- `docs/developer-setup.md`
+- `docs/deployment-runbook.md`
+- `README.md`
+
+## PR BT Progress: Seat Ownership Enforcement + Session-Gated Table Actions
+
+- Added seat-claim state to server table runtime snapshots and persisted export/restore flow.
+- Added authoritative seat-claim APIs:
+  - `GET /api/table/seat`
+  - `POST /api/table/seat`
+  - `DELETE /api/table/seat`
+- Added `PLAYER_ACTION` authorization checks at route level:
+  - unauthenticated requests are rejected when targeting claimed seats
+  - `PLAYER` sessions must claim a seat before acting
+  - `PLAYER` sessions are restricted to their claimed seat id
+- Updated logout flow to release current authenticated user seat claim.
+- Updated client server-runtime controller to auto-claim selected seat when a server session is available.
+- Added server and runtime-state regression coverage for seat-claim lifecycle, conflicts, and restore behavior.
+
+Sources:
+
+- `apps/server/src/table-service.ts`
+- `apps/server/src/table-service.test.ts`
+- `apps/server/src/index.ts`
+- `apps/server/src/http-routes.test.ts`
+- `apps/server/src/runtime-state-store.test.ts`
+- `apps/client/src/server-table-controller.ts`
+- `apps/client/src/table-controller-factory.ts`
+- `apps/server/README.md`
+- `docs/developer-setup.md`
+- `docs/deployment-runbook.md`

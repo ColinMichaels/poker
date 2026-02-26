@@ -8,31 +8,27 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1eee6476-c5d8-4dc1-b068-da2be4a7c407" name="Default Changelist" comment="feat(client): add server session store with localStorage support and Firebase integration&#10;&#10;- Introduced `server-session-store` for managing server sessions in the client.&#10;- Added utility functions to read, write, and clear sessions from localStorage.&#10;- Updated dependencies with Firebase SDK for session handling and storage integration.">
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/.env.example" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/src/auth/external-auth-session-bridge.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/src/auth/external-id-token-provider.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/src/auth/firebase-web-id-token-provider.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/src/auth/server-session-store.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/src/client-auth.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/src/client-runtime-config.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/src/vite-env.d.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/tests/client-runtime-config.test.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/tests/external-auth-session-bridge.test.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/scripts/prepare-firebase-hosting-config.mjs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/modern/apps/client/src/server-table-controller.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/modern/apps/client/src/table-controller-factory.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/modern/apps/client/tests/server-table-controller.test.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/apps/client/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/client/.env.example" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/.env.example" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/client/src/client-runtime-config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/src/client-runtime-config.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/apps/client/src/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/src/main.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/apps/client/src/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/src/styles.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/apps/client/vite.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/vite.config.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/client/src/table-controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/src/table-controller.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/client/src/vite-env.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/src/vite-env.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/client/tests/client-runtime-config.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/tests/client-runtime-config.test.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/server/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/apps/server/src/http-routes.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/http-routes.test.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/server/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/server/src/runtime-state-store.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/runtime-state-store.test.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/server/src/table-service.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/table-service.test.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/server/src/table-service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/table-service.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/docs/deployment-runbook.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/docs/deployment-runbook.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/docs/developer-setup.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/docs/developer-setup.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/docs/legacy-decommission-plan.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/docs/legacy-decommission-plan.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/docs/phase-2-engine-progress.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/docs/phase-2-engine-progress.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/modern/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/modern/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -503,7 +499,15 @@
       <option name="project" value="LOCAL" />
       <updated>1772137456917</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="feat(client): add server session store with localStorage support and Firebase integration&#10;&#10;- Introduced `server-session-store` for managing server sessions in the client.&#10;- Added utility functions to read, write, and clear sessions from localStorage.&#10;- Updated dependencies with Firebase SDK for session handling and storage integration.">
+      <option name="closed" value="true" />
+      <created>1772144711293</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1772144711293</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

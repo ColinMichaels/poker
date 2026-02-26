@@ -46,6 +46,7 @@ function testSaveAndRestoreRoundTrip(): void {
     const login = authWalletService.login({ email: 'colin@example.com', password: 'demo' });
     const userId = login.session.user.id;
     authWalletService.adjustWallet(userId, { method: 'add', amount: 40, reason: 'persisted-adjustment' });
+    tableService.claimSeat(userId, 2);
 
     tableService.applyCommand({ type: 'START_HAND', handId: 'hand-1000', seed: 501 });
     tableService.applyCommand({ type: 'POST_BLINDS' });
@@ -71,10 +72,12 @@ function testSaveAndRestoreRoundTrip(): void {
     const restoredSession = restoredAuthService.getSession(login.session.token);
     const restoredAudit = restoredAuthService.getAuthAuditLog(20, userId);
     const restoredTableSnapshot = restoredTableService.getSnapshot();
+    const restoredSeatClaim = restoredTableService.getSeatClaimForUser(userId);
 
     assertEqual(restoredWallet.balance, 540, 'Expected restored wallet balance to match persisted value.');
     assertEqual(restoredSession.user.id, userId, 'Expected restored session user id to match.');
     assert(restoredAudit.length > 0, 'Expected restored auth audit log to contain entries.');
+    assertEqual(restoredSeatClaim?.seatId, 2, 'Expected restored seat claim to match persisted seat id.');
     assertEqual(
       restoredTableSnapshot.commandSequence,
       3,

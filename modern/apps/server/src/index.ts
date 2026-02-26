@@ -33,7 +33,7 @@ function jsonHeaders(): Record<string, string> {
   return {
     'content-type': 'application/json; charset=utf-8',
     'access-control-allow-origin': '*',
-    'access-control-allow-methods': 'GET,POST,PATCH,OPTIONS',
+    'access-control-allow-methods': 'GET,POST,PATCH,DELETE,OPTIONS',
     'access-control-allow-headers': 'content-type, authorization',
   };
 }
@@ -347,6 +347,18 @@ function parseWalletAdjustment(body: unknown): WalletAdjustmentRequestDTO {
   };
 }
 
+function parseSeatClaimRequest(body: unknown): { seatId: number } {
+  const record = requireObject(body, 'body');
+  assertInteger(record.seatId, 'seatId');
+  if (record.seatId <= 0) {
+    throw new HttpError(400, 'BAD_REQUEST', 'seatId must be greater than zero.');
+  }
+
+  return {
+    seatId: record.seatId,
+  };
+}
+
 function getHandIdFromPath(pathname: string, suffix: '' | '/replay'): string | null {
   const pattern = suffix === ''
     ? /^\/api\/table\/hands\/([^/]+)$/
@@ -382,6 +394,10 @@ function mapToHttpError(error: unknown): HttpError {
     return new HttpError(401, 'INVALID_FIREBASE_ID_TOKEN', message);
   }
 
+  if (message.includes('already claimed by another user')) {
+    return new HttpError(409, 'SEAT_CONFLICT', message);
+  }
+
   if (message.includes('was not found')) {
     return new HttpError(404, 'NOT_FOUND', message);
   }
@@ -402,6 +418,44 @@ function requireAuthenticatedContext(request: IncomingMessage, authWalletService
     userId: context.user.id,
     role: context.user.role,
   };
+}
+
+function authorizeTableCommandRequest(
+  request: IncomingMessage,
+  command: TableCommand,
+  tableService: TableService,
+  authWalletService: AuthWalletService,
+): void {
+  if (command.type !== 'PLAYER_ACTION') {
+    return;
+  }
+
+  const seatClaim = tableService.getSeatClaimBySeatId(command.seatId);
+  const token = getBearerToken(request);
+  if (!token) {
+    if (seatClaim) {
+      throw new HttpError(401, 'UNAUTHORIZED', 'Authentication required to act on a claimed seat.');
+    }
+    return;
+  }
+
+  const authContext = authWalletService.requireAuth(token);
+  if (authContext.user.role !== 'PLAYER') {
+    return;
+  }
+
+  const userClaim = tableService.getSeatClaimForUser(authContext.user.id);
+  if (!userClaim) {
+    throw new HttpError(403, 'SEAT_UNCLAIMED', 'Claim a seat before submitting player actions.');
+  }
+
+  if (userClaim.seatId !== command.seatId) {
+    throw new HttpError(
+      403,
+      'SEAT_FORBIDDEN',
+      `Authenticated user controls seat ${userClaim.seatId}, not seat ${command.seatId}.`,
+    );
+  }
 }
 
 export async function handleRequest(
@@ -552,7 +606,8 @@ export async function handleRequest(
     }
 
     if (method === 'POST' && pathname === '/api/auth/logout') {
-      const { token } = requireAuthenticatedContext(request, authWalletService);
+      const { token, userId } = requireAuthenticatedContext(request, authWalletService);
+      tableService.releaseSeatForUser(userId);
       authWalletService.logout(token);
       persistRuntimeState();
       sendNoContent(response);
@@ -659,6 +714,38 @@ export async function handleRequest(
       return;
     }
 
+    if (method === 'GET' && pathname === '/api/table/seat') {
+      const { userId } = requireAuthenticatedContext(request, authWalletService);
+      sendJson(response, 200, {
+        claim: tableService.getSeatClaimForUser(userId),
+      });
+      return;
+    }
+
+    if (method === 'POST' && pathname === '/api/table/seat') {
+      const { userId } = requireAuthenticatedContext(request, authWalletService);
+      const body = await readJsonBody(request);
+      const { seatId } = parseSeatClaimRequest(body);
+      const claim = tableService.claimSeat(userId, seatId);
+      persistRuntimeState();
+      sendJson(response, 200, {
+        claim,
+      });
+      return;
+    }
+
+    if (method === 'DELETE' && pathname === '/api/table/seat') {
+      const { userId } = requireAuthenticatedContext(request, authWalletService);
+      const released = tableService.releaseSeatForUser(userId);
+      if (released) {
+        persistRuntimeState();
+      }
+      sendJson(response, 200, {
+        released,
+      });
+      return;
+    }
+
     if (method === 'GET' && pathname === '/api/table/logs/commands') {
       const limit = parseLogLimit(requestUrl.searchParams.get('limit'), 100);
       sendJson(response, 200, {
@@ -702,6 +789,7 @@ export async function handleRequest(
     if (method === 'POST' && pathname === '/api/table/command') {
       const body = await readJsonBody(request);
       const command = extractCommand(body);
+      authorizeTableCommandRequest(request, command, tableService, authWalletService);
       const result = tableService.applyCommand(command);
       persistRuntimeState();
       sendJson(response, 200, result);

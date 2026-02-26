@@ -58,6 +58,8 @@ Client runtime variables (for Firebase-authenticated web client):
 - `VITE_EXTERNAL_AUTH_MODE` (`firebase_id_token` or `disabled`; defaults to auto-enable when Firebase keys are present)
 - `VITE_EXTERNAL_AUTH_LOGIN_PATH` (default: `/api/auth/external/login`)
 - `VITE_API_BASE_URL` (optional absolute API origin for non-rewrite deployments)
+- `VITE_TABLE_RUNTIME_MODE` (`local` or `server`; default: `local`)
+- `VITE_TABLE_POLL_INTERVAL_MS` (optional positive integer poll interval in ms for server table snapshots; default: `900`)
 - `VITE_FIREBASE_API_KEY`
 - `VITE_FIREBASE_AUTH_DOMAIN`
 - `VITE_FIREBASE_PROJECT_ID`
@@ -71,6 +73,7 @@ Client runtime variables (for Firebase-authenticated web client):
 Template reference:
 
 - `apps/server/.env.example`
+- `apps/client/.env.example`
 
 ## Health + Readiness Checks
 
@@ -84,6 +87,8 @@ Auth/wallet sanity checks:
 2. `GET /api/auth/session` with bearer token
 3. `GET /api/wallet` with bearer token
 4. `GET /api/auth/audit?limit=20` with bearer token
+5. `POST /api/table/seat` with bearer token (for example `{ "seatId": 1 }`)
+6. `GET /api/table/seat` with bearer token
 
 ## Deployment Notes
 
@@ -96,6 +101,10 @@ Auth/wallet sanity checks:
 - If production overrides enable demo users or legacy wallet routes, server startup logs explicit warnings.
 - Bootstrap file format accepts either a JSON array of user records or `{ "users": [...] }`. Each user requires `email` and `password` (or `passwordHash` in `scrypt$<salt-hex>$<digest-hex>` format).
 - Current auth API supports session revocation (`/api/auth/revoke-others`) and per-user audit logs.
+- Current table API includes seat ownership/session controls:
+1. `POST /api/table/seat` claims seat ownership for authenticated user.
+2. `PLAYER` sessions can only submit `PLAYER_ACTION` on their claimed seat.
+3. logout (`POST /api/auth/logout`) releases current authenticated user seat claim.
 - External identity login is available via `POST /api/auth/external/login` (`signed_assertion`, `trusted_headers`, or `firebase_id_token` mode).
 - External auth secret rotation can be performed without downtime:
 1. Deploy with new key at `POKER_EXTERNAL_AUTH_SHARED_SECRET` and old key at `POKER_EXTERNAL_AUTH_SHARED_SECRET_PREVIOUS`.

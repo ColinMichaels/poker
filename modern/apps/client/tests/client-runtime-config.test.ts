@@ -16,6 +16,8 @@ describe('client runtime config', () => {
   it('defaults external auth mode to disabled when firebase config is absent', () => {
     const config = loadClientRuntimeConfig(createEnv());
     expect(config.externalAuthMode).toBe('disabled');
+    expect(config.tableRuntimeMode).toBe('local');
+    expect(config.tablePollIntervalMs).toBe(900);
     expect(config.firebase).toBeNull();
   });
 
@@ -58,5 +60,17 @@ describe('client runtime config', () => {
 
     expect(config.apiBaseUrl).toBe('https://example.com');
     expect(config.externalAuthLoginPath).toBe('/api/auth/external/login');
+  });
+
+  it('parses table runtime env values', () => {
+    const config = loadClientRuntimeConfig(
+      createEnv({
+        VITE_TABLE_RUNTIME_MODE: 'server',
+        VITE_TABLE_POLL_INTERVAL_MS: '1400',
+      }),
+    );
+
+    expect(config.tableRuntimeMode).toBe('server');
+    expect(config.tablePollIntervalMs).toBe(1400);
   });
 });
