@@ -4,28 +4,19 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1eee6476-c5d8-4dc1-b068-da2be4a7c407" name="Default Changelist" comment="Expand Texas Hold'em engine with betting flow, side-pot payouts, client action DTOs, and comprehensive test coverage.">
-      <change afterPath="$PROJECT_DIR$/.github/workflows/modern-ci.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/.nvmrc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/src/content/howto-content.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/src/styles.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/src/table-controller.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/docs/developer-setup.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/docs/legacy-decommission-plan.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/package-lock.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/scripts/generate-howto-content.mjs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    <list default="true" id="1eee6476-c5d8-4dc1-b068-da2be4a7c407" name="Default Changelist" comment="Add `package-lock.json` for the modern Poker workspace with updated dependencies and configurations">
+      <change afterPath="$PROJECT_DIR$/modern/apps/server/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/modern/apps/server/src/node-shims.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/modern/apps/server/src/table-service.test.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/modern/apps/server/src/table-service.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/02-upgrade-plan/target-architecture-babylon.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/02-upgrade-plan/target-architecture-babylon.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/apps/client/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/apps/client/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/apps/client/src/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/src/main.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/apps/server/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/server/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/server/tsconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/tsconfig.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/docs/developer-setup.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/docs/developer-setup.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/docs/phase-2-engine-progress.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/docs/phase-2-engine-progress.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/modern/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/tsconfig.base.json" beforeDir="false" afterPath="$PROJECT_DIR$/modern/tsconfig.base.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -390,7 +381,15 @@
       <option name="project" value="LOCAL" />
       <updated>1772065822931</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Add `package-lock.json` for the modern Poker workspace with updated dependencies and configurations">
+      <option name="closed" value="true" />
+      <created>1772092379697</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1772092379697</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -411,7 +410,8 @@
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="Introduce modern client scaffold with initial dependencies, configurations, and asset structure." />
     <MESSAGE value="Expand Texas Hold'em engine with betting flow, side-pot payouts, client action DTOs, and comprehensive test coverage." />
-    <option name="LAST_COMMIT_MESSAGE" value="Expand Texas Hold'em engine with betting flow, side-pot payouts, client action DTOs, and comprehensive test coverage." />
+    <MESSAGE value="Add `package-lock.json` for the modern Poker workspace with updated dependencies and configurations" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add `package-lock.json` for the modern Poker workspace with updated dependencies and configurations" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

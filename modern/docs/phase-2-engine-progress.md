@@ -148,3 +148,23 @@ Validation notes:
 - Added generated typed guide data from legacy `resources/js/Pages/HowTo/games/*.vue` sources.
 - Added generator script: `modern/scripts/generate-howto-content.mjs`.
 - Added modern client `How To` view with game variant tabs and migrated rounds/rules sections.
+
+## PR B Progress: Authoritative Server Hand Lifecycle MVP
+
+- Replaced server scaffold with an HTTP service that owns a single in-memory table state.
+- Added authoritative command endpoint (`POST /api/table/command`) that applies only `TableCommand` transitions via `@poker/poker-engine`.
+- Added per-hand history capture:
+  - start snapshot
+  - ordered command log
+  - ordered event log
+  - final snapshot on `HAND_COMPLETE`
+- Added deterministic hand replay verification from snapshot + command stream (`GET /api/table/hands/:handId/replay`).
+- Added server lifecycle/replay tests:
+  - `apps/server/src/table-service.test.ts`
+  - `npm run test:server`
+
+Sources:
+
+- `apps/server/src/table-service.ts`
+- `apps/server/src/index.ts`
+- `apps/server/src/table-service.test.ts`

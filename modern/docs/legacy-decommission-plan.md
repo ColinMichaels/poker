@@ -20,9 +20,8 @@ Purpose: make `modern/` the primary codebase without losing reusable legacy func
 
 These are not extraction failures, but they are blockers to deleting the legacy app:
 
-1. Authoritative backend/session service is still scaffold-only (`modern/apps/server/src/index.ts`).
-2. Legacy auth/wallet/user CRUD flows do not yet have modern replacements.
-3. Root repository still reflects legacy project shape and README messaging.
+1. Legacy auth/wallet/user CRUD flows do not yet have modern replacements.
+2. Root repository still reflects legacy project shape and README messaging.
 
 ## Completed in PR A
 
@@ -30,6 +29,18 @@ These are not extraction failures, but they are blockers to deleting the legacy 
   - `modern/apps/client/src/content/howto-content.ts`
   - generator: `modern/scripts/generate-howto-content.mjs`
 - Modern client now includes a dedicated `How To` view driven by migrated content.
+
+## Completed in PR B
+
+- Added an authoritative single-table server runtime in `modern/apps/server`:
+  - command pipeline endpoint: `POST /api/table/command`
+  - state snapshot endpoint: `GET /api/table/state`
+  - logs endpoints: `GET /api/table/logs/commands`, `GET /api/table/logs/events`
+- Added one-hand snapshot + replay support:
+  - hand history endpoints: `GET /api/table/hands/:handId`
+  - replay verification endpoint: `GET /api/table/hands/:handId/replay`
+- Added server lifecycle/replay tests:
+  - `modern/apps/server/src/table-service.test.ts`
 
 ## Known Intentional Asset Exceptions
 

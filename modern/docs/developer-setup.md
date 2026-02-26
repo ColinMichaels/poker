@@ -21,10 +21,18 @@ From repository root:
 ## Common Commands
 
 - `npm run dev:client` - start Vite client dev server
+- `npm run dev:server` - start authoritative table server (watch mode)
 - `npm run typecheck` - run TypeScript checks in all workspaces
 - `npm run test:engine` - run poker-engine fixtures + reducer tests
+- `npm run test:server` - run server lifecycle + replay tests
 - `npm run generate:howto-content` - regenerate migrated legacy HowTo content
 - `npm run generate:assets:normalize` - regenerate normalized asset pack + manifest
+
+## Server Smoke Check
+
+1. `npm run dev:server`
+2. `curl http://127.0.0.1:8787/health`
+3. `curl http://127.0.0.1:8787/api/table/state`
 
 ## CI Parity
 

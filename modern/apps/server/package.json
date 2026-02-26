@@ -4,9 +4,11 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
+    "dev": "node --watch --experimental-strip-types ./src/index.ts",
+    "start": "node ./dist/index.js",
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "node --experimental-strip-types ./src/index.ts"
+    "test": "node --experimental-strip-types ./src/table-service.test.ts"
   },
   "dependencies": {
     "@poker/game-contracts": "file:../../packages/game-contracts",

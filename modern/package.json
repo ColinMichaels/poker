@@ -14,9 +14,12 @@
   "scripts": {
     "dev": "npm run dev --workspace @poker/client",
     "dev:client": "npm run dev --workspace @poker/client",
+    "dev:server": "npm run dev --workspace @poker/server",
     "preview": "npm run preview --workspace @poker/client",
     "build:client": "npm run build --workspace @poker/client",
+    "build:server": "npm run build --workspace @poker/server",
     "test:engine": "npm run test --workspace @poker/poker-engine",
+    "test:server": "npm run test --workspace @poker/server",
     "build": "npm run build --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",

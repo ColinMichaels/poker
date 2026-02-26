@@ -26,7 +26,10 @@ From `modern/`:
 - `nvm use` - switch to the workspace Node version
 - `npm install` - install all workspace dependencies
 - `npm run dev:client` - run client dev server
+- `npm run dev:server` - run authoritative server in watch mode
 - `npm run typecheck` - run TypeScript checks across all workspaces
+- `npm run build:server` - compile the server workspace
+- `npm run test:server` - run server hand lifecycle/replay tests
 - `npm run generate:howto-content` - extract legacy `HowTo` Vue content into modern typed guide data
 - `npm run generate:assets` - generate asset manifest only
 - `npm run generate:assets:normalize` - generate manifest and write normalized assets to `apps/client/public/assets`
@@ -46,3 +49,4 @@ From `modern/`:
 
 - This workspace is wired for npm workspaces.
 - Run all workspace install/build commands from `modern/`.
+- Server API details: `apps/server/README.md`.
