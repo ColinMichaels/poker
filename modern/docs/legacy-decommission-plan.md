@@ -200,6 +200,12 @@ These are not extraction failures, but they are blockers to deleting the legacy 
   - closes HTTP server with forced-exit timeout fallback
 - Updated deployment runbook with graceful shutdown behavior.
 
+## Completed in PR V
+
+- Updated root `npm run ci` wrapper to run environment doctor first:
+  - `npm run doctor && npm run ci --prefix modern`
+- Updated root/developer docs to reflect doctor-first CI flow.
+
 ## Known Intentional Asset Exceptions
 
 - Non-canonical card extras remain excluded from canonical face set:
@@ -273,6 +279,7 @@ Exit criteria:
 19. PR S: Root Node/npm environment doctor and engine alignment.
 20. PR T: Modern CI trigger coverage for root toolchain guardrails.
 21. PR U: Graceful shutdown and final-persist handling for modern server.
+22. PR V: Root CI now enforces doctor-first verification.
 
 ## Cutover Go/No-Go Checklist
 

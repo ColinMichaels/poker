@@ -8,7 +8,7 @@
     "dev": "npm run dev:client --prefix modern",
     "dev:client": "npm run dev:client --prefix modern",
     "dev:server": "npm run dev:server --prefix modern",
-    "ci": "npm run ci --prefix modern",
+    "ci": "npm run doctor && npm run ci --prefix modern",
     "doctor": "node ./scripts/doctor-modern-env.mjs",
     "typecheck": "npm run typecheck --prefix modern",
     "build": "npm run build --prefix modern",

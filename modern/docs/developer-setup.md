@@ -36,7 +36,7 @@ Root shortcut scripts are also available:
 
 - `npm run dev` (modern client)
 - `npm run doctor` (root environment check for modern workspace requirements)
-- `npm run ci` (modern full verification)
+- `npm run ci` (root doctor + modern full verification)
 - `npm run build` (modern workspace build)
 - `npm run test` (modern engine + server tests)
 

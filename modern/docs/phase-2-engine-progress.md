@@ -477,3 +477,15 @@ Sources:
 
 - `apps/server/src/index.ts`
 - `docs/deployment-runbook.md`
+
+## PR V Progress: Doctor-First Root CI
+
+- Updated root `ci` script to run environment doctor before modern verification:
+  - `npm run doctor && npm run ci --prefix modern`
+- Updated root/developer setup docs to reflect doctor-first root CI behavior.
+
+Sources:
+
+- `package.json`
+- `README.md`
+- `docs/developer-setup.md`
