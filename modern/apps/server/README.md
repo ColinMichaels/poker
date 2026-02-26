@@ -31,12 +31,19 @@ Environment overrides:
 - `TABLE_ID`
 - `POKER_STATE_PERSIST` (`1`/`0`, default `1`)
 - `POKER_STATE_FILE` (absolute path to JSON runtime state file)
+- `POKER_AUTH_TOKEN_SECRET` (HMAC signing secret for bearer sessions)
+- `POKER_SESSION_TTL_MS` (session ttl in milliseconds, default `28800000`)
 
 Runtime persistence:
 
 - Enabled by default.
 - Persists table/auth state after mutating requests.
 - Default file: `modern/apps/server/.data/runtime-state.json`
+
+Auth/session behavior:
+
+- Passwords are stored as salted `scrypt` hashes.
+- Session tokens are HMAC-signed and expire by ttl.
 
 ## HTTP API
 

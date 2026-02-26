@@ -236,3 +236,23 @@ Sources:
 - `apps/server/src/runtime-state-store.ts`
 - `apps/server/src/index.ts`
 - `apps/server/src/runtime-state-store.test.ts`
+
+## PR G Progress: Auth/Session Hardening Primitives
+
+- Replaced plaintext password handling with salted `scrypt` password hashes.
+- Added restore-time migration path for legacy plaintext persisted user records.
+- Replaced unsigned bearer sessions with HMAC-signed session tokens.
+- Added session expiration enforcement with configurable ttl.
+- Added auth hardening env controls:
+  - `POKER_AUTH_TOKEN_SECRET`
+  - `POKER_SESSION_TTL_MS`
+- Added auth hardening test coverage:
+  - tampered token rejection
+  - session expiry behavior
+  - legacy user credential migration
+
+Sources:
+
+- `apps/server/src/auth-wallet-service.ts`
+- `apps/server/src/auth-wallet-service.test.ts`
+- `apps/server/src/index.ts`

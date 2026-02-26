@@ -30,6 +30,8 @@ Environment variables:
 - `TABLE_ID` (default: `table-1`)
 - `POKER_STATE_PERSIST` (`1`/`0`, default: `1`)
 - `POKER_STATE_FILE` (default: `apps/server/.data/runtime-state.json`)
+- `POKER_AUTH_TOKEN_SECRET` (required for non-dev deployments; signs bearer session tokens)
+- `POKER_SESSION_TTL_MS` (default: `28800000`)
 
 ## Health + Readiness Checks
 
@@ -45,4 +47,5 @@ Auth/wallet sanity checks:
 ## Deployment Notes
 
 - Current runtime persists table/auth/wallet state to local JSON for restart continuity.
-- For production hardening, replace demo auth/session flows with real identity, signed/rotating tokens, and encrypted credential storage.
+- Current auth/session uses signed, expiring bearer tokens and salted scrypt password hashes.
+- Remaining production hardening: external identity provider, secret management/rotation, and revocation/audit controls.

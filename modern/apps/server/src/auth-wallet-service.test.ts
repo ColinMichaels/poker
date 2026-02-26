@@ -93,6 +93,63 @@ function testInsufficientBalanceAndProfileUpdate(): void {
   assertEqual(updatedProfile.displayName, 'Colin-Updated Player-Updated', 'Expected display name to reflect updates.');
 }
 
+function testRejectsTamperedSessionToken(): void {
+  const service = new AuthWalletService();
+  const login = service.login({ email: 'colin@example.com', password: 'demo' });
+  const tamperedToken = `${login.session.token}x`;
+
+  assertThrows(
+    () => service.requireAuth(tamperedToken),
+    /Invalid session token/,
+    'Expected tampered session token to be rejected.',
+  );
+}
+
+function testSessionExpiry(): void {
+  const service = new AuthWalletService({ sessionTtlMs: 1 });
+  const login = service.login({ email: 'colin@example.com', password: 'demo' });
+
+  const waitUntil = Date.now() + 5;
+  while (Date.now() < waitUntil) {
+    // Busy-wait for deterministic expiry in this no-deps test harness.
+  }
+
+  assertThrows(
+    () => service.getSession(login.session.token),
+    /Session expired/,
+    'Expected session to expire after configured ttl.',
+  );
+}
+
+function testRestoresLegacyPlaintextUserRecords(): void {
+  const createdAt = new Date().toISOString();
+  const legacyUserRecord = {
+    id: 99,
+    email: 'legacy@example.com',
+    password: 'demo',
+    firstName: 'Legacy',
+    lastName: 'User',
+    walletBalance: 250,
+    wins: 0,
+    gamesPlayed: 0,
+    walletUpdatedAt: createdAt,
+    walletLedger: [],
+  };
+
+  const service = new AuthWalletService({
+    users: [legacyUserRecord],
+  });
+
+  const login = service.login({ email: 'legacy@example.com', password: 'demo' });
+  const snapshot = service.exportState();
+
+  assertEqual(login.session.user.id, 99, 'Expected login to work for restored legacy user record.');
+  assert(
+    snapshot.users[0]?.passwordHash.startsWith('scrypt$') === true,
+    'Expected legacy plaintext password to be migrated to scrypt hash.',
+  );
+}
+
 function testStateRoundTripRestore(): void {
   const service = new AuthWalletService();
   const login = service.login({ email: 'colin@example.com', password: 'demo' });
@@ -119,6 +176,9 @@ function runAll(): void {
   testLoginSessionAndLogoutFlow();
   testWalletAdjustmentsAndLedger();
   testInsufficientBalanceAndProfileUpdate();
+  testRejectsTamperedSessionToken();
+  testSessionExpiry();
+  testRestoresLegacyPlaintextUserRecords();
   testStateRoundTripRestore();
   console.info('Auth/wallet tests passed (session + wallet + profile flows).');
 }

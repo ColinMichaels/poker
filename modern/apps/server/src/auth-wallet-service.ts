@@ -1,3 +1,4 @@
+import { createHmac, randomBytes, scryptSync } from 'node:crypto';
 import type {
   AuthSessionDTO,
   LoginRequestDTO,
@@ -10,10 +11,17 @@ import type {
   WalletLedgerEntryDTO,
 } from '@poker/game-contracts';
 
+const DEFAULT_SESSION_TTL_MS = 8 * 60 * 60 * 1000;
+const DEFAULT_TOKEN_SECRET = 'poker-local-dev-auth-secret-change-me';
+const SESSION_TOKEN_PREFIX = 'pkr';
+const PASSWORD_HASH_PREFIX = 'scrypt';
+const PASSWORD_HASH_KEY_LENGTH = 32;
+const PASSWORD_SALT_BYTES = 16;
+
 export interface PersistedUserRecord {
   id: number;
   email: string;
-  password: string;
+  passwordHash: string;
   firstName: string;
   lastName: string;
   walletBalance: number;
@@ -21,6 +29,11 @@ export interface PersistedUserRecord {
   gamesPlayed: number;
   walletUpdatedAt: string;
   walletLedger: WalletLedgerEntryDTO[];
+}
+
+interface LegacyPersistedUserRecord extends Omit<PersistedUserRecord, 'passwordHash'> {
+  passwordHash?: string;
+  password?: string;
 }
 
 export interface PersistedSessionRecord {
@@ -36,13 +49,21 @@ export interface AuthWalletStateSnapshot {
 }
 
 export interface AuthWalletServiceOptions {
-  users?: PersistedUserRecord[];
+  users?: Array<PersistedUserRecord | LegacyPersistedUserRecord>;
   sessions?: PersistedSessionRecord[];
+  tokenSecret?: string;
+  sessionTtlMs?: number;
 }
 
 export interface AuthContext {
   token: string;
   user: UserProfileDTO;
+}
+
+interface ParsedSessionToken {
+  userId: number;
+  issuedAtMs: number;
+  expiresAtMs: number;
 }
 
 function nowIso(): string {
@@ -63,9 +84,137 @@ function requirePositiveInteger(value: number, label: string): void {
   }
 }
 
-function createSessionToken(userId: number): string {
-  const entropy = Math.random().toString(36).slice(2, 12);
-  return `sess_${userId}_${Date.now()}_${entropy}`;
+function requireTokenSecret(rawValue: string | undefined): string {
+  const secret = (rawValue ?? DEFAULT_TOKEN_SECRET).trim();
+  if (secret.length < 16) {
+    throw new Error('tokenSecret must be at least 16 characters.');
+  }
+
+  return secret;
+}
+
+function toIso(valueMs: number): string {
+  return new Date(valueMs).toISOString();
+}
+
+function isFiniteTimestamp(valueMs: number): boolean {
+  return Number.isFinite(valueMs) && valueMs > 0;
+}
+
+function constantTimeEqual(left: string, right: string): boolean {
+  if (left.length !== right.length) {
+    return false;
+  }
+
+  let mismatch = 0;
+  for (let index = 0; index < left.length; index += 1) {
+    mismatch |= left.charCodeAt(index) ^ right.charCodeAt(index);
+  }
+
+  return mismatch === 0;
+}
+
+function hashPassword(password: string): string {
+  if (password.length === 0) {
+    throw new Error('Password cannot be empty.');
+  }
+
+  const salt = randomBytes(PASSWORD_SALT_BYTES).toString('hex');
+  const digest = scryptSync(password, salt, PASSWORD_HASH_KEY_LENGTH).toString('hex');
+  return `${PASSWORD_HASH_PREFIX}$${salt}$${digest}`;
+}
+
+function verifyPassword(password: string, passwordHash: string): boolean {
+  const parts = passwordHash.split('$');
+  if (parts.length !== 3 || parts[0] !== PASSWORD_HASH_PREFIX) {
+    return false;
+  }
+
+  const salt = parts[1];
+  const expectedDigest = parts[2];
+  const actualDigest = scryptSync(password, salt, PASSWORD_HASH_KEY_LENGTH).toString('hex');
+  return constantTimeEqual(actualDigest, expectedDigest);
+}
+
+function signSessionPayload(payload: string, tokenSecret: string): string {
+  return createHmac('sha256', tokenSecret).update(payload).digest('hex');
+}
+
+function createSessionToken(
+  userId: number,
+  issuedAtMs: number,
+  expiresAtMs: number,
+  tokenSecret: string,
+): string {
+  const nonce = randomBytes(16).toString('hex');
+  const payload = `${userId}:${issuedAtMs}:${expiresAtMs}:${nonce}`;
+  const signature = signSessionPayload(payload, tokenSecret);
+  return `${SESSION_TOKEN_PREFIX}.${payload}.${signature}`;
+}
+
+function parseSessionToken(token: string, tokenSecret: string): ParsedSessionToken {
+  const parts = token.split('.');
+  if (parts.length !== 3 || parts[0] !== SESSION_TOKEN_PREFIX) {
+    throw new Error('Invalid session token.');
+  }
+
+  const payload = parts[1];
+  const signature = parts[2];
+  const expectedSignature = signSessionPayload(payload, tokenSecret);
+
+  if (!constantTimeEqual(signature, expectedSignature)) {
+    throw new Error('Invalid session token.');
+  }
+
+  const payloadParts = payload.split(':');
+  if (payloadParts.length !== 4) {
+    throw new Error('Invalid session token.');
+  }
+
+  const userId = Number.parseInt(payloadParts[0], 10);
+  const issuedAtMs = Number.parseInt(payloadParts[1], 10);
+  const expiresAtMs = Number.parseInt(payloadParts[2], 10);
+
+  if (!Number.isInteger(userId) || userId <= 0) {
+    throw new Error('Invalid session token.');
+  }
+
+  if (!isFiniteTimestamp(issuedAtMs) || !isFiniteTimestamp(expiresAtMs) || expiresAtMs <= issuedAtMs) {
+    throw new Error('Invalid session token.');
+  }
+
+  return {
+    userId,
+    issuedAtMs,
+    expiresAtMs,
+  };
+}
+
+function normalizePersistedUserRecord(rawUser: PersistedUserRecord | LegacyPersistedUserRecord): PersistedUserRecord {
+  const user = cloneDeep(rawUser as LegacyPersistedUserRecord);
+
+  const passwordHash = typeof user.passwordHash === 'string' && user.passwordHash.length > 0
+    ? user.passwordHash
+    : typeof user.password === 'string' && user.password.length > 0
+      ? hashPassword(user.password)
+      : null;
+
+  if (!passwordHash) {
+    throw new Error(`User ${user.id} is missing password credentials.`);
+  }
+
+  return {
+    id: user.id,
+    email: user.email,
+    passwordHash,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    walletBalance: user.walletBalance,
+    wins: user.wins,
+    gamesPlayed: user.gamesPlayed,
+    walletUpdatedAt: user.walletUpdatedAt,
+    walletLedger: Array.isArray(user.walletLedger) ? user.walletLedger : [],
+  };
 }
 
 function buildDefaultUsers(): PersistedUserRecord[] {
@@ -75,7 +224,7 @@ function buildDefaultUsers(): PersistedUserRecord[] {
     {
       id: 1,
       email: 'colin@example.com',
-      password: 'demo',
+      passwordHash: hashPassword('demo'),
       firstName: 'Colin',
       lastName: 'Player',
       walletBalance: 500,
@@ -87,7 +236,7 @@ function buildDefaultUsers(): PersistedUserRecord[] {
     {
       id: 2,
       email: 'luna@example.com',
-      password: 'demo',
+      passwordHash: hashPassword('demo'),
       firstName: 'Luna',
       lastName: 'Bot',
       walletBalance: 500,
@@ -103,6 +252,8 @@ export class AuthWalletService {
   private readonly usersById: Map<number, PersistedUserRecord>;
   private readonly usersByEmail: Map<string, PersistedUserRecord>;
   private readonly sessionsByToken: Map<string, PersistedSessionRecord>;
+  private readonly tokenSecret: string;
+  private readonly sessionTtlMs: number;
 
   public constructor(options: AuthWalletServiceOptions = {}) {
     const users = options.users ? cloneDeep(options.users) : buildDefaultUsers();
@@ -111,8 +262,14 @@ export class AuthWalletService {
     this.usersById = new Map();
     this.usersByEmail = new Map();
     this.sessionsByToken = new Map();
+    this.tokenSecret = requireTokenSecret(options.tokenSecret);
+    this.sessionTtlMs = options.sessionTtlMs ?? DEFAULT_SESSION_TTL_MS;
 
-    for (const user of users) {
+    requirePositiveInteger(this.sessionTtlMs, 'sessionTtlMs');
+
+    for (const rawUser of users) {
+      const user = normalizePersistedUserRecord(rawUser);
+
       if (this.usersById.has(user.id)) {
         throw new Error(`Duplicate user id detected during auth restore: ${user.id}`);
       }
@@ -126,12 +283,17 @@ export class AuthWalletService {
       this.usersByEmail.set(normalizedEmail, user);
     }
 
-    for (const session of sessions) {
-      if (!this.usersById.has(session.userId)) {
-        throw new Error(`Session ${session.token} references missing user ${session.userId}.`);
+    for (const rawSession of sessions) {
+      const normalizedSession = this.normalizeSessionForRestore(rawSession);
+      if (!normalizedSession) {
+        continue;
       }
 
-      this.sessionsByToken.set(session.token, session);
+      if (!this.usersById.has(normalizedSession.userId)) {
+        throw new Error(`Session ${normalizedSession.token} references missing user ${normalizedSession.userId}.`);
+      }
+
+      this.sessionsByToken.set(normalizedSession.token, normalizedSession);
     }
   }
 
@@ -140,20 +302,27 @@ export class AuthWalletService {
       throw new Error('Email is required.');
     }
 
+    if (typeof request.password !== 'string' || request.password.length === 0) {
+      throw new Error('Password is required.');
+    }
+
     const user = this.usersByEmail.get(normalizeEmail(request.email));
     if (!user) {
       throw new Error('Invalid credentials.');
     }
 
-    if (typeof request.password === 'string' && request.password !== user.password) {
+    if (!verifyPassword(request.password, user.passwordHash)) {
       throw new Error('Invalid credentials.');
     }
 
+    const issuedAtMs = Date.now();
+    const expiresAtMs = issuedAtMs + this.sessionTtlMs;
+
     const session: PersistedSessionRecord = {
-      token: createSessionToken(user.id),
+      token: createSessionToken(user.id, issuedAtMs, expiresAtMs, this.tokenSecret),
       userId: user.id,
-      issuedAt: nowIso(),
-      expiresAt: null,
+      issuedAt: toIso(issuedAtMs),
+      expiresAt: toIso(expiresAtMs),
     };
 
     this.sessionsByToken.set(session.token, session);
@@ -172,10 +341,7 @@ export class AuthWalletService {
       throw new Error('Authentication required.');
     }
 
-    const session = this.sessionsByToken.get(token);
-    if (!session) {
-      throw new Error('Invalid session token.');
-    }
+    const session = this.requireSession(token);
 
     return {
       token,
@@ -184,12 +350,7 @@ export class AuthWalletService {
   }
 
   public getSession(token: string): AuthSessionDTO {
-    const session = this.sessionsByToken.get(token);
-    if (!session) {
-      throw new Error('Invalid session token.');
-    }
-
-    return this.toSessionDTO(session);
+    return this.toSessionDTO(this.requireSession(token));
   }
 
   public getUserProfile(userId: number): UserProfileDTO {
@@ -276,6 +437,54 @@ export class AuthWalletService {
         left.issuedAt.localeCompare(right.issuedAt),
       )),
     };
+  }
+
+  private normalizeSessionForRestore(rawSession: PersistedSessionRecord): PersistedSessionRecord | null {
+    const parsed = this.tryParseSession(rawSession.token);
+    if (!parsed) {
+      return null;
+    }
+
+    const nowMs = Date.now();
+    if (parsed.expiresAtMs <= nowMs) {
+      return null;
+    }
+
+    return {
+      token: rawSession.token,
+      userId: parsed.userId,
+      issuedAt: toIso(parsed.issuedAtMs),
+      expiresAt: toIso(parsed.expiresAtMs),
+    };
+  }
+
+  private requireSession(token: string): PersistedSessionRecord {
+    const session = this.sessionsByToken.get(token);
+    if (!session) {
+      throw new Error('Invalid session token.');
+    }
+
+    const parsed = this.tryParseSession(token);
+    if (!parsed || parsed.userId !== session.userId) {
+      this.sessionsByToken.delete(token);
+      throw new Error('Invalid session token.');
+    }
+
+    const nowMs = Date.now();
+    if (parsed.expiresAtMs <= nowMs) {
+      this.sessionsByToken.delete(token);
+      throw new Error('Session expired.');
+    }
+
+    return session;
+  }
+
+  private tryParseSession(token: string): ParsedSessionToken | null {
+    try {
+      return parseSessionToken(token, this.tokenSecret);
+    } catch {
+      return null;
+    }
   }
 
   private requireUser(userId: number): PersistedUserRecord {

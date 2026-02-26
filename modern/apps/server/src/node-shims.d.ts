@@ -38,6 +38,21 @@ declare module 'node:os' {
   export function tmpdir(): string;
 }
 
+declare module 'node:crypto' {
+  export interface Hmac {
+    update(data: string): Hmac;
+    digest(encoding: 'hex'): string;
+  }
+
+  export interface BinaryValue {
+    toString(encoding: 'hex'): string;
+  }
+
+  export function createHmac(algorithm: 'sha256', key: string): Hmac;
+  export function randomBytes(size: number): BinaryValue;
+  export function scryptSync(password: string, salt: string, keylen: number): BinaryValue;
+}
+
 declare const process: {
   env: Record<string, string | undefined>;
 };

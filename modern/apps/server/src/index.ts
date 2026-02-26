@@ -51,6 +51,19 @@ function parsePersistenceEnabled(rawValue: string | undefined): boolean {
   throw new Error(`Invalid POKER_STATE_PERSIST value: ${rawValue}`);
 }
 
+function parseSessionTtlMs(rawValue: string | undefined): number | undefined {
+  if (rawValue === undefined) {
+    return undefined;
+  }
+
+  const parsed = Number.parseInt(rawValue, 10);
+  if (!Number.isInteger(parsed) || parsed <= 0) {
+    throw new Error(`Invalid POKER_SESSION_TTL_MS value: ${rawValue}`);
+  }
+
+  return parsed;
+}
+
 function defaultStateFilePath(): string {
   return decodeURIComponent(new URL('../.data/runtime-state.json', import.meta.url).pathname);
 }
@@ -207,13 +220,13 @@ function parseLoginRequest(body: unknown): LoginRequestDTO {
     throw new HttpError(400, 'BAD_REQUEST', 'email is required.');
   }
 
-  if (record.password !== undefined && typeof record.password !== 'string') {
-    throw new HttpError(400, 'BAD_REQUEST', 'password must be a string.');
+  if (typeof record.password !== 'string' || record.password.trim().length === 0) {
+    throw new HttpError(400, 'BAD_REQUEST', 'password is required.');
   }
 
   return {
     email: record.email,
-    password: record.password as string | undefined,
+    password: record.password,
   };
 }
 
@@ -281,7 +294,7 @@ function mapToHttpError(error: unknown): HttpError {
   }
 
   const message = error instanceof Error ? error.message : String(error);
-  if (message === 'Authentication required.' || message === 'Invalid session token.') {
+  if (message === 'Authentication required.' || message === 'Invalid session token.' || message === 'Session expired.') {
     return new HttpError(401, 'UNAUTHORIZED', message);
   }
 
@@ -496,6 +509,8 @@ const host = process.env.HOST ?? DEFAULT_HOST;
 const tableId = process.env.TABLE_ID ?? DEFAULT_TABLE_ID;
 const persistenceEnabled = parsePersistenceEnabled(process.env.POKER_STATE_PERSIST);
 const stateFilePath = process.env.POKER_STATE_FILE ?? defaultStateFilePath();
+const authTokenSecret = process.env.POKER_AUTH_TOKEN_SECRET;
+const authSessionTtlMs = parseSessionTtlMs(process.env.POKER_SESSION_TTL_MS);
 const runtimeStateStore = persistenceEnabled ? new RuntimeStateStore(stateFilePath) : null;
 
 let persistedRuntimeState: RuntimeStateSnapshot | null = null;
@@ -536,8 +551,13 @@ const authWalletService = persistedRuntimeState
   ? new AuthWalletService({
     users: persistedRuntimeState.auth.users,
     sessions: persistedRuntimeState.auth.sessions,
+    tokenSecret: authTokenSecret,
+    sessionTtlMs: authSessionTtlMs,
   })
-  : new AuthWalletService();
+  : new AuthWalletService({
+    tokenSecret: authTokenSecret,
+    sessionTtlMs: authSessionTtlMs,
+  });
 
 function persistRuntimeState(): void {
   if (!runtimeStateStore) {
@@ -569,5 +589,8 @@ server.listen(port, host, () => {
     console.info(`Runtime persistence: enabled (${runtimeStateStore.getFilePath()})`);
   } else {
     console.info('Runtime persistence: disabled');
+  }
+  if (!authTokenSecret) {
+    console.warn('Auth token secret: using development default. Set POKER_AUTH_TOKEN_SECRET for non-dev environments.');
   }
 });

@@ -20,7 +20,7 @@ Purpose: make `modern/` the primary codebase without losing reusable legacy func
 
 These are not extraction failures, but they are blockers to deleting the legacy app:
 
-1. Real auth hardening is not yet implemented (current auth/session uses demo credentials and unsigned bearer tokens).
+1. Real auth hardening is not yet implemented (current auth/session still uses demo credentials and no external identity provider).
 
 ## Completed in PR A
 
@@ -82,6 +82,16 @@ These are not extraction failures, but they are blockers to deleting the legacy 
   - `POKER_STATE_PERSIST` (default enabled)
   - `POKER_STATE_FILE`
 
+## Completed in PR G
+
+- Added auth/session hardening primitives:
+  - salted `scrypt` password hashing (including restore-time migration from legacy plaintext user records)
+  - HMAC-signed bearer session tokens
+  - session expiration with configurable ttl
+- Added auth hardening environment controls:
+  - `POKER_AUTH_TOKEN_SECRET`
+  - `POKER_SESSION_TTL_MS`
+
 ## Known Intentional Asset Exceptions
 
 - Non-canonical card extras remain excluded from canonical face set:
@@ -140,6 +150,7 @@ Exit criteria:
 4. PR D: Root documentation + deployment cutover.
 5. PR E: Legacy archive/removal.
 6. PR F: Server runtime persistence.
+7. PR G: Auth/session hardening primitives.
 
 ## Cutover Go/No-Go Checklist
 
