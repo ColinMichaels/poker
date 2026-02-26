@@ -31,6 +31,7 @@ From `modern/`:
 - `npm run dev:server` - run authoritative server in watch mode
 - `npm run ci` - run typecheck + build + engine tests + server tests
 - `npm run check:legacy-refs` - verify modern runtime source does not introduce new `legacy/` path references
+- `npm run check:server-env-template` - verify `apps/server/.env.example` includes required server env keys
 - `npm run typecheck` - run TypeScript checks across all workspaces
 - `npm run build:server` - compile the server workspace
 - `npm run test:server` - run server hand lifecycle + auth/wallet tests

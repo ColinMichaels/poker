@@ -502,3 +502,17 @@ Sources:
 - `apps/server/README.md`
 - `docs/developer-setup.md`
 - `docs/deployment-runbook.md`
+
+## PR X Progress: Env Template Sync Guard
+
+- Added script to verify required server environment keys are present in:
+  - `apps/server/.env.example`
+- Added workspace command:
+  - `npm run check:server-env-template`
+- Integrated env-template verification into canonical modern CI command.
+
+Sources:
+
+- `scripts/check-server-env-template.mjs`
+- `apps/server/.env.example`
+- `package.json`

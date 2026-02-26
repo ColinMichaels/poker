@@ -212,6 +212,13 @@ These are not extraction failures, but they are blockers to deleting the legacy 
   - `modern/apps/server/.env.example`
 - Linked env template from server/developer/deployment docs for consistent setup.
 
+## Completed in PR X
+
+- Added server env-template synchronization guard:
+  - `modern/scripts/check-server-env-template.mjs`
+  - `npm run check:server-env-template`
+- Integrated env-template guard into canonical modern CI verification script.
+
 ## Known Intentional Asset Exceptions
 
 - Non-canonical card extras remain excluded from canonical face set:
@@ -287,6 +294,7 @@ Exit criteria:
 21. PR U: Graceful shutdown and final-persist handling for modern server.
 22. PR V: Root CI now enforces doctor-first verification.
 23. PR W: Server environment template and doc alignment.
+24. PR X: CI guard for server env-template key coverage.
 
 ## Cutover Go/No-Go Checklist
 
