@@ -35,6 +35,9 @@ From repository root:
 - `npm run test:server` - run server lifecycle + auth/wallet parity tests
 - `npm run generate:howto-content` - regenerate migrated legacy HowTo content
 - `npm run generate:assets:normalize` - regenerate normalized asset pack + manifest
+- `npm run firebase:prepare:hosting` - generate `.firebase.deploy.json` from `firebase.json` with optional backend overrides
+- `npm run firebase:deploy:hosting` - build client and deploy hosting
+- `npm run firebase:deploy:hosting:backend-target` - build client and deploy hosting with required backend rewrite target env
 
 Root shortcut scripts are also available:
 
@@ -96,10 +99,26 @@ To use Firebase Admin SDK adapter instead of JWT verifier:
 - optionally set `POKER_EXTERNAL_AUTH_FIREBASE_SERVICE_ACCOUNT_FILE=/path/to/service-account.json`
 - ensure `firebase-admin` is installed for `@poker/server` (`npm install --workspace @poker/server firebase-admin`)
 
+Client Firebase auth bridge setup (automatic `/api/auth/external/login` exchange):
+
+1. Copy `apps/client/.env.example` to `apps/client/.env.local`.
+2. Set Firebase web keys:
+   `VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_AUTH_DOMAIN`, `VITE_FIREBASE_PROJECT_ID`, `VITE_FIREBASE_APP_ID`
+3. Optional:
+   `VITE_EXTERNAL_AUTH_MODE=firebase_id_token` (auto-detected when Firebase keys are present),
+   `VITE_FIREBASE_AUTH_EMULATOR_URL`,
+   `VITE_FIREBASE_AUTH_CUSTOM_TOKEN`,
+   `VITE_API_BASE_URL` (only needed for non-proxied API setups).
+4. Start `npm run dev:server` and `npm run dev:client`.
+5. When Firebase auth has a signed-in user, the client automatically exchanges the Firebase ID token for a server session via `/api/auth/external/login`.
+
+The Vite dev server proxies `/api` and `/health` to `http://127.0.0.1:8787` by default.
+
 Firebase hosting starter config:
 
 - `firebase.hosting.example.json` shows SPA hosting for `apps/client/dist` and `/api/**` rewrite to a Cloud Run backend.
 - `firebase.json` is the active baseline config; `.firebaserc.example` provides project binding template.
+- `FIREBASE_BACKEND_SERVICE_ID` and `FIREBASE_BACKEND_REGION` can override `/api/**` Cloud Run rewrite in generated deploy config.
 
 ## CI Parity
 

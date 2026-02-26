@@ -12,6 +12,8 @@ import {
 } from './multi-table-logic';
 import { executeMultiTableAction } from './multi-table-action-submit';
 import { buildWinOddsSnapshot, type SeatWinOdds, type WinOddsSnapshot } from './win-odds';
+import { createClientAuthBridge } from './client-auth.ts';
+import type { ExternalAuthSessionState } from './auth/external-auth-session-bridge.ts';
 
 const root = document.getElementById('app');
 
@@ -194,6 +196,8 @@ let multiActionConfirmTimerId: number | null = null;
 const multiTableControllerById = new Map<string, LocalTableController>();
 const multiTableModelByTableId = new Map<string, TableViewModel>();
 const multiTableAutoNextHandTimerById = new Map<string, number>();
+const clientAuthBridge = createClientAuthBridge();
+let clientAuthState: ExternalAuthSessionState = clientAuthBridge.getState();
 
 interface PlaySnapshot {
   handId: string;
@@ -295,6 +299,17 @@ function scheduleMultiTableAutoNextHand(tableId: string, model: TableViewModel):
 
 initializeMultiTableControllers();
 mountControllerForSeat(selectedLobbySeatId);
+clientAuthBridge.subscribe((state) => {
+  clientAuthState = state;
+  if (!lastRenderedModel) {
+    return;
+  }
+  render(appRoot, lastRenderedModel);
+});
+void clientAuthBridge.start();
+window.addEventListener('beforeunload', () => {
+  clientAuthBridge.stop();
+});
 window.addEventListener('resize', () => {
   if (!lastRenderedModel || resizeRenderQueued) {
     return;
@@ -406,6 +421,7 @@ function render(container: HTMLElement, model: TableViewModel): void {
         : activeView === 'multitable'
           ? 'Multi-Table'
           : 'Rules';
+  const authStatus = formatClientAuthStatus(clientAuthState);
   const isPlayView = activeView === 'play';
   const topbarClasses = ['app-topbar', isPlayView ? 'is-play-focus' : ''].filter((value) => value.length > 0).join(' ');
 
@@ -420,6 +436,7 @@ function render(container: HTMLElement, model: TableViewModel): void {
     '    <div class="app-topbar-brand">',
     '      <p class="app-badge">Poker App</p>',
     `      <p class="app-status">${escapeHtml(topbarStatus)}</p>`,
+    `      <p class="app-status app-auth-status">${escapeHtml(authStatus)}</p>`,
     '    </div>',
     '    <nav class="app-topbar-nav" aria-label="Primary views">',
     ...(isPlayView
@@ -705,6 +722,22 @@ function render(container: HTMLElement, model: TableViewModel): void {
 
 function chips(amount: number): string {
   return `${amount.toLocaleString()} chips`;
+}
+
+function formatClientAuthStatus(state: ExternalAuthSessionState): string {
+  if (state.status === 'disabled') {
+    return 'Auth: local mode';
+  }
+  if (state.status === 'linked' && state.storedSession) {
+    return `Auth: linked (${state.storedSession.userEmail})`;
+  }
+  if (state.status === 'linking') {
+    return 'Auth: linking...';
+  }
+  if (state.status === 'waiting_for_identity') {
+    return 'Auth: waiting for Firebase sign-in';
+  }
+  return `Auth: error (${state.message})`;
 }
 
 function metricPill(label: string, value: string): string {

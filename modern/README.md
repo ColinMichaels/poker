@@ -43,6 +43,9 @@ From `modern/`:
 - `npm run generate:assets:normalize` - generate manifest and write normalized assets to `apps/client/public/assets`
 - `npm run validate:fixtures` - validate Texas Hold'em fixtures
 - `npm run test --workspace @poker/poker-engine` - run evaluator/showdown/reducer tests
+- `npm run firebase:prepare:hosting` - create `.firebase.deploy.json` with optional backend rewrite overrides
+- `npm run firebase:deploy:hosting` - build client and deploy Firebase Hosting with current `firebase.json` rewrite target
+- `npm run firebase:deploy:hosting:backend-target` - deploy Hosting with backend rewrite target from env (`FIREBASE_BACKEND_SERVICE_ID`, `FIREBASE_BACKEND_REGION`)
 
 ## CI
 
@@ -57,4 +60,5 @@ From `modern/`:
 - Run all workspace install/build commands from `modern/`.
 - Server API details: `apps/server/README.md`.
 - Server env template: `apps/server/.env.example`.
+- Client env template: `apps/client/.env.example`.
 - Firebase Hosting config: `firebase.json` (`.firebaserc.example` template).

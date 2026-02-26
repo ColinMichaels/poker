@@ -125,6 +125,13 @@ body {
   text-transform: uppercase;
 }
 
+.app-auth-status {
+  max-width: min(55vw, 26rem);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .eyebrow {
   color: var(--muted);
   font-family: var(--mono);

@@ -1357,3 +1357,43 @@ Sources:
 - `apps/server/README.md`
 - `docs/developer-setup.md`
 - `docs/deployment-runbook.md`
+
+## PR BR Progress: Firebase Deploy Wiring + Client Token Exchange Bridge
+
+- Added Firebase deploy commands in modern workspace:
+  - `firebase:prepare:hosting`
+  - `firebase:deploy:hosting`
+  - `firebase:deploy:hosting:backend-target`
+- Added deploy-config generation script:
+  - reads `firebase.json`
+  - emits `.firebase.deploy.json`
+  - supports backend rewrite overrides via `FIREBASE_BACKEND_SERVICE_ID` + `FIREBASE_BACKEND_REGION`
+- Added provider-agnostic client auth bridge:
+  - token provider interface for external identity
+  - Firebase web provider implementation via Firebase JS SDK
+  - automatic external-login exchange (`/api/auth/external/login`)
+  - persisted server-session snapshot storage
+- Added client runtime config/env support for Firebase auth:
+  - `apps/client/.env.example` with `VITE_FIREBASE_*` and external-auth keys
+  - Vite `/api` + `/health` local proxy for server integration in dev
+- Added client tests for runtime config and auth bridge behavior.
+
+Sources:
+
+- `package.json`
+- `scripts/prepare-firebase-hosting-config.mjs`
+- `apps/client/package.json`
+- `apps/client/.env.example`
+- `apps/client/src/client-runtime-config.ts`
+- `apps/client/src/client-auth.ts`
+- `apps/client/src/auth/external-id-token-provider.ts`
+- `apps/client/src/auth/firebase-web-id-token-provider.ts`
+- `apps/client/src/auth/external-auth-session-bridge.ts`
+- `apps/client/src/auth/server-session-store.ts`
+- `apps/client/src/main.ts`
+- `apps/client/src/styles.css`
+- `apps/client/vite.config.ts`
+- `apps/client/tests/client-runtime-config.test.ts`
+- `apps/client/tests/external-auth-session-bridge.test.ts`
+- `docs/developer-setup.md`
+- `docs/deployment-runbook.md`

@@ -18,7 +18,7 @@ function assertEqual<T>(actual: T, expected: T, message: string): void {
   }
 }
 
-class MockIncomingMessage implements IncomingMessage {
+class MockIncomingMessage {
   public readonly method?: string;
   public readonly url?: string;
   public readonly headers: Record<string, string | string[] | undefined>;
@@ -57,7 +57,7 @@ class MockIncomingMessage implements IncomingMessage {
   }
 }
 
-class MockServerResponse implements ServerResponse {
+class MockServerResponse {
   public statusCode = 200;
   public headers: Record<string, string> = {};
   public body = '';
@@ -122,8 +122,8 @@ async function invokeRoute(options: {
   const response = new MockServerResponse();
 
   await handleRequest(
-    options.request,
-    response,
+    options.request as unknown as IncomingMessage,
+    response as unknown as ServerResponse<IncomingMessage>,
     tableService,
     authWalletService,
     options.runtimeInfo,

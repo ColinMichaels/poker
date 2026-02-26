@@ -7,31 +7,32 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1eee6476-c5d8-4dc1-b068-da2be4a7c407" name="Default Changelist" comment="feat(server): add support for external auth secret rotation&#10;&#10;- Extended HMAC-based external assertion verification to accept both current and previous secrets for zero-downtime key rotation.&#10;- Updated runtime config (`POKER_EXTERNAL_AUTH_SHARED_SECRET_PREVIOUS`) and added validations for rotation setup.&#10;- Enhanced `/health` endpoint with secret rotation diagnostics.&#10;- Added tests for rotated-secret fallback and external login behavior.&#10;- Updated deployment and setup documentation with key rotation instructions.">
-      <change afterPath="$PROJECT_DIR$/modern/.firebaserc.example" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/server/src/firebase-admin-id-token.test.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/server/src/firebase-admin-id-token.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/server/src/firebase-id-token-verifier.test.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/server/src/firebase-id-token-verifier.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/server/src/firebase-id-token.test.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/server/src/firebase-id-token.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/firebase.hosting.example.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/firebase.json" afterDir="false" />
+    <list default="true" id="1eee6476-c5d8-4dc1-b068-da2be4a7c407" name="Default Changelist" comment="feat(client): add server session store with localStorage support and Firebase integration&#10;&#10;- Introduced `server-session-store` for managing server sessions in the client.&#10;- Added utility functions to read, write, and clear sessions from localStorage.&#10;- Updated dependencies with Firebase SDK for session handling and storage integration.">
+      <change afterPath="$PROJECT_DIR$/modern/apps/client/.env.example" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/modern/apps/client/src/auth/external-auth-session-bridge.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/modern/apps/client/src/auth/external-id-token-provider.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/modern/apps/client/src/auth/firebase-web-id-token-provider.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/modern/apps/client/src/auth/server-session-store.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/modern/apps/client/src/client-auth.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/modern/apps/client/src/client-runtime-config.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/modern/apps/client/src/vite-env.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/modern/apps/client/tests/client-runtime-config.test.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/modern/apps/client/tests/external-auth-session-bridge.test.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/modern/scripts/prepare-firebase-hosting-config.mjs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/apps/server/.env.example" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/.env.example" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/apps/server/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/apps/server/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/client/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/client/src/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/src/main.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/client/src/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/src/styles.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/client/vite.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/vite.config.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/apps/server/src/http-routes.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/http-routes.test.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/apps/server/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/apps/server/src/node-shims.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/node-shims.d.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/apps/server/src/startup-config.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/startup-config.test.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/apps/server/src/startup-config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/startup-config.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/docs/deployment-runbook.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/docs/deployment-runbook.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/docs/developer-setup.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/docs/developer-setup.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/docs/legacy-decommission-plan.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/docs/legacy-decommission-plan.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/docs/phase-2-engine-progress.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/docs/phase-2-engine-progress.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/scripts/check-server-env-template.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/modern/scripts/check-server-env-template.mjs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/modern/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/modern/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -494,7 +495,15 @@
       <option name="project" value="LOCAL" />
       <updated>1772129571212</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="feat(server): add Firebase ID token verification and external auth mode&#10;&#10;- Added support for Firebase ID tokens as an external auth mode (`firebase_id_token`).&#10;- Introduced `verifyFirebaseIdToken` with JWT-based signature and claim validations.&#10;- Added an alternate Firebase Admin SDK verifier for token validation.&#10;- Updated runtime configuration and documentation to support Firebase integration.&#10;- Included smoke checks and tests for Firebase ID token modes.&#10;- Added">
+      <option name="closed" value="true" />
+      <created>1772137456917</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1772137456917</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -529,7 +538,12 @@
     <MESSAGE value="feat(server): add trusted-header external auth mode&#10;&#10;- Introduced `trusted_headers` mode for external auth, enabling auth-proxy integration with identity headers.&#10;- Added runtime config (`POKER_EXTERNAL_AUTH_MODE` and `POKER_EXTERNAL_AUTH_PROXY_SHARED_SECRET`) and validation for the new mode.&#10;- Enhanced `/health` endpoint to include external auth mode diagnostics.&#10;- Updated external auth login flow to support trusted-header validation and error handling.&#10;- Added regression tests for trusted-header login success and invalid proxy secret rejection.&#10;- Updated documentation and environment templates for trusted-header setup and usage." />
     <MESSAGE value="feat(server): add trusted-headers external auth mode&#10;&#10;- Introduced `trusted_headers` external auth mode for proxy integrations with explicit mode selection (`POKER_EXTERNAL_AUTH_MODE`).&#10;- Added validation for proxy secrets (`POKER_EXTERNAL_AUTH_PROXY_SHARED_SECRET`).&#10;- Enhanced `/health` diagnostics with `externalAuthMode` runtime field.&#10;- Updated docs for new external auth modes, including setup and usage guidelines.&#10;- Added tests for trusted-header mode validation and behavior." />
     <MESSAGE value="feat(server): add Firebase ID token verification for external auth&#10;&#10;- Introduced support for `firebase_id_token` mode in external auth with JWT and Admin SDK verification options.  &#10;- Added Firebase cert fetching, RS256 signature validation, and token claim mapping.  &#10;- Updated external auth runtime config (`POKER_EXTERNAL_AUTH_FIREBASE_*`) and docs with Firebase-specific settings.  &#10;- Implemented tests for Firebase ID token validation, claim parsing, and service account usage.  &#10;- Added starter `firebase.hosting.example.json` for SPA hosting with API rewrite to Cloud Run.  " />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(server): add Firebase ID token verification for external auth&#10;&#10;- Introduced support for `firebase_id_token` mode in external auth with JWT and Admin SDK verification options.  &#10;- Added Firebase cert fetching, RS256 signature validation, and token claim mapping.  &#10;- Updated external auth runtime config (`POKER_EXTERNAL_AUTH_FIREBASE_*`) and docs with Firebase-specific settings.  &#10;- Implemented tests for Firebase ID token validation, claim parsing, and service account usage.  &#10;- Added starter `firebase.hosting.example.json` for SPA hosting with API rewrite to Cloud Run.  " />
+    <MESSAGE value="feat(server): add Firebase ID token verification and hosting integration&#10;&#10;- Introduced Firebase-based ID token verification for external authentication (`POKER_EXTERNAL_AUTH_MODE=firebase_id_token`).&#10;- Added support for both JWT-based and Admin SDK token verifiers with configuration options.&#10;- Added `firebase.hosting.example.json` template for SPA hosting and API rewrites to Cloud Run.&#10;- Updated documentation with Firebase setup and usage instructions.&#10;- Expanded tests to cover Firebase ID token verification and claims validation." />
+    <MESSAGE value="feat(server): add Firebase ID token authentication support&#10;&#10;- Introduced `firebase_id_token` mode for external authentication via Firebase.&#10;- Added lightweight RS256 JWT verifier (`verifyFirebaseIdToken`) and optional Firebase Admin SDK adapter.&#10;- Extended runtime config to support Firebase verifier modes (`jwt` or `admin_sdk`) and related settings.&#10;- Updated `/api/auth/external/login` to handle Firebase ID tokens in Bearer or custom headers.&#10;- Added tests for Firebase ID token verification and Admin SDK integration.&#10;- Included starter Firebase Hosting configuration for the client and API rewrite.&#10;- Updated documentation for Firebase authentication setup and hosting config." />
+    <MESSAGE value="feat(server): add Firebase ID token verification and external auth mode&#10;&#10;- Added support for Firebase ID tokens as an external auth mode (`firebase_id_token`).&#10;- Introduced `verifyFirebaseIdToken` with JWT-based signature and claim validations.&#10;- Added an alternate Firebase Admin SDK verifier for token validation" />
+    <MESSAGE value="feat(server): add Firebase ID token verification and external auth mode&#10;&#10;- Added support for Firebase ID tokens as an external auth mode (`firebase_id_token`).&#10;- Introduced `verifyFirebaseIdToken` with JWT-based signature and claim validations.&#10;- Added an alternate Firebase Admin SDK verifier for token validation Firebase Hosting starter configuration for SPAs." />
+    <MESSAGE value="feat(client): add server session store with localStorage support and Firebase integration&#10;&#10;- Introduced `server-session-store` for managing server sessions in the client.&#10;- Added utility functions to read, write, and clear sessions from localStorage.&#10;- Updated dependencies with Firebase SDK for session handling and storage integration." />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(client): add server session store with localStorage support and Firebase integration&#10;&#10;- Introduced `server-session-store` for managing server sessions in the client.&#10;- Added utility functions to read, write, and clear sessions from localStorage.&#10;- Updated dependencies with Firebase SDK for session handling and storage integration." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

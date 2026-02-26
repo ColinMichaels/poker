@@ -675,6 +675,25 @@ These are not extraction failures, but they are blockers to deleting the legacy 
 - Kept `/api/auth/external/login` provider-agnostic by injecting verifier implementation through runtime context.
 - Added regression coverage for Admin SDK adapter, verifier-factory selection, and startup config verifier/credential validation.
 
+## Completed in PR BR
+
+- Added Firebase hosting deploy wiring for modern workspace:
+  - `npm run firebase:prepare:hosting`
+  - `npm run firebase:deploy:hosting`
+  - `npm run firebase:deploy:hosting:backend-target`
+- Added deploy-config generation script with backend rewrite overrides:
+  - `FIREBASE_BACKEND_SERVICE_ID`
+  - `FIREBASE_BACKEND_REGION`
+  - `FIREBASE_HOSTING_SITE`
+- Added client-side Firebase auth bridge with decoupled token-provider interface:
+  - automatic Firebase ID token exchange to `/api/auth/external/login`
+  - persisted server session snapshot for runtime continuity
+- Added client runtime config + env template for Firebase web SDK integration:
+  - `apps/client/.env.example`
+  - `VITE_FIREBASE_*` keys
+  - `VITE_EXTERNAL_AUTH_MODE`, `VITE_EXTERNAL_AUTH_LOGIN_PATH`
+- Added client regression coverage for runtime config parsing and external auth session bridge lifecycle.
+
 ## Known Intentional Asset Exceptions
 
 - Non-canonical card extras remain excluded from canonical face set:
@@ -796,6 +815,7 @@ Exit criteria:
 67. PR BO: Trusted-header external provider integration mode.
 68. PR BP: Firebase ID token provider mode wiring.
 69. PR BQ: Firebase Admin SDK adapter behind pluggable verifier interface.
+70. PR BR: Firebase deploy scripts and client external-auth bridge wiring.
 
 ## Cutover Go/No-Go Checklist
 
