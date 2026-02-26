@@ -4,164 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1eee6476-c5d8-4dc1-b068-da2be4a7c407" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/sshConfigs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/01-repo-review/asset-inventory-and-reuse.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/01-repo-review/current-state-architecture.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/01-repo-review/issues-and-risks.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/01-repo-review/poker-logic-extraction.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/02-upgrade-plan/phased-migration-roadmap.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/02-upgrade-plan/reuse-mapping-old-to-new.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/02-upgrade-plan/target-architecture-babylon.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/03-llm-agent-prompts/agent-charter.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/03-llm-agent-prompts/build-prompts-by-phase.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/03-llm-agent-prompts/review-and-qa-prompts.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/index.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/package.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/avatars/andy-warhol.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/avatars/barack-obama.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/avatars/batman.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/avatars/brazilian-native-man.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/avatars/brazilian-native-woman.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/avatars/charlie-chaplin.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/avatars/construction-worker-black-woman.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/avatars/dalai-lama.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/avatars/dave-grohl.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/avatars/donald-trump.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/avatars/footballer-cristiano-ronaldo.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/avatars/footballer-luis-suarez.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/avatars/footballer-neymar-jr.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/avatars/girl-in-ballcap.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/avatars/mahatma-gandhi.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/avatars/malcolm-x.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/avatars/matrix-trinity.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/avatars/mick-jagger.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/avatars/muslim-man.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/avatars/muslim-woman.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/avatars/nikola-tesla.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/avatars/player_02.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/avatars/player_f_01.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/avatars/robot-01.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/avatars/robot-02.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/avatars/robot-03.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/avatars/superhero-black-panther.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/avatars/traditional-african-man.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/avatars/traditional-african-woman.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/avatars/traditional-indian-man.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/avatars/traditional-indian-woman.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/avatars/traditional-japanese-man.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/avatars/traditional-japanese-woman.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/10C.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/10D.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/10H.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/10S.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/2C.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/2D.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/2H.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/2S.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/3C.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/3D.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/3H.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/3S.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/4C.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/4D.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/4H.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/4S.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/5C.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/5D.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/5H.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/5S.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/6C.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/6D.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/6H.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/6S.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/7C.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/7D.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/7H.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/7S.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/8C.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/8D.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/8H.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/8S.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/9C.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/9D.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/9H.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/9S.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/AC.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/AD.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/AH.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/AS.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/Card_back_01.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/Card_back_02.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/Card_back_06.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/JC.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/JD.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/JH.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/JS.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/KC.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/KD.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/KH.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/KS.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/QC.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/QD.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/QH.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/cards/QS.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/chips/1.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/chips/10.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/chips/100.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/chips/1000.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/chips/25.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/chips/5.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/chips/50.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/chips/500.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/logos/poker_logo.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/logos/poker_logo.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/logos/poker_logo_full@3x.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/logos/poker_logo_main.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/sounds/card.mp3" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/sounds/cha-ching.mp3" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/sounds/chip.mp3" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/sounds/chip2.mp3" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/sounds/chip3.mp3" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/sounds/chips.mp3" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/sounds/im-batman.mp3" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/sounds/robot-2.mp3" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/sounds/robot-blip.mp3" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/sounds/shuffle.mp3" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/sounds/tada.mp3" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/public/assets/sounds/we_have_losers.mp3" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/src/main.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/tsconfig.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/vite.config.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/server/package.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/server/src/index.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/server/tsconfig.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/docs/phase-1-deliverables.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/package.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/packages/asset-manifest/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/packages/asset-manifest/generated/asset-manifest-report.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/packages/asset-manifest/generated/asset-manifest.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/packages/asset-manifest/generated/asset-manifest.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/packages/asset-manifest/package.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/packages/asset-manifest/scripts/generate-manifest.mjs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/packages/asset-manifest/src/index.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/packages/asset-manifest/tsconfig.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/packages/game-contracts/package.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/packages/game-contracts/src/index.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/packages/game-contracts/tsconfig.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/packages/poker-engine/fixtures/texas-holdem/hand-rank-fixtures.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/packages/poker-engine/fixtures/texas-holdem/showdown-fixtures.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/packages/poker-engine/package.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/packages/poker-engine/scripts/validate-fixtures.mjs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/packages/poker-engine/spec/texas-holdem-mvp-spec.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/packages/poker-engine/src/commands.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/packages/poker-engine/src/index.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/packages/poker-engine/src/state.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/packages/poker-engine/src/types.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/packages/poker-engine/tsconfig.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/tsconfig.base.json" afterDir="false" />
+    <list default="true" id="1eee6476-c5d8-4dc1-b068-da2be4a7c407" name="Default Changelist" comment="Introduce modern client scaffold with initial dependencies, configurations, and asset structure.">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/docs/phase-2-engine-progress.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/docs/phase-2-engine-progress.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/modern/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/packages/game-contracts/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/packages/game-contracts/src/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/packages/poker-engine/scripts/run-fixture-tests.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/modern/packages/poker-engine/scripts/run-fixture-tests.mjs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/packages/poker-engine/src/commands.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/packages/poker-engine/src/commands.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/packages/poker-engine/src/engine.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/packages/poker-engine/src/engine.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/packages/poker-engine/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/packages/poker-engine/src/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/packages/poker-engine/src/state.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/packages/poker-engine/src/state.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -213,6 +65,11 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitHubPullRequestSearchHistory"><![CDATA[{
@@ -313,6 +170,9 @@
       <path value="$PROJECT_DIR$/vendor/barryvdh/laravel-debugbar" />
     </include_path>
   </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="AISelfReview" />
+  </component>
   <component name="ProjectColorInfo"><![CDATA[{
   "associatedIndex": 7
 }]]></component>
@@ -327,11 +187,12 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "master",
+    "git-widget-placeholder": "feature/modernizing",
     "junie.onboarding.icon.badge.shown": "true",
     "last_opened_file_path": "/Users/colin/Projects/poker",
     "node.js.detected.package.eslint": "true",
@@ -342,6 +203,13 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RecapSpentCounter">
+    <option name="endsOfQuotaMs" value="1773266417423" />
+    <option name="spentUsd" value="0.0328978" />
+  </component>
+  <component name="RecapUselessUpdatesCounter">
+    <option name="suspendCountdown" value="7" />
+  </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
@@ -456,6 +324,23 @@
       <workItem from="1578331910838" duration="246000" />
       <workItem from="1578515312078" duration="235000" />
     </task>
+    <task id="LOCAL-00001" summary="Introduce modern client scaffold with initial dependencies, configurations, and asset structure.">
+      <option name="closed" value="true" />
+      <created>1772058894590</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1772058894590</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Introduce modern client scaffold with initial dependencies, configurations, and asset structure.">
+      <option name="closed" value="true" />
+      <created>1772059477595</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1772059477595</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -474,99 +359,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-  </component>
-  <component name="WindowStateProjectService">
-    <state x="-1570" y="316" key="#PHP" timestamp="1575997751162">
-      <screen x="-2560" y="23" width="2560" height="1417" />
-    </state>
-    <state x="-1570" y="316" key="#PHP/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575997751162" />
-    <state x="385" y="277" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1577990966765">
-      <screen x="0" y="23" width="1920" height="1177" />
-    </state>
-    <state x="385" y="277" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.23.1920.1177@0.23.1920.1177" timestamp="1577990966765" />
-    <state x="-1592" y="466" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1578331773312">
-      <screen x="-2560" y="23" width="2560" height="1417" />
-    </state>
-    <state x="-1592" y="466" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1578331773312" />
-    <state x="726" y="391" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.23.1920.1177@0.23.1920.1177" timestamp="1577911959224" />
-    <state x="-1553" y="403" key="#phpspec.yml" timestamp="1575997777019">
-      <screen x="-2560" y="23" width="2560" height="1417" />
-    </state>
-    <state x="-1553" y="403" key="#phpspec.yml/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575997777019" />
-    <state width="2518" height="501" key="GridCell.Tab.0.bottom" timestamp="1575999847734">
-      <screen x="-2560" y="23" width="2560" height="1417" />
-    </state>
-    <state width="2518" height="501" key="GridCell.Tab.0.bottom/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575999847734" />
-    <state width="2518" height="501" key="GridCell.Tab.0.center" timestamp="1575999847733">
-      <screen x="-2560" y="23" width="2560" height="1417" />
-    </state>
-    <state width="2518" height="501" key="GridCell.Tab.0.center/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575999847733" />
-    <state width="2518" height="501" key="GridCell.Tab.0.left" timestamp="1575999847733">
-      <screen x="-2560" y="23" width="2560" height="1417" />
-    </state>
-    <state width="2518" height="501" key="GridCell.Tab.0.left/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575999847733" />
-    <state width="2518" height="501" key="GridCell.Tab.0.right" timestamp="1575999847733">
-      <screen x="-2560" y="23" width="2560" height="1417" />
-    </state>
-    <state width="2518" height="501" key="GridCell.Tab.0.right/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575999847733" />
-    <state width="2518" height="501" key="GridCell.Tab.1.bottom" timestamp="1575999847735">
-      <screen x="-2560" y="23" width="2560" height="1417" />
-    </state>
-    <state width="2518" height="501" key="GridCell.Tab.1.bottom/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575999847735" />
-    <state width="2518" height="501" key="GridCell.Tab.1.center" timestamp="1575999847734">
-      <screen x="-2560" y="23" width="2560" height="1417" />
-    </state>
-    <state width="2518" height="501" key="GridCell.Tab.1.center/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575999847734" />
-    <state width="2518" height="501" key="GridCell.Tab.1.left" timestamp="1575999847734">
-      <screen x="-2560" y="23" width="2560" height="1417" />
-    </state>
-    <state width="2518" height="501" key="GridCell.Tab.1.left/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575999847734" />
-    <state width="2518" height="501" key="GridCell.Tab.1.right" timestamp="1575999847735">
-      <screen x="-2560" y="23" width="2560" height="1417" />
-    </state>
-    <state width="2518" height="501" key="GridCell.Tab.1.right/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575999847735" />
-    <state width="2518" height="501" key="GridCell.Tab.2.bottom" timestamp="1575999847736">
-      <screen x="-2560" y="23" width="2560" height="1417" />
-    </state>
-    <state width="2518" height="501" key="GridCell.Tab.2.bottom/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575999847736" />
-    <state width="2518" height="501" key="GridCell.Tab.2.center" timestamp="1575999847735">
-      <screen x="-2560" y="23" width="2560" height="1417" />
-    </state>
-    <state width="2518" height="501" key="GridCell.Tab.2.center/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575999847735" />
-    <state width="2518" height="501" key="GridCell.Tab.2.left" timestamp="1575999847735">
-      <screen x="-2560" y="23" width="2560" height="1417" />
-    </state>
-    <state width="2518" height="501" key="GridCell.Tab.2.left/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575999847735" />
-    <state width="2518" height="501" key="GridCell.Tab.2.right" timestamp="1575999847736">
-      <screen x="-2560" y="23" width="2560" height="1417" />
-    </state>
-    <state width="2518" height="501" key="GridCell.Tab.2.right/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575999847736" />
-    <state x="-1734" y="370" key="SettingsEditor" timestamp="1575998462662">
-      <screen x="-2560" y="23" width="2560" height="1417" />
-    </state>
-    <state x="-1734" y="370" key="SettingsEditor/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575998462662" />
-    <state x="-1270" y="620" width="390" height="268" key="XPathView.InputDialog.DIMENSION_SERVICE_KEY.SIMPLE" timestamp="1575998331608">
-      <screen x="-2560" y="23" width="2560" height="1417" />
-    </state>
-    <state x="-1270" y="620" width="390" height="268" key="XPathView.InputDialog.DIMENSION_SERVICE_KEY.SIMPLE/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575998331608" />
-    <state x="-1417" y="501" key="com.intellij.database.view.ui.DbObjectDialog" timestamp="1575914771646">
-      <screen x="-2560" y="23" width="2560" height="1417" />
-    </state>
-    <state x="-1417" y="501" key="com.intellij.database.view.ui.DbObjectDialog/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1575914771646" />
-    <state x="-1603" y="564" key="com.intellij.ide.util.TipDialog" timestamp="1578515345423">
-      <screen x="-2560" y="23" width="2560" height="1417" />
-    </state>
-    <state x="-1603" y="564" key="com.intellij.ide.util.TipDialog/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1578515345423" />
-    <state x="718" y="472" key="com.intellij.ide.util.TipDialog/0.23.1920.1177@0.23.1920.1177" timestamp="1577918764660" />
-    <state x="646" y="252" key="refactoring.ChangeSignatureDialog" timestamp="1577990951422">
-      <screen x="0" y="23" width="1920" height="1177" />
-    </state>
-    <state x="646" y="252" key="refactoring.ChangeSignatureDialog/0.23.1920.1177@0.23.1920.1177" timestamp="1577990951422" />
-    <state x="709" y="293" width="670" height="562" key="search.everywhere.popup" timestamp="1577990957697">
-      <screen x="0" y="23" width="1920" height="1177" />
-    </state>
-    <state x="-1615" y="348" width="670" height="676" key="search.everywhere.popup/-2560.23.2560.1417/0.23.2560.1417@-2560.23.2560.1417" timestamp="1576168255727" />
-    <state x="709" y="293" width="670" height="562" key="search.everywhere.popup/0.23.1920.1177@0.23.1920.1177" timestamp="1577990957697" />
+    <MESSAGE value="Introduce modern client scaffold with initial dependencies, configurations, and asset structure." />
+    <option name="LAST_COMMIT_MESSAGE" value="Introduce modern client scaffold with initial dependencies, configurations, and asset structure." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

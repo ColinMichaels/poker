@@ -3,6 +3,7 @@ export type PlayerId = string;
 
 export type TablePhase =
   | 'LOBBY'
+  | 'SEATED'
   | 'BLINDS_POSTED'
   | 'DEAL_HOLE'
   | 'BETTING_PRE_FLOP'
@@ -30,4 +31,34 @@ export interface DomainEvent<TEvent extends string, TPayload> {
   payload: TPayload;
   sequence: number;
   createdAt: string;
+}
+
+export type PokerAction = 'FOLD' | 'CHECK' | 'CALL' | 'BET' | 'RAISE' | 'ALL_IN';
+export type ActionAmountSemantics = 'NO_AMOUNT' | 'TARGET_BET' | 'ALL_IN';
+
+export interface ActionOptionDTO {
+  action: PokerAction;
+  allowed: boolean;
+  amountSemantics: ActionAmountSemantics;
+  minAmount: number | null;
+  maxAmount: number | null;
+}
+
+export interface SeatActionStateDTO {
+  seatId: number;
+  isActingSeat: boolean;
+  folded: boolean;
+  allIn: boolean;
+  stack: number;
+  currentBet: number;
+  toCall: number;
+  canRaise: boolean;
+  actions: ActionOptionDTO[];
+}
+
+export interface TableActionStateDTO {
+  handId: string;
+  phase: TablePhase;
+  actingSeatId: number;
+  seats: SeatActionStateDTO[];
 }
