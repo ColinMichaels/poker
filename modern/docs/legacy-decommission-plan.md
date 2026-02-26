@@ -252,6 +252,14 @@ These are not extraction failures, but they are blockers to deleting the legacy 
   - legacy wallet routes enabled in production
 - Added startup-config `isProduction` signal for explicit runtime-mode handling.
 
+## Completed in PR AD
+
+- Added cutover readiness command at repository root:
+  - `npm run readiness:legacy-cutover`
+- Added script:
+  - `scripts/check-legacy-cutover-readiness.mjs`
+- Linked readiness command from root and legacy-removal execution docs.
+
 ## Known Intentional Asset Exceptions
 
 - Non-canonical card extras remain excluded from canonical face set:
@@ -333,6 +341,7 @@ Exit criteria:
 27. PR AA: Repository-level npm engine enforcement.
 28. PR AB: Modern CI trigger coverage for `.npmrc` changes.
 29. PR AC: Production compatibility-override startup warnings.
+30. PR AD: Legacy cutover readiness command.
 
 ## Cutover Go/No-Go Checklist
 

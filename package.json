@@ -10,6 +10,7 @@
     "dev:server": "npm run dev:server --prefix modern",
     "ci": "npm run doctor && npm run ci --prefix modern",
     "doctor": "node ./scripts/doctor-modern-env.mjs",
+    "readiness:legacy-cutover": "node ./scripts/check-legacy-cutover-readiness.mjs",
     "typecheck": "npm run typecheck --prefix modern",
     "build": "npm run build --prefix modern",
     "test": "npm run test:engine --prefix modern && npm run test:server --prefix modern",

@@ -580,3 +580,17 @@ Sources:
 - `apps/server/src/startup-config.ts`
 - `apps/server/src/startup-config.test.ts`
 - `apps/server/src/index.ts`
+
+## PR AD Progress: Legacy Cutover Readiness Command
+
+- Added root readiness command:
+  - `npm run readiness:legacy-cutover`
+- Command validates key legacy-removal prerequisites and runs:
+  - `npm run check:legacy-refs --prefix modern`
+  - `npm run check:server-env-template --prefix modern`
+
+Sources:
+
+- `scripts/check-legacy-cutover-readiness.mjs`
+- `package.json`
+- `docs/legacy-removal-execution.md`

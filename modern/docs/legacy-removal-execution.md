@@ -13,6 +13,10 @@ Before removing `legacy/`, all items below must be true:
 5. No open approved emergency PRs labeled `allow-legacy-change`.
 6. Rollback owner and archive location are explicitly assigned.
 
+Quick helper:
+
+- From repository root, run `npm run readiness:legacy-cutover` for baseline static checks before opening the removal PR.
+
 ## Pre-Removal Snapshot
 
 1. Create a signed tag for the final state that still contains `legacy/`.
