@@ -179,20 +179,14 @@ let selectedGuideId = HOW_TO_GUIDES[0]?.id ?? '';
 let selectedLobbyTableId = LOBBY_TABLES[0]?.id ?? '';
 let selectedLobbySeatId = 1;
 let previousPlaySnapshot: PlaySnapshot | null = null;
-let mobileActionDockExpanded = false;
 let lastRenderedModel: TableViewModel | null = null;
-let lastRenderedView: 'lobby' | 'play' | 'howto' | 'multitable' | null = null;
 let resizeRenderQueued = false;
 let draftTargetBetAmount: number | null = null;
 let lastProcessedEventLogId: number | null = null;
 let hasCompletedInitialRender = false;
 const howToCardFaceUpOverrides = new Map<string, boolean>();
-const MOBILE_DOCK_SWIPE_DISTANCE = 46;
-const MOBILE_DOCK_SWIPE_DISTANCE_FAST = 20;
-const MOBILE_DOCK_FAST_GESTURE_MS = 220;
 const BOARD_DEAL_STAGGER_MS = 70;
 const CHIP_FLOW_STAGGER_MS = 90;
-const DESKTOP_DOCK_MEDIA_QUERY = '(min-width: 720px)';
 const MULTI_ACTION_CONFIRM_MS = 440;
 const MULTI_TABLE_USER_SEAT_ID = 1;
 const MULTI_TABLE_AUTO_NEXT_HAND_DELAY_MS = 850;
@@ -399,17 +393,6 @@ function render(container: HTMLElement, model: TableViewModel): void {
     draftTargetBetAmount = null;
   }
   const targetBetInputAmount = resolveTargetBetInputAmount(amountOption, defaultAmount);
-  const enteringPlayView = activeView === 'play' && lastRenderedView !== 'play';
-  lastRenderedView = activeView;
-  const isDesktopViewport = isDesktopDockViewport();
-  if (
-    !isDesktopViewport &&
-    isUserTurn &&
-    (transitionState.userTurnChanged || transitionState.handAdvanced || enteringPlayView)
-  ) {
-    mobileActionDockExpanded = true;
-  }
-  const dockExpanded = isDesktopViewport || mobileActionDockExpanded;
   if (activeView === 'multitable') {
     normalizeMultiTableActionSelection();
     setMultiTableBetAmount(multiTableState.targetBetAmount);
@@ -423,6 +406,8 @@ function render(container: HTMLElement, model: TableViewModel): void {
         : activeView === 'multitable'
           ? 'Multi-Table'
           : 'Rules';
+  const isPlayView = activeView === 'play';
+  const topbarClasses = ['app-topbar', isPlayView ? 'is-play-focus' : ''].filter((value) => value.length > 0).join(' ');
 
   const shellClasses = ['table-shell', motionClasses.shellClass].filter((value) => value.length > 0);
   if (!hasCompletedInitialRender) {
@@ -431,22 +416,30 @@ function render(container: HTMLElement, model: TableViewModel): void {
 
   container.innerHTML = [
     `  <div class="${shellClasses.join(' ')}">`,
-    '  <header class="app-topbar">',
+    `  <header class="${topbarClasses}">`,
     '    <div class="app-topbar-brand">',
     '      <p class="app-badge">Poker App</p>',
     `      <p class="app-status">${escapeHtml(topbarStatus)}</p>`,
     '    </div>',
     '    <nav class="app-topbar-nav" aria-label="Primary views">',
-    `      <button class="${activeView === 'lobby' ? 'view-tab is-active' : 'view-tab'}" data-role="view-lobby" aria-pressed="${activeView === 'lobby' ? 'true' : 'false'}">Lobby</button>`,
-    `      <button class="${activeView === 'play' ? 'view-tab is-active' : 'view-tab'}" data-role="view-play" aria-pressed="${activeView === 'play' ? 'true' : 'false'}">Table</button>`,
-    `      <button class="${activeView === 'multitable' ? 'view-tab is-active' : 'view-tab'}" data-role="view-multitable" aria-pressed="${activeView === 'multitable' ? 'true' : 'false'}">Multi Table</button>`,
-    `      <button class="${activeView === 'howto' ? 'view-tab is-active' : 'view-tab'}" data-role="view-howto" aria-pressed="${activeView === 'howto' ? 'true' : 'false'}">Rules</button>`,
+    ...(isPlayView
+      ? [
+          '      <button class="view-tab" data-role="view-lobby" aria-pressed="false">Lobby</button>',
+          '      <span class="view-pill is-active" aria-current="page">Table</span>',
+          '      <button class="view-tab" data-role="view-multitable" aria-pressed="false">Multi</button>',
+        ]
+      : [
+          `      <button class="${activeView === 'lobby' ? 'view-tab is-active' : 'view-tab'}" data-role="view-lobby" aria-pressed="${activeView === 'lobby' ? 'true' : 'false'}">Lobby</button>`,
+          `      <button class="${activeView === 'play' ? 'view-tab is-active' : 'view-tab'}" data-role="view-play" aria-pressed="${activeView === 'play' ? 'true' : 'false'}">Table</button>`,
+          `      <button class="${activeView === 'multitable' ? 'view-tab is-active' : 'view-tab'}" data-role="view-multitable" aria-pressed="${activeView === 'multitable' ? 'true' : 'false'}">Multi Table</button>`,
+          `      <button class="${activeView === 'howto' ? 'view-tab is-active' : 'view-tab'}" data-role="view-howto" aria-pressed="${activeView === 'howto' ? 'true' : 'false'}">Rules</button>`,
+        ]),
     '    </nav>',
     '  </header>',
     activeView === 'play'
       ? renderPlayView(
           model,
-          allowedActions,
+          userSeatAction?.actions ?? [],
           isUserTurn,
           amountOption,
           targetBetInputAmount,
@@ -455,8 +448,6 @@ function render(container: HTMLElement, model: TableViewModel): void {
           boardDealPlan,
           chipFlowPlan,
           motionClasses,
-          isDesktopViewport,
-          dockExpanded,
         )
       : activeView === 'lobby'
         ? renderLobbyView(model)
@@ -636,67 +627,6 @@ function render(container: HTMLElement, model: TableViewModel): void {
   }
 
   if (activeView === 'play') {
-    const dockToggleButton = container.querySelector<HTMLButtonElement>('[data-role="dock-toggle"]');
-    let suppressDockToggleClick = false;
-
-    dockToggleButton?.addEventListener('click', () => {
-      if (suppressDockToggleClick) {
-        suppressDockToggleClick = false;
-        return;
-      }
-
-      mobileActionDockExpanded = !mobileActionDockExpanded;
-      render(container, model);
-    });
-    if (dockToggleButton && !isDesktopViewport) {
-      let touchStartY: number | null = null;
-      let touchStartAtMs = 0;
-
-      dockToggleButton.addEventListener(
-        'touchstart',
-        (event) => {
-          if (event.touches.length !== 1) {
-            return;
-          }
-
-          touchStartY = event.touches[0].clientY;
-          touchStartAtMs = Date.now();
-        },
-        { passive: true },
-      );
-
-      dockToggleButton.addEventListener(
-        'touchend',
-        (event) => {
-          if (touchStartY === null || event.changedTouches.length !== 1) {
-            touchStartY = null;
-            return;
-          }
-
-          const deltaY = event.changedTouches[0].clientY - touchStartY;
-          const durationMs = Date.now() - touchStartAtMs;
-          touchStartY = null;
-
-          const didSwipe = applyMobileDockSwipe(deltaY, durationMs);
-          if (!didSwipe) {
-            return;
-          }
-
-          suppressDockToggleClick = true;
-          render(container, model);
-        },
-        { passive: true },
-      );
-
-      dockToggleButton.addEventListener(
-        'touchcancel',
-        () => {
-          touchStartY = null;
-        },
-        { passive: true },
-      );
-    }
-
     const nextHandButton = container.querySelector<HTMLButtonElement>('[data-role="next-hand"]');
     nextHandButton?.addEventListener('click', () => {
       controller?.startNextHand();
@@ -788,7 +718,7 @@ function metricPill(label: string, value: string): string {
 
 function renderPlayView(
   model: TableViewModel,
-  allowedActions: readonly ActionOptionDTO[],
+  actionOptions: readonly ActionOptionDTO[],
   isUserTurn: boolean,
   amountOption: ActionOptionDTO | null,
   targetBetInputAmount: number,
@@ -797,10 +727,7 @@ function renderPlayView(
   boardDealPlan: BoardDealAnimationPlan,
   chipFlowPlan: ChipFlowAnimationPlan,
   motionClasses: MotionClassSet,
-  isDesktopViewport: boolean,
-  dockExpanded: boolean,
 ): string {
-  const dockContentId = 'action-dock-content';
   const quickAmounts = buildQuickAmountPresets(amountOption, targetBetInputAmount, model.state.pot);
   const actingSeatLabel = model.state.actingSeatId > 0 ? `Seat ${model.state.actingSeatId}` : 'No active seat';
   const userWinChance = getSeatWinOdds(winOddsSnapshot, model.userSeatId)?.percentage ?? 0;
@@ -824,20 +751,10 @@ function renderPlayView(
   const controlsPanelClasses = [
     'controls-panel',
     isUserTurn ? 'is-live' : 'is-waiting',
-    isDesktopViewport ? 'is-desktop-dock' : 'is-mobile-dock',
-    dockExpanded ? 'is-dock-open' : 'is-dock-collapsed',
     motionClasses.playControlsClass,
   ]
     .filter((value) => value.length > 0)
     .join(' ');
-  const dockToggleClasses = ['dock-toggle', dockExpanded ? 'is-open' : '']
-    .filter((value) => value.length > 0)
-    .join(' ');
-  const dockSummary = isUserTurn
-    ? `Your turn • ${allowedActions.length} actions`
-    : dockExpanded
-      ? `Waiting • ${allowedActions.length} actions ready`
-      : 'Swipe up for actions';
   const boardClasses = ['board-cards'];
   if (motionClasses.playBoardClass.length > 0) {
     boardClasses.push(motionClasses.playBoardClass);
@@ -848,14 +765,14 @@ function renderPlayView(
 
   return [
     `  <section class="${metricsClass}">`,
-    metricPill('Hand', `#${model.handNumber} (${model.state.handId})`),
+    metricPill('Hand', `#${model.handNumber}`),
     metricPill('Phase', formatPhaseLabel(model.state.phase)),
     metricPill('Pot', chips(model.state.pot)),
     metricPill('Your Win %', formatWinPercentage(userWinChance)),
     '  </section>',
     `  ${renderHandOutcomeBanner(model, winOddsSnapshot)}`,
     '  <div class="play-layout">',
-    '    <div class="play-main">',
+    '    <section class="play-main">',
     '      <section class="table-stage">',
     `        <article class="${feltClasses.join(' ')}">`,
     `          <p class="${transitionState.phaseChanged ? 'phase-pill is-phase-shift' : 'phase-pill'}">${escapeHtml(formatPhaseLabel(model.state.phase))}</p>`,
@@ -865,36 +782,29 @@ function renderPlayView(
     `          <div class="seat-radar">${renderSeatRadar(model, transitionState)}</div>`,
     `          ${renderChipFlowLayer(chipFlowPlan)}`,
     `          <div class="${boardClasses.join(' ')}">${renderBoardCards(model, transitionState, boardDealPlan)}</div>`,
-    '          <p class="stage-note">Community board</p>',
     '        </article>',
     `        <aside class="${turnPanelClasses}">`,
-    '          <h2>Hand Flow</h2>',
-    `          <p>${escapeHtml(isUserTurn ? 'Your seat is live. Pick a legal action in the dock.' : 'Waiting for another seat to act.')}</p>`,
+    '          <h2>Table State</h2>',
     '          <div class="turn-grid">',
     `            <p><span>Acting</span><strong>${escapeHtml(actingSeatLabel)}</strong></p>`,
-    `            <p><span>Button</span><strong>Seat ${model.state.buttonSeatId}</strong></p>`,
     `            <p><span>Blinds</span><strong>SB ${model.state.smallBlindSeatId} / BB ${model.state.bigBlindSeatId}</strong></p>`,
     '          </div>',
     `          ${renderWinOddsPanel(model, winOddsSnapshot)}`,
     '        </aside>',
     '      </section>',
-    `      ${renderPlayerHud(model, allowedActions, isUserTurn, transitionState, winOddsSnapshot)}`,
-    `      <section class="seats-grid">${renderSeats(model, transitionState, winOddsSnapshot)}</section>`,
-    '    </div>',
-    '    <aside class="play-side">',
+    '    </section>',
+    '    <section class="play-bottom">',
+    '      <div class="play-players">',
+    `        ${renderPlayerHud(model, isUserTurn, transitionState, winOddsSnapshot)}`,
+    `        <section class="seats-grid">${renderSeats(model, transitionState, winOddsSnapshot)}</section>`,
+    '      </div>',
     `      <section class="${controlsPanelClasses}">`,
-    `        <button class="${dockToggleClasses}" type="button" data-role="dock-toggle" aria-controls="${dockContentId}" aria-expanded="${dockExpanded ? 'true' : 'false'}">`,
-    '          <span class="dock-grip" aria-hidden="true"></span>',
-    `          <span class="dock-summary">${escapeHtml(dockSummary)}</span>`,
-    `          <span class="dock-chevron">${dockExpanded ? 'Hide' : 'Swipe'}</span>`,
-    '        </button>',
-    `        <div id="${dockContentId}" class="${dockExpanded ? 'dock-content is-open' : 'dock-content'}">`,
+    '        <div class="controls-body">',
     '        <div class="controls-head">',
     '          <div class="controls-head-row">',
-    '            <h2>Action Dock</h2>',
+    '            <h2>Actions</h2>',
     `            <button class="cta cta-compact" data-role="next-hand">${model.state.phase === 'HAND_COMPLETE' ? 'Deal Next Hand' : 'Reset Hand'}</button>`,
     '          </div>',
-    `          <p>${escapeHtml(isUserTurn ? 'Tap an action to keep the hand moving.' : 'The dock updates as soon as it is your turn.')}</p>`,
     '        </div>',
     amountOption
       ? [
@@ -905,11 +815,11 @@ function renderPlayView(
           '        </div>',
         ].join('\n')
       : '',
-    `        <div class="actions-row">${renderActionButtons(allowedActions, isUserTurn)}</div>`,
+    `        <div class="actions-row">${renderActionButtons(actionOptions, isUserTurn)}</div>`,
     `        ${renderPayouts(model)}`,
     '        </div>',
     '      </section>',
-    '    </aside>',
+    '    </section>',
     '  </div>',
   ].join('\n');
 }
@@ -1165,7 +1075,6 @@ function renderMultiTableView(motionClasses: MotionClassSet, chipFlowPlan: ChipF
 
 function renderPlayerHud(
   model: TableViewModel,
-  allowedActions: readonly ActionOptionDTO[],
   isUserTurn: boolean,
   transitionState: PlayTransitionState,
   winOddsSnapshot: WinOddsSnapshot,
@@ -1181,9 +1090,6 @@ function renderPlayerHud(
   const cards = userSeat.holeCards.length > 0
     ? userSeat.holeCards.map((card) => renderCard(card.code, false)).join('')
     : `${renderCard(null, true)}${renderCard(null, true)}`;
-  const legalActions = allowedActions.length > 0
-    ? allowedActions.map((option) => formatActionLabel(option.action)).join(' · ')
-    : 'None';
   const userWinOdds = getSeatWinOdds(winOddsSnapshot, model.userSeatId);
   const userWinLabel = userWinOdds?.isContender ? formatWinPercentage(userWinOdds.percentage) : '--';
   const playerHudClasses = [
@@ -1213,7 +1119,6 @@ function renderPlayerHud(
     `          <p><span>Win %</span><strong>${escapeHtml(userWinLabel)}</strong></p>`,
     '        </div>',
     userWinOdds?.handLabel ? `        <p class="player-hud-actions"><span>Best Hand:</span> ${escapeHtml(userWinOdds.handLabel)}</p>` : '',
-    `        <p class="player-hud-actions"><span>Legal:</span> ${escapeHtml(legalActions)}</p>`,
     '      </section>',
   ].join('\n');
 }
@@ -1602,21 +1507,29 @@ function renderActionButtons(options: readonly ActionOptionDTO[], isUserTurn: bo
   const buttons: string[] = [];
 
   for (const action of order) {
-    const option = allowedByAction.get(action);
-    if (!option || !option.allowed) {
-      continue;
-    }
+    const fallbackSemantics =
+      action === 'ALL_IN' ? 'ALL_IN' : action === 'BET' || action === 'RAISE' ? 'TARGET_BET' : 'NO_AMOUNT';
+    const option =
+      allowedByAction.get(action) ??
+      ({
+        action,
+        allowed: false,
+        amountSemantics: fallbackSemantics,
+        minAmount: null,
+        maxAmount: null,
+      } satisfies ActionOptionDTO);
 
     const bettingRange =
-      option.amountSemantics === 'TARGET_BET'
+      option.allowed && option.amountSemantics === 'TARGET_BET'
         ? `${option.minAmount ?? 0}-${option.maxAmount ?? option.minAmount ?? 0}`
         : '';
-    const buttonLabel = formatActionButtonLabel(action, option);
+    const buttonLabel = option.allowed ? formatActionButtonLabel(action, option) : formatActionLabel(action);
     const actionAriaLabel = bettingRange.length > 0 ? `${buttonLabel} (${bettingRange})` : buttonLabel;
+    const buttonDisabled = !isUserTurn || !option.allowed;
 
     buttons.push(
       [
-        `<button class="action-btn action-${actionTone(action)}" data-action="${action}" aria-label="${escapeHtml(actionAriaLabel)}" ${isUserTurn ? '' : 'disabled'}>`,
+        `<button class="action-btn action-${actionTone(action)}" data-action="${action}" aria-label="${escapeHtml(actionAriaLabel)}" ${buttonDisabled ? 'disabled' : ''}>`,
         `  <span>${buttonLabel}</span>`,
         bettingRange.length > 0 ? `  <small>${bettingRange}</small>` : '',
         '</button>',
@@ -2611,31 +2524,6 @@ function buildPlayTransitionState(model: TableViewModel, isUserTurn: boolean): P
 
 function countBoardCards(model: TableViewModel): number {
   return model.state.board.reduce((count, card) => (card ? count + 1 : count), 0);
-}
-
-function isDesktopDockViewport(): boolean {
-  return window.matchMedia(DESKTOP_DOCK_MEDIA_QUERY).matches;
-}
-
-function applyMobileDockSwipe(deltaY: number, durationMs: number): boolean {
-  const isFastGesture = durationMs <= MOBILE_DOCK_FAST_GESTURE_MS;
-  const threshold = isFastGesture ? MOBILE_DOCK_SWIPE_DISTANCE_FAST : MOBILE_DOCK_SWIPE_DISTANCE;
-
-  if (Math.abs(deltaY) < threshold) {
-    return false;
-  }
-
-  if (deltaY < 0 && !mobileActionDockExpanded) {
-    mobileActionDockExpanded = true;
-    return true;
-  }
-
-  if (deltaY > 0 && mobileActionDockExpanded) {
-    mobileActionDockExpanded = false;
-    return true;
-  }
-
-  return false;
 }
 
 function buildSeatBadges(model: TableViewModel, seatId: number): string {

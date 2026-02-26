@@ -90,6 +90,23 @@ body {
   gap: 0.1rem;
 }
 
+.app-topbar.is-play-focus {
+  gap: 0.45rem;
+  padding-bottom: 0.38rem;
+}
+
+.app-topbar.is-play-focus .app-topbar-brand {
+  gap: 0;
+}
+
+.app-topbar.is-play-focus .app-badge {
+  font-size: 0.86rem;
+}
+
+.app-topbar.is-play-focus .app-status {
+  display: none;
+}
+
 .app-badge {
   color: #25536a;
   font-family: var(--display);
@@ -125,6 +142,10 @@ body {
   justify-content: flex-end;
 }
 
+.app-topbar.is-play-focus .app-topbar-nav {
+  gap: 0.28rem;
+}
+
 .view-tab,
 .cta,
 .howto-tab,
@@ -157,6 +178,26 @@ body {
   background: #1f4c5b;
   border-color: #1f4c5b;
   color: #fff;
+}
+
+.app-topbar.is-play-focus .view-tab {
+  font-size: 0.7rem;
+  min-height: 34px;
+  padding: 0.32rem 0.68rem;
+}
+
+.view-pill {
+  background: #1f4c5b;
+  border: 1px solid #1f4c5b;
+  border-radius: 999px;
+  color: #fff;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.02em;
+  min-height: 34px;
+  padding: 0.32rem 0.68rem;
+  display: inline-flex;
+  align-items: center;
 }
 
 .cta {
@@ -383,11 +424,28 @@ body {
   gap: 0.72rem;
 }
 
-.play-layout,
-.play-main,
-.play-side {
+.play-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 0.72rem;
+  min-height: clamp(560px, 74dvh, 920px);
+}
+
+.play-main {
   display: grid;
   gap: 0.72rem;
+}
+
+/* Keep players and controls in a dedicated lower rail so the center stays focused on table + stats. */
+.play-bottom {
+  display: grid;
+  gap: 0.72rem;
+  margin-top: auto;
+}
+
+.play-players {
+  display: grid;
+  gap: 0.65rem;
 }
 
 .felt-table {
@@ -942,6 +1000,7 @@ body {
 .seats-grid {
   display: grid;
   gap: 0.65rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .seat-card {
@@ -1135,14 +1194,10 @@ body {
   backdrop-filter: blur(2px);
   bottom: calc(0.45rem + env(safe-area-inset-bottom));
   box-shadow: 0 12px 28px rgb(0 0 0 / 16%);
+  padding: 0.44rem 0.55rem calc(0.55rem + env(safe-area-inset-bottom));
   position: sticky;
   transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
   z-index: 5;
-}
-
-.controls-panel.is-mobile-dock {
-  border-radius: 18px;
-  padding: 0.44rem 0.55rem calc(0.55rem + env(safe-area-inset-bottom));
 }
 
 .controls-panel.is-live {
@@ -1162,89 +1217,9 @@ body {
   border-color: #dfb983;
 }
 
-.dock-toggle {
-  align-items: center;
-  background: transparent;
-  border: 0;
-  border-radius: 12px;
-  color: var(--ink);
-  cursor: pointer;
-  display: grid;
-  gap: 0.15rem;
-  grid-template-columns: auto 1fr auto;
-  margin: 0;
-  padding: 0.2rem 0.24rem 0.22rem;
-  text-align: left;
-  touch-action: pan-y;
-  user-select: none;
-  width: 100%;
-}
-
-.dock-toggle:focus-visible {
-  background: rgb(207 122 38 / 7%);
-  outline: 0;
-}
-
-.dock-grip {
-  background: #d4b68f;
-  border-radius: 999px;
-  display: block;
-  height: 4px;
-  margin-right: 0.35rem;
-  width: 30px;
-}
-
-.dock-summary {
-  font-family: var(--mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.dock-chevron {
-  color: var(--muted);
-  font-family: var(--mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-}
-
-.dock-content {
+.controls-body {
   display: grid;
   gap: 0.1rem;
-  max-height: 0;
-  opacity: 0;
-  overflow: hidden;
-  pointer-events: none;
-  transform: translateY(5px);
-  transition: max-height 240ms ease, opacity 160ms ease, transform 180ms ease;
-}
-
-.dock-content.is-open {
-  max-height: 720px;
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateY(0);
-}
-
-.controls-panel.is-mobile-dock.is-dock-collapsed .dock-toggle {
-  animation: dock-toggle-pulse 260ms ease-out;
-}
-
-.controls-panel.is-mobile-dock.is-dock-collapsed .dock-grip {
-  animation: dock-grip-nudge 1.2s ease-in-out infinite;
-}
-
-.controls-panel.is-desktop-dock .dock-toggle {
-  display: none;
-}
-
-.controls-panel.is-desktop-dock .dock-content {
-  max-height: none;
-  opacity: 1;
-  overflow: visible;
-  pointer-events: auto;
-  transform: none;
 }
 
 .controls-head {
@@ -2377,27 +2352,6 @@ body {
   }
 }
 
-@keyframes dock-toggle-pulse {
-  from {
-    background: rgb(207 122 38 / 15%);
-  }
-  to {
-    background: transparent;
-  }
-}
-
-@keyframes dock-grip-nudge {
-  0% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-2px);
-  }
-  100% {
-    transform: translateY(0);
-  }
-}
-
 @keyframes pending-turn-pulse {
   from {
     box-shadow: 0 0 0 0 rgb(225 177 98 / 0%);
@@ -2474,8 +2428,13 @@ body {
   }
 
   .play-main,
-  .play-side {
+  .play-bottom {
     gap: 0.85rem;
+  }
+
+  .play-players {
+    align-items: start;
+    grid-template-columns: minmax(220px, 0.9fr) minmax(0, 1.5fr);
   }
 
   .felt-table {
@@ -2515,12 +2474,6 @@ body {
 
   .seats-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .controls-panel {
-    bottom: auto;
-    box-shadow: none;
-    position: static;
   }
 
   .actions-row {
@@ -2586,9 +2539,8 @@ body {
   }
 
   .play-layout {
-    align-items: start;
     gap: 0.95rem;
-    grid-template-columns: minmax(0, 1.55fr) minmax(320px, 1fr);
+    min-height: clamp(640px, 78dvh, 1040px);
   }
 
   .lobby-shell {
@@ -2599,10 +2551,9 @@ body {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .play-side {
+  .play-players {
     gap: 0.85rem;
-    position: sticky;
-    top: 0.8rem;
+    grid-template-columns: minmax(260px, 0.95fr) minmax(0, 1.7fr);
   }
 
   .table-stage {
