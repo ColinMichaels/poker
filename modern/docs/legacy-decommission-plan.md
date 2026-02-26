@@ -628,6 +628,53 @@ These are not extraction failures, but they are blockers to deleting the legacy 
 - Added explicit test-only listen guard:
   - `POKER_SERVER_NO_LISTEN=1` disables HTTP listen during direct handler tests.
 
+## Completed in PR BO
+
+- Added external provider integration mode for auth-proxy deployments:
+  - `POKER_EXTERNAL_AUTH_MODE=trusted_headers`
+  - validates trusted proxy secret and `x-external-auth-*` identity headers
+- Kept signed-assertion mode as default while adding explicit mode selection:
+  - `signed_assertion` (existing)
+  - `trusted_headers` (new)
+- Added startup/env guardrails for trusted-header mode:
+  - `POKER_EXTERNAL_AUTH_PROXY_SHARED_SECRET` requirement and minimum-length validation
+- Extended runtime diagnostics:
+  - `/health` now includes `runtime.externalAuthMode`
+- Added regression coverage for trusted-header mode success + invalid proxy-secret paths.
+
+## Completed in PR BP
+
+- Added Firebase-native external auth mode with decoupled verification module:
+  - `POKER_EXTERNAL_AUTH_MODE=firebase_id_token`
+  - standalone Firebase ID token verifier (`firebase-id-token.ts`)
+- Added Firebase verification config controls:
+  - `POKER_EXTERNAL_AUTH_FIREBASE_PROJECT_ID`
+  - `POKER_EXTERNAL_AUTH_FIREBASE_AUDIENCE`
+  - `POKER_EXTERNAL_AUTH_FIREBASE_ISSUER`
+  - `POKER_EXTERNAL_AUTH_FIREBASE_CERTS_URL`
+- Wired `/api/auth/external/login` for Firebase bearer token flow while preserving existing modes:
+  - signed assertions
+  - trusted headers
+  - Firebase ID token
+- Kept provider wiring uncoupled by injecting verifier function into route runtime context for testability/future replacement.
+- Added regression tests for Firebase verifier and route-level Firebase mode login flow.
+- Added Firebase Hosting starter config template for modern SPA + `/api/**` backend rewrite:
+  - `modern/firebase.hosting.example.json`
+  - `modern/firebase.json`
+  - `modern/.firebaserc.example`
+
+## Completed in PR BQ
+
+- Added pluggable Firebase verifier selection with stable runtime interface:
+  - `POKER_EXTERNAL_AUTH_FIREBASE_VERIFIER=jwt|admin_sdk`
+- Added Firebase Admin SDK adapter module for ID token verification (optional runtime path):
+  - dynamic SDK loading to avoid hard coupling in route layer
+  - optional service-account file support
+- Added startup/env validation for Admin SDK path:
+  - `POKER_EXTERNAL_AUTH_FIREBASE_SERVICE_ACCOUNT_FILE`
+- Kept `/api/auth/external/login` provider-agnostic by injecting verifier implementation through runtime context.
+- Added regression coverage for Admin SDK adapter, verifier-factory selection, and startup config verifier/credential validation.
+
 ## Known Intentional Asset Exceptions
 
 - Non-canonical card extras remain excluded from canonical face set:
@@ -746,6 +793,9 @@ Exit criteria:
 64. PR BL: External identity signed-assertion login integration.
 65. PR BM: External auth secret-rotation verification hardening.
 66. PR BN: Route-level external auth + health runtime diagnostics regression tests.
+67. PR BO: Trusted-header external provider integration mode.
+68. PR BP: Firebase ID token provider mode wiring.
+69. PR BQ: Firebase Admin SDK adapter behind pluggable verifier interface.
 
 ## Cutover Go/No-Go Checklist
 

@@ -6,7 +6,17 @@ const DEFAULT_HOST = '127.0.0.1';
 const DEFAULT_PORT = 8787;
 const DEFAULT_TABLE_ID = 'table-1';
 const DEFAULT_EXTERNAL_AUTH_ISSUER = 'external-idp';
+const DEFAULT_EXTERNAL_AUTH_MODE = 'signed_assertion';
+const DEFAULT_FIREBASE_CERTS_URL =
+  'https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com';
+const DEFAULT_FIREBASE_VERIFIER = 'jwt';
 const ALLOWED_USER_ROLES: readonly UserRole[] = ['PLAYER', 'OPERATOR', 'ADMIN'];
+const ALLOWED_EXTERNAL_AUTH_MODES: readonly ExternalAuthMode[] = [
+  'signed_assertion',
+  'trusted_headers',
+  'firebase_id_token',
+];
+const ALLOWED_FIREBASE_VERIFIERS: readonly FirebaseVerifierMode[] = ['jwt', 'admin_sdk'];
 
 function parsePort(rawValue: string | undefined): number {
   if (!rawValue) {
@@ -88,6 +98,35 @@ function parseExternalAuthEnabled(rawValue: string | undefined): boolean {
   }
 
   return parseBooleanEnv(rawValue, 'POKER_EXTERNAL_AUTH_ENABLED');
+}
+
+export type ExternalAuthMode = 'signed_assertion' | 'trusted_headers' | 'firebase_id_token';
+export type FirebaseVerifierMode = 'jwt' | 'admin_sdk';
+
+function parseExternalAuthMode(rawValue: string | undefined): ExternalAuthMode {
+  if (rawValue === undefined) {
+    return DEFAULT_EXTERNAL_AUTH_MODE;
+  }
+
+  const normalized = rawValue.trim().toLowerCase().replace(/-/g, '_');
+  if (ALLOWED_EXTERNAL_AUTH_MODES.includes(normalized as ExternalAuthMode)) {
+    return normalized as ExternalAuthMode;
+  }
+
+  throw new Error(`Invalid POKER_EXTERNAL_AUTH_MODE value: ${rawValue}`);
+}
+
+function parseFirebaseVerifierMode(rawValue: string | undefined): FirebaseVerifierMode {
+  if (rawValue === undefined) {
+    return DEFAULT_FIREBASE_VERIFIER;
+  }
+
+  const normalized = rawValue.trim().toLowerCase().replace(/-/g, '_');
+  if (ALLOWED_FIREBASE_VERIFIERS.includes(normalized as FirebaseVerifierMode)) {
+    return normalized as FirebaseVerifierMode;
+  }
+
+  throw new Error(`Invalid POKER_EXTERNAL_AUTH_FIREBASE_VERIFIER value: ${rawValue}`);
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -174,9 +213,17 @@ export interface StartupConfig {
   authBootstrapUsers: AuthUserSeedRecord[] | undefined;
   allowLegacyWalletRoutes: boolean;
   externalAuthEnabled: boolean;
+  externalAuthMode: ExternalAuthMode;
   externalAuthIssuer: string;
   externalAuthSharedSecret: string | undefined;
   externalAuthSharedSecretPrevious: string | undefined;
+  externalAuthProxySharedSecret: string | undefined;
+  externalAuthFirebaseProjectId: string | undefined;
+  externalAuthFirebaseAudience: string | undefined;
+  externalAuthFirebaseIssuer: string | undefined;
+  externalAuthFirebaseCertsUrl: string;
+  externalAuthFirebaseVerifier: FirebaseVerifierMode;
+  externalAuthFirebaseServiceAccountFile: string | undefined;
   externalAuthVerificationSecrets: string[];
 }
 
@@ -186,16 +233,48 @@ export function loadStartupConfig(env: Record<string, string | undefined>): Star
   const authBootstrapUsersFile = env.POKER_AUTH_BOOTSTRAP_USERS_FILE?.trim();
   const authTokenSecret = env.POKER_AUTH_TOKEN_SECRET?.trim();
   const externalAuthEnabled = parseExternalAuthEnabled(env.POKER_EXTERNAL_AUTH_ENABLED);
+  const externalAuthMode = parseExternalAuthMode(env.POKER_EXTERNAL_AUTH_MODE);
   const externalAuthIssuer = env.POKER_EXTERNAL_AUTH_ISSUER?.trim() || DEFAULT_EXTERNAL_AUTH_ISSUER;
   const externalAuthSharedSecret = env.POKER_EXTERNAL_AUTH_SHARED_SECRET?.trim() || undefined;
   const externalAuthSharedSecretPrevious = env.POKER_EXTERNAL_AUTH_SHARED_SECRET_PREVIOUS?.trim() || undefined;
+  const externalAuthProxySharedSecret = env.POKER_EXTERNAL_AUTH_PROXY_SHARED_SECRET?.trim() || undefined;
+  const externalAuthFirebaseProjectId = env.POKER_EXTERNAL_AUTH_FIREBASE_PROJECT_ID?.trim() || undefined;
+  const externalAuthFirebaseVerifier = parseFirebaseVerifierMode(env.POKER_EXTERNAL_AUTH_FIREBASE_VERIFIER);
+  const externalAuthFirebaseServiceAccountFile = env.POKER_EXTERNAL_AUTH_FIREBASE_SERVICE_ACCOUNT_FILE?.trim()
+    || undefined;
+  const externalAuthFirebaseAudience = env.POKER_EXTERNAL_AUTH_FIREBASE_AUDIENCE?.trim() || undefined;
+  const externalAuthFirebaseIssuer = env.POKER_EXTERNAL_AUTH_FIREBASE_ISSUER?.trim()
+    || (externalAuthFirebaseProjectId
+      ? `https://securetoken.google.com/${externalAuthFirebaseProjectId}`
+      : undefined);
+  const externalAuthFirebaseCertsUrl = env.POKER_EXTERNAL_AUTH_FIREBASE_CERTS_URL?.trim() || DEFAULT_FIREBASE_CERTS_URL;
 
   if (isProduction && !authTokenSecret) {
     throw new Error('POKER_AUTH_TOKEN_SECRET is required when NODE_ENV=production.');
   }
 
-  if (externalAuthEnabled && !externalAuthSharedSecret) {
+  if (externalAuthEnabled && externalAuthMode === 'signed_assertion' && !externalAuthSharedSecret) {
     throw new Error('POKER_EXTERNAL_AUTH_SHARED_SECRET is required when POKER_EXTERNAL_AUTH_ENABLED=1.');
+  }
+
+  if (externalAuthEnabled && externalAuthMode === 'trusted_headers' && !externalAuthProxySharedSecret) {
+    throw new Error('POKER_EXTERNAL_AUTH_PROXY_SHARED_SECRET is required in trusted_headers mode.');
+  }
+
+  if (externalAuthEnabled && externalAuthMode === 'firebase_id_token' && !externalAuthFirebaseProjectId) {
+    throw new Error('POKER_EXTERNAL_AUTH_FIREBASE_PROJECT_ID is required in firebase_id_token mode.');
+  }
+
+  if (
+    externalAuthEnabled
+    && externalAuthMode === 'firebase_id_token'
+    && externalAuthFirebaseVerifier === 'admin_sdk'
+    && externalAuthFirebaseServiceAccountFile
+    && !fs.existsSync(externalAuthFirebaseServiceAccountFile)
+  ) {
+    throw new Error(
+      `POKER_EXTERNAL_AUTH_FIREBASE_SERVICE_ACCOUNT_FILE does not exist: ${externalAuthFirebaseServiceAccountFile}`,
+    );
   }
 
   if (externalAuthSharedSecret && externalAuthSharedSecret.length < 16) {
@@ -214,7 +293,11 @@ export function loadStartupConfig(env: Record<string, string | undefined>): Star
     throw new Error('POKER_EXTERNAL_AUTH_SHARED_SECRET_PREVIOUS must differ from POKER_EXTERNAL_AUTH_SHARED_SECRET.');
   }
 
-  const externalAuthVerificationSecrets = externalAuthSharedSecret
+  if (externalAuthProxySharedSecret && externalAuthProxySharedSecret.length < 16) {
+    throw new Error('POKER_EXTERNAL_AUTH_PROXY_SHARED_SECRET must be at least 16 characters when provided.');
+  }
+
+  const externalAuthVerificationSecrets = externalAuthMode === 'signed_assertion' && externalAuthSharedSecret
     ? Array.from(
       new Set([externalAuthSharedSecret, externalAuthSharedSecretPrevious].filter((secret): secret is string =>
         typeof secret === 'string' && secret.length > 0
@@ -236,9 +319,17 @@ export function loadStartupConfig(env: Record<string, string | undefined>): Star
     authBootstrapUsers: loadBootstrapUsersFromFile(authBootstrapUsersFile),
     allowLegacyWalletRoutes: parseAllowLegacyWalletRoutes(env.POKER_ENABLE_LEGACY_WALLET_ROUTES, env.NODE_ENV),
     externalAuthEnabled,
+    externalAuthMode,
     externalAuthIssuer,
     externalAuthSharedSecret,
     externalAuthSharedSecretPrevious,
+    externalAuthProxySharedSecret,
+    externalAuthFirebaseProjectId,
+    externalAuthFirebaseAudience,
+    externalAuthFirebaseIssuer,
+    externalAuthFirebaseCertsUrl,
+    externalAuthFirebaseVerifier,
+    externalAuthFirebaseServiceAccountFile,
     externalAuthVerificationSecrets,
   };
 }

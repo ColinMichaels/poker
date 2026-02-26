@@ -7,15 +7,24 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1eee6476-c5d8-4dc1-b068-da2be4a7c407" name="Default Changelist" comment="feat(server): add external auth assertion support with integration for signed identity exchange&#10;&#10;- Implements HMAC-based external auth assertions.&#10;- Introduces `/api/auth/external/login` for external identity logins.&#10;- Adds external identity linking and reuse in `AuthWalletService`.&#10;- Updates runtime config and documentation to support external auth setup.">
-      <change afterPath="$PROJECT_DIR$/modern/apps/server/scripts/http-routes.test.mjs" afterDir="false" />
+    <list default="true" id="1eee6476-c5d8-4dc1-b068-da2be4a7c407" name="Default Changelist" comment="feat(server): add support for external auth secret rotation&#10;&#10;- Extended HMAC-based external assertion verification to accept both current and previous secrets for zero-downtime key rotation.&#10;- Updated runtime config (`POKER_EXTERNAL_AUTH_SHARED_SECRET_PREVIOUS`) and added validations for rotation setup.&#10;- Enhanced `/health` endpoint with secret rotation diagnostics.&#10;- Added tests for rotated-secret fallback and external login behavior.&#10;- Updated deployment and setup documentation with key rotation instructions.">
+      <change afterPath="$PROJECT_DIR$/modern/.firebaserc.example" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/modern/apps/server/src/firebase-admin-id-token.test.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/modern/apps/server/src/firebase-admin-id-token.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/modern/apps/server/src/firebase-id-token-verifier.test.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/modern/apps/server/src/firebase-id-token-verifier.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/modern/apps/server/src/firebase-id-token.test.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/modern/apps/server/src/firebase-id-token.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/modern/firebase.hosting.example.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/modern/firebase.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/apps/server/.env.example" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/.env.example" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/apps/server/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/apps/server/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/apps/server/src/external-auth.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/external-auth.test.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/apps/server/src/external-auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/external-auth.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/server/src/http-routes.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/http-routes.test.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/apps/server/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/server/src/node-shims.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/node-shims.d.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/apps/server/src/startup-config.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/startup-config.test.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/apps/server/src/startup-config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/startup-config.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/docs/deployment-runbook.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/docs/deployment-runbook.md" afterDir="false" />
@@ -228,10 +237,10 @@
 }]]></component>
   <component name="RecapSpentCounter">
     <option name="endsOfQuotaMs" value="1773266417423" />
-    <option name="spentUsd" value="0.07445466" />
+    <option name="spentUsd" value="0.08793066" />
   </component>
   <component name="RecapUselessUpdatesCounter">
-    <option name="suspendCountdown" value="1" />
+    <option name="suspendCountdown" value="0" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -477,7 +486,15 @@
       <option name="project" value="LOCAL" />
       <updated>1772128300382</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="feat(server): add support for external auth secret rotation&#10;&#10;- Extended HMAC-based external assertion verification to accept both current and previous secrets for zero-downtime key rotation.&#10;- Updated runtime config (`POKER_EXTERNAL_AUTH_SHARED_SECRET_PREVIOUS`) and added validations for rotation setup.&#10;- Enhanced `/health` endpoint with secret rotation diagnostics.&#10;- Added tests for rotated-secret fallback and external login behavior.&#10;- Updated deployment and setup documentation with key rotation instructions.">
+      <option name="closed" value="true" />
+      <created>1772129571212</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1772129571212</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -508,7 +525,11 @@
     <MESSAGE value="feat: add multi-table regression tests and map test suite into CI" />
     <MESSAGE value="refactor(client): streamline mobile action dock UX and update play view layout" />
     <MESSAGE value="feat(server): add external auth assertion support with integration for signed identity exchange&#10;&#10;- Implements HMAC-based external auth assertions.&#10;- Introduces `/api/auth/external/login` for external identity logins.&#10;- Adds external identity linking and reuse in `AuthWalletService`.&#10;- Updates runtime config and documentation to support external auth setup." />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(server): add external auth assertion support with integration for signed identity exchange&#10;&#10;- Implements HMAC-based external auth assertions.&#10;- Introduces `/api/auth/external/login` for external identity logins.&#10;- Adds external identity linking and reuse in `AuthWalletService`.&#10;- Updates runtime config and documentation to support external auth setup." />
+    <MESSAGE value="feat(server): add support for external auth secret rotation&#10;&#10;- Extended HMAC-based external assertion verification to accept both current and previous secrets for zero-downtime key rotation.&#10;- Updated runtime config (`POKER_EXTERNAL_AUTH_SHARED_SECRET_PREVIOUS`) and added validations for rotation setup.&#10;- Enhanced `/health` endpoint with secret rotation diagnostics.&#10;- Added tests for rotated-secret fallback and external login behavior.&#10;- Updated deployment and setup documentation with key rotation instructions." />
+    <MESSAGE value="feat(server): add trusted-header external auth mode&#10;&#10;- Introduced `trusted_headers` mode for external auth, enabling auth-proxy integration with identity headers.&#10;- Added runtime config (`POKER_EXTERNAL_AUTH_MODE` and `POKER_EXTERNAL_AUTH_PROXY_SHARED_SECRET`) and validation for the new mode.&#10;- Enhanced `/health` endpoint to include external auth mode diagnostics.&#10;- Updated external auth login flow to support trusted-header validation and error handling.&#10;- Added regression tests for trusted-header login success and invalid proxy secret rejection.&#10;- Updated documentation and environment templates for trusted-header setup and usage." />
+    <MESSAGE value="feat(server): add trusted-headers external auth mode&#10;&#10;- Introduced `trusted_headers` external auth mode for proxy integrations with explicit mode selection (`POKER_EXTERNAL_AUTH_MODE`).&#10;- Added validation for proxy secrets (`POKER_EXTERNAL_AUTH_PROXY_SHARED_SECRET`).&#10;- Enhanced `/health` diagnostics with `externalAuthMode` runtime field.&#10;- Updated docs for new external auth modes, including setup and usage guidelines.&#10;- Added tests for trusted-header mode validation and behavior." />
+    <MESSAGE value="feat(server): add Firebase ID token verification for external auth&#10;&#10;- Introduced support for `firebase_id_token` mode in external auth with JWT and Admin SDK verification options.  &#10;- Added Firebase cert fetching, RS256 signature validation, and token claim mapping.  &#10;- Updated external auth runtime config (`POKER_EXTERNAL_AUTH_FIREBASE_*`) and docs with Firebase-specific settings.  &#10;- Implemented tests for Firebase ID token validation, claim parsing, and service account usage.  &#10;- Added starter `firebase.hosting.example.json` for SPA hosting with API rewrite to Cloud Run.  " />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(server): add Firebase ID token verification for external auth&#10;&#10;- Introduced support for `firebase_id_token` mode in external auth with JWT and Admin SDK verification options.  &#10;- Added Firebase cert fetching, RS256 signature validation, and token claim mapping.  &#10;- Updated external auth runtime config (`POKER_EXTERNAL_AUTH_FIREBASE_*`) and docs with Firebase-specific settings.  &#10;- Implemented tests for Firebase ID token validation, claim parsing, and service account usage.  &#10;- Added starter `firebase.hosting.example.json` for SPA hosting with API rewrite to Cloud Run.  " />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

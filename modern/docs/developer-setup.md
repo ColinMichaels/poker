@@ -69,12 +69,37 @@ If demo users are disabled (`POKER_AUTH_ALLOW_DEMO_USERS=0`), set `POKER_AUTH_BO
 External auth smoke check (optional):
 
 1. Enable external auth in env:
-   `POKER_EXTERNAL_AUTH_ENABLED=1`, `POKER_EXTERNAL_AUTH_ISSUER=<issuer>`, `POKER_EXTERNAL_AUTH_SHARED_SECRET=<secret>`
+   `POKER_EXTERNAL_AUTH_ENABLED=1`, `POKER_EXTERNAL_AUTH_MODE=signed_assertion`, `POKER_EXTERNAL_AUTH_ISSUER=<issuer>`, `POKER_EXTERNAL_AUTH_SHARED_SECRET=<secret>`
    Optional rotation fallback:
    `POKER_EXTERNAL_AUTH_SHARED_SECRET_PREVIOUS=<old-secret>`
 2. Create a signed assertion using `createExternalAuthAssertion` in `apps/server/src/external-auth.ts` (or any equivalent HMAC-SHA256 signer that matches the payload format).
 3. Login with assertion:
    `curl -s -X POST http://127.0.0.1:8787/api/auth/external/login -H 'content-type: application/json' -d '{"assertion":"<ASSERTION>"}'`
+
+Trusted-headers mode smoke check (for auth-proxy integration):
+
+1. Set env:
+   `POKER_EXTERNAL_AUTH_ENABLED=1`, `POKER_EXTERNAL_AUTH_MODE=trusted_headers`, `POKER_EXTERNAL_AUTH_ISSUER=<issuer>`, `POKER_EXTERNAL_AUTH_PROXY_SHARED_SECRET=<proxy-secret>`
+2. Call login route with trusted headers:
+   `curl -s -X POST http://127.0.0.1:8787/api/auth/external/login -H 'x-external-auth-proxy-secret: <proxy-secret>' -H 'x-external-auth-provider: <provider>' -H 'x-external-auth-subject: <subject>' -H 'x-external-auth-email: <email>'`
+
+Firebase ID token mode smoke check:
+
+1. Set env:
+   `POKER_EXTERNAL_AUTH_ENABLED=1`, `POKER_EXTERNAL_AUTH_MODE=firebase_id_token`, `POKER_EXTERNAL_AUTH_FIREBASE_PROJECT_ID=<firebase-project-id>`, `POKER_EXTERNAL_AUTH_FIREBASE_VERIFIER=jwt`
+2. Call login route with Firebase ID token:
+   `curl -s -X POST http://127.0.0.1:8787/api/auth/external/login -H 'authorization: Bearer <FIREBASE_ID_TOKEN>'`
+
+To use Firebase Admin SDK adapter instead of JWT verifier:
+
+- set `POKER_EXTERNAL_AUTH_FIREBASE_VERIFIER=admin_sdk`
+- optionally set `POKER_EXTERNAL_AUTH_FIREBASE_SERVICE_ACCOUNT_FILE=/path/to/service-account.json`
+- ensure `firebase-admin` is installed for `@poker/server` (`npm install --workspace @poker/server firebase-admin`)
+
+Firebase hosting starter config:
+
+- `firebase.hosting.example.json` shows SPA hosting for `apps/client/dist` and `/api/**` rewrite to a Cloud Run backend.
+- `firebase.json` is the active baseline config; `.firebaserc.example` provides project binding template.
 
 ## CI Parity
 

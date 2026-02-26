@@ -14,6 +14,12 @@ From `modern/`:
 1. `npm ci`
 2. `npm run ci`
 
+Firebase Hosting starter template:
+
+- `firebase.json` (current default SPA hosting + `/api/**` rewrite to Cloud Run service)
+- `.firebaserc.example` (project binding template)
+- `firebase.hosting.example.json` (reference snapshot)
+
 ## Start Server
 
 From `modern/` after build:
@@ -30,9 +36,17 @@ Environment variables:
 - `POKER_AUTH_TOKEN_SECRET` (required for non-dev deployments; signs bearer session tokens)
 - `POKER_SESSION_TTL_MS` (default: `28800000`)
 - `POKER_EXTERNAL_AUTH_ENABLED` (`1`/`0`, default: `0`)
+- `POKER_EXTERNAL_AUTH_MODE` (`signed_assertion`, `trusted_headers`, or `firebase_id_token`; default: `signed_assertion`)
 - `POKER_EXTERNAL_AUTH_ISSUER` (expected issuer for signed assertion exchange, default: `external-idp`)
 - `POKER_EXTERNAL_AUTH_SHARED_SECRET` (required when external auth is enabled)
 - `POKER_EXTERNAL_AUTH_SHARED_SECRET_PREVIOUS` (optional previous verification secret during rotation)
+- `POKER_EXTERNAL_AUTH_PROXY_SHARED_SECRET` (required when `POKER_EXTERNAL_AUTH_MODE=trusted_headers`)
+- `POKER_EXTERNAL_AUTH_FIREBASE_PROJECT_ID` (required when `POKER_EXTERNAL_AUTH_MODE=firebase_id_token`)
+- `POKER_EXTERNAL_AUTH_FIREBASE_AUDIENCE` (optional audience override for Firebase ID token verification)
+- `POKER_EXTERNAL_AUTH_FIREBASE_ISSUER` (optional issuer override for Firebase ID token verification)
+- `POKER_EXTERNAL_AUTH_FIREBASE_CERTS_URL` (optional Firebase cert endpoint override)
+- `POKER_EXTERNAL_AUTH_FIREBASE_VERIFIER` (`jwt` or `admin_sdk`, default: `jwt`)
+- `POKER_EXTERNAL_AUTH_FIREBASE_SERVICE_ACCOUNT_FILE` (optional service-account JSON path for `admin_sdk`)
 - `POKER_AUTH_ALLOW_DEMO_USERS` (`1`/`0`, default: `0` when `NODE_ENV=production`)
 - `POKER_AUTH_BOOTSTRAP_USERS_FILE` (JSON seed file used when no persisted auth state exists)
 - `POKER_ENABLE_LEGACY_WALLET_ROUTES` (`1`/`0`, default: `0` when `NODE_ENV=production`)
@@ -44,7 +58,7 @@ Template reference:
 ## Health + Readiness Checks
 
 - `GET /health` (liveness)
-  - includes runtime flags for persistence/demo-users/legacy-wallet-route/external-auth modes, including external auth rotation fallback status
+  - includes runtime flags for persistence/demo-users/legacy-wallet-route/external-auth, including mode and rotation fallback status
 - `GET /api/table/state` (authoritative table snapshot)
 
 Auth/wallet sanity checks:
@@ -65,8 +79,20 @@ Auth/wallet sanity checks:
 - If production overrides enable demo users or legacy wallet routes, server startup logs explicit warnings.
 - Bootstrap file format accepts either a JSON array of user records or `{ "users": [...] }`. Each user requires `email` and `password` (or `passwordHash` in `scrypt$<salt-hex>$<digest-hex>` format).
 - Current auth API supports session revocation (`/api/auth/revoke-others`) and per-user audit logs.
-- External identity login is available via `POST /api/auth/external/login` (signed assertion exchange).
+- External identity login is available via `POST /api/auth/external/login` (`signed_assertion`, `trusted_headers`, or `firebase_id_token` mode).
 - External auth secret rotation can be performed without downtime:
 1. Deploy with new key at `POKER_EXTERNAL_AUTH_SHARED_SECRET` and old key at `POKER_EXTERNAL_AUTH_SHARED_SECRET_PREVIOUS`.
 2. Rotate the identity provider signer to the new key.
 3. Remove `POKER_EXTERNAL_AUTH_SHARED_SECRET_PREVIOUS` after old assertions expire.
+- Trusted auth-proxy integration mode is available:
+1. Set `POKER_EXTERNAL_AUTH_MODE=trusted_headers`.
+2. Set `POKER_EXTERNAL_AUTH_PROXY_SHARED_SECRET`.
+3. Configure the upstream identity proxy to inject `x-external-auth-*` headers and the proxy secret header.
+- Firebase ID token integration mode is available:
+1. Set `POKER_EXTERNAL_AUTH_MODE=firebase_id_token`.
+2. Set `POKER_EXTERNAL_AUTH_FIREBASE_PROJECT_ID` (and optional issuer/audience overrides as needed).
+3. Choose verifier path:
+4. `POKER_EXTERNAL_AUTH_FIREBASE_VERIFIER=jwt` for built-in verifier, or `admin_sdk` for Firebase Admin adapter.
+5. If using `admin_sdk`, optionally set `POKER_EXTERNAL_AUTH_FIREBASE_SERVICE_ACCOUNT_FILE` (otherwise use default app credentials).
+6. Send Firebase ID tokens to `/api/auth/external/login` via bearer token.
+7. For `admin_sdk` mode, ensure `firebase-admin` is installed in server workspace dependencies.

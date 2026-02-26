@@ -1261,3 +1261,99 @@ Sources:
 - `apps/server/src/http-routes.test.ts`
 - `apps/server/src/index.ts`
 - `apps/server/package.json`
+
+## PR BO Progress: Trusted-Header External Provider Integration Mode
+
+- Added explicit external auth mode selection:
+  - `signed_assertion` (existing signed payload exchange)
+  - `trusted_headers` (new auth-proxy identity header mode)
+- Added trusted-header login path in external auth route:
+  - validates `x-external-auth-proxy-secret` against server config
+  - validates required identity headers (`provider`, `subject`, `email`)
+  - supports optional first/last name, role, and issuer-header consistency check
+- Added startup config validation for trusted-header mode:
+  - `POKER_EXTERNAL_AUTH_MODE`
+  - `POKER_EXTERNAL_AUTH_PROXY_SHARED_SECRET` (required when mode is `trusted_headers`)
+- Extended `/health` runtime diagnostics with `externalAuthMode`.
+- Added route-level regression tests for trusted-header mode success + invalid proxy secret rejection.
+- Updated server/developer/deployment docs and env template/checker for new mode configuration.
+
+Sources:
+
+- `apps/server/src/index.ts`
+- `apps/server/src/startup-config.ts`
+- `apps/server/src/startup-config.test.ts`
+- `apps/server/src/http-routes.test.ts`
+- `apps/server/.env.example`
+- `scripts/check-server-env-template.mjs`
+- `apps/server/README.md`
+- `docs/developer-setup.md`
+- `docs/deployment-runbook.md`
+
+## PR BP Progress: Firebase ID Token Provider Mode Wiring
+
+- Added Firebase-native external auth mode (`firebase_id_token`) while preserving existing external auth modes.
+- Implemented standalone Firebase ID token verifier module:
+  - RS256 signature verification against Firebase cert endpoint
+  - issuer/audience/subject/exp/iat validation
+  - normalized identity extraction for provider subject/email/name/role
+- Added startup config support + validation for Firebase mode:
+  - project id required in Firebase mode
+  - audience/issuer/cert-url overrides supported
+- Wired external login route to accept Firebase bearer token in Firebase mode:
+  - `Authorization: Bearer <ID_TOKEN>` (or `x-firebase-id-token`)
+  - verifier dependency injected through runtime context for easy future provider swaps
+- Added test coverage:
+  - dedicated Firebase verifier tests
+  - route-level Firebase mode login test in HTTP handler harness
+- Updated env template/checker and docs for Firebase mode configuration.
+- Added Firebase Hosting starter template for SPA hosting + `/api/**` rewrite to Cloud Run.
+
+Sources:
+
+- `apps/server/src/firebase-id-token.ts`
+- `apps/server/src/firebase-id-token.test.ts`
+- `apps/server/src/index.ts`
+- `apps/server/src/http-routes.test.ts`
+- `apps/server/src/startup-config.ts`
+- `apps/server/src/startup-config.test.ts`
+- `apps/server/.env.example`
+- `scripts/check-server-env-template.mjs`
+- `apps/server/README.md`
+- `docs/developer-setup.md`
+- `docs/deployment-runbook.md`
+- `firebase.hosting.example.json`
+- `firebase.json`
+- `.firebaserc.example`
+
+## PR BQ Progress: Firebase Admin SDK Adapter (Pluggable Verifier)
+
+- Added Firebase verifier-mode selection while keeping route integration decoupled:
+  - `POKER_EXTERNAL_AUTH_FIREBASE_VERIFIER=jwt|admin_sdk`
+- Added optional Firebase Admin SDK adapter module:
+  - dynamic module loading (`firebase-admin/app`, `firebase-admin/auth`)
+  - optional service-account JSON file support
+  - normalized identity output aligned with existing external auth contract
+- Added startup/env validation for Admin SDK verifier path:
+  - `POKER_EXTERNAL_AUTH_FIREBASE_SERVICE_ACCOUNT_FILE`
+- Added verifier-factory module to isolate provider implementation choice from route logic.
+- Extended health/runtime diagnostics to include Firebase verifier selection.
+- Added regression tests:
+  - Admin SDK adapter behavior with mocked SDK modules
+  - verifier-factory mode selection/failure behavior
+  - startup config validation for verifier mode and service-account path
+
+Sources:
+
+- `apps/server/src/firebase-admin-id-token.ts`
+- `apps/server/src/firebase-admin-id-token.test.ts`
+- `apps/server/src/firebase-id-token-verifier.ts`
+- `apps/server/src/firebase-id-token-verifier.test.ts`
+- `apps/server/src/index.ts`
+- `apps/server/src/startup-config.ts`
+- `apps/server/src/startup-config.test.ts`
+- `apps/server/.env.example`
+- `scripts/check-server-env-template.mjs`
+- `apps/server/README.md`
+- `docs/developer-setup.md`
+- `docs/deployment-runbook.md`

@@ -57,3 +57,4 @@ From `modern/`:
 - Run all workspace install/build commands from `modern/`.
 - Server API details: `apps/server/README.md`.
 - Server env template: `apps/server/.env.example`.
+- Firebase Hosting config: `firebase.json` (`.firebaserc.example` template).

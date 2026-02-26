@@ -45,11 +45,42 @@ declare module 'node:crypto' {
     digest(encoding: 'hex' | 'base64'): string;
   }
 
+  export interface Sign {
+    update(data: string): Sign;
+    sign(privateKey: string, outputFormat: 'base64'): string;
+  }
+
+  export interface Verify {
+    update(data: string): Verify;
+    verify(publicKey: string, signature: BinaryValue): boolean;
+  }
+
   export interface BinaryValue {
     toString(encoding: 'hex'): string;
   }
 
+  export interface KeyPairSyncResult<TPublicKey, TPrivateKey> {
+    publicKey: TPublicKey;
+    privateKey: TPrivateKey;
+  }
+
   export function createHmac(algorithm: 'sha256', key: string): Hmac;
+  export function createSign(algorithm: 'RSA-SHA256'): Sign;
+  export function createVerify(algorithm: 'RSA-SHA256'): Verify;
+  export function generateKeyPairSync(
+    type: 'rsa',
+    options: {
+      modulusLength: number;
+      publicKeyEncoding: {
+        type: 'spki';
+        format: 'pem';
+      };
+      privateKeyEncoding: {
+        type: 'pkcs8';
+        format: 'pem';
+      };
+    },
+  ): KeyPairSyncResult<string, string>;
   export function randomBytes(size: number): BinaryValue;
   export function scryptSync(password: string, salt: string, keylen: number): BinaryValue;
 }

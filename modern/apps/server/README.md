@@ -34,9 +34,17 @@ Environment overrides:
 - `POKER_AUTH_TOKEN_SECRET` (HMAC signing secret for bearer sessions; required when `NODE_ENV=production`)
 - `POKER_SESSION_TTL_MS` (session ttl in milliseconds, default `28800000`)
 - `POKER_EXTERNAL_AUTH_ENABLED` (`1`/`0`, default `0`)
+- `POKER_EXTERNAL_AUTH_MODE` (`signed_assertion`, `trusted_headers`, or `firebase_id_token`, default `signed_assertion`)
 - `POKER_EXTERNAL_AUTH_ISSUER` (expected issuer for signed assertions, default `external-idp`)
 - `POKER_EXTERNAL_AUTH_SHARED_SECRET` (HMAC verification secret for signed assertions; required when external auth is enabled)
 - `POKER_EXTERNAL_AUTH_SHARED_SECRET_PREVIOUS` (optional previous verification secret for key rotation)
+- `POKER_EXTERNAL_AUTH_PROXY_SHARED_SECRET` (required in `trusted_headers` mode; shared secret expected in `x-external-auth-proxy-secret`)
+- `POKER_EXTERNAL_AUTH_FIREBASE_PROJECT_ID` (required in `firebase_id_token` mode)
+- `POKER_EXTERNAL_AUTH_FIREBASE_AUDIENCE` (optional Firebase audience override; defaults to project id)
+- `POKER_EXTERNAL_AUTH_FIREBASE_ISSUER` (optional Firebase issuer override; defaults to `https://securetoken.google.com/<projectId>`)
+- `POKER_EXTERNAL_AUTH_FIREBASE_CERTS_URL` (optional Firebase signing cert endpoint override)
+- `POKER_EXTERNAL_AUTH_FIREBASE_VERIFIER` (`jwt` or `admin_sdk`, default `jwt`)
+- `POKER_EXTERNAL_AUTH_FIREBASE_SERVICE_ACCOUNT_FILE` (optional service-account JSON path for `admin_sdk` verifier)
 - `POKER_AUTH_ALLOW_DEMO_USERS` (`1`/`0`, default `1` unless `NODE_ENV=production`)
 - `POKER_AUTH_BOOTSTRAP_USERS_FILE` (path to JSON file with bootstrap auth users)
 - `POKER_ENABLE_LEGACY_WALLET_ROUTES` (`1`/`0`, default `1` unless `NODE_ENV=production`)
@@ -55,7 +63,11 @@ Runtime persistence:
   - `runtime.authDemoUsersEnabled`
   - `runtime.legacyWalletRoutesEnabled`
   - `runtime.externalAuthEnabled`
-  - `runtime.externalAuthIssuer`
+- `runtime.externalAuthMode`
+- `runtime.externalAuthIssuer`
+- `runtime.externalAuthFirebaseProjectId`
+- `runtime.externalAuthFirebaseIssuer`
+- `runtime.externalAuthFirebaseVerifier`
   - `runtime.externalAuthSecretRotationEnabled`
 
 Auth/session behavior:
@@ -103,16 +115,45 @@ Default demo login users (when enabled):
 
 External auth login:
 
-- Send a signed assertion payload to `POST /api/auth/external/login`:
-  - `{ "assertion": "<base64url(payload)>.<base64url(hmac-signature)>" }`
-- Assertion payload fields:
-  - required: `iss`, `sub`, `email`, `exp`
-  - optional: `firstName`, `lastName`, `role`
-- The server verifies:
-  - HMAC signature with `POKER_EXTERNAL_AUTH_SHARED_SECRET` (or `POKER_EXTERNAL_AUTH_SHARED_SECRET_PREVIOUS` during rotation)
-  - issuer match with `POKER_EXTERNAL_AUTH_ISSUER`
-  - expiration (`exp`) against current server time
-- On success, the server links/reuses user identity and returns the same session shape as `/api/auth/login`.
+- `signed_assertion` mode (`POKER_EXTERNAL_AUTH_MODE=signed_assertion`):
+  - send payload to `POST /api/auth/external/login`:
+    - `{ "assertion": "<base64url(payload)>.<base64url(hmac-signature)>" }`
+  - assertion payload fields:
+    - required: `iss`, `sub`, `email`, `exp`
+    - optional: `firstName`, `lastName`, `role`
+  - server verifies:
+    - HMAC signature with `POKER_EXTERNAL_AUTH_SHARED_SECRET` (or `POKER_EXTERNAL_AUTH_SHARED_SECRET_PREVIOUS` during rotation)
+    - issuer match with `POKER_EXTERNAL_AUTH_ISSUER`
+    - expiration (`exp`) against current server time
+
+- `trusted_headers` mode (`POKER_EXTERNAL_AUTH_MODE=trusted_headers`):
+  - request must include:
+    - `x-external-auth-proxy-secret` (must match `POKER_EXTERNAL_AUTH_PROXY_SHARED_SECRET`)
+    - `x-external-auth-provider`
+    - `x-external-auth-subject`
+    - `x-external-auth-email`
+  - optional:
+    - `x-external-auth-first-name`
+    - `x-external-auth-last-name`
+    - `x-external-auth-role` (`PLAYER`/`OPERATOR`/`ADMIN`)
+    - `x-external-auth-issuer` (must match `POKER_EXTERNAL_AUTH_ISSUER` when provided)
+
+- `firebase_id_token` mode (`POKER_EXTERNAL_AUTH_MODE=firebase_id_token`):
+  - request must include Firebase ID token in `Authorization: Bearer <ID_TOKEN>` or `x-firebase-id-token`
+  - required env: `POKER_EXTERNAL_AUTH_FIREBASE_PROJECT_ID`
+  - verifier selection:
+    - `POKER_EXTERNAL_AUTH_FIREBASE_VERIFIER=jwt` (default lightweight verifier)
+    - `POKER_EXTERNAL_AUTH_FIREBASE_VERIFIER=admin_sdk` (uses Firebase Admin SDK runtime adapter)
+  - optional Admin SDK credential path:
+    - `POKER_EXTERNAL_AUTH_FIREBASE_SERVICE_ACCOUNT_FILE=/path/to/service-account.json`
+  - if `POKER_EXTERNAL_AUTH_FIREBASE_VERIFIER=admin_sdk`, install Firebase Admin SDK in server workspace:
+    - `npm install --workspace @poker/server firebase-admin`
+  - token verification enforces:
+    - RS256 signature against Firebase certs
+    - issuer/audience/sub/exp/iat constraints
+    - email claim presence (used for local user mapping)
+
+- On success, server links/reuses user identity and returns the same session shape as `/api/auth/login`.
 
 External auth secret rotation:
 
@@ -135,3 +176,7 @@ Auth audit authorization:
 
 - `PLAYER` sessions can only read their own auth-audit records.
 - `OPERATOR` and `ADMIN` sessions can read cross-user records (`userId`) or all records (no `userId` filter).
+
+Firebase hosting starter template:
+
+- `modern/firebase.hosting.example.json` provides a baseline SPA hosting config with `/api/**` rewrite to a Cloud Run service.

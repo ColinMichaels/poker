@@ -40,9 +40,25 @@ function testLoadsDevelopmentDefaults(): void {
   assertEqual(config.authAllowDemoUsers, true, 'Expected demo users enabled by default outside production.');
   assertEqual(config.allowLegacyWalletRoutes, true, 'Expected legacy routes enabled by default outside production.');
   assertEqual(config.externalAuthEnabled, false, 'Expected external auth disabled by default.');
+  assertEqual(config.externalAuthMode, 'signed_assertion', 'Expected default external auth mode.');
   assertEqual(config.externalAuthIssuer, 'external-idp', 'Expected default external auth issuer.');
   assertEqual(config.externalAuthSharedSecret, undefined, 'Expected no external auth secret by default.');
   assertEqual(config.externalAuthSharedSecretPrevious, undefined, 'Expected no previous external auth secret by default.');
+  assertEqual(config.externalAuthProxySharedSecret, undefined, 'Expected no external auth proxy shared secret by default.');
+  assertEqual(config.externalAuthFirebaseProjectId, undefined, 'Expected no Firebase project id by default.');
+  assertEqual(config.externalAuthFirebaseAudience, undefined, 'Expected no Firebase audience override by default.');
+  assertEqual(config.externalAuthFirebaseIssuer, undefined, 'Expected no Firebase issuer override by default.');
+  assertEqual(config.externalAuthFirebaseVerifier, 'jwt', 'Expected default Firebase verifier mode.');
+  assertEqual(
+    config.externalAuthFirebaseServiceAccountFile,
+    undefined,
+    'Expected no Firebase service account file by default.',
+  );
+  assertEqual(
+    config.externalAuthFirebaseCertsUrl,
+    'https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com',
+    'Expected default Firebase certs url.',
+  );
   assertEqual(config.externalAuthVerificationSecrets.length, 0, 'Expected no external auth verification secrets by default.');
   assertEqual(config.authBootstrapUsers, undefined, 'Expected no bootstrap users by default.');
 }
@@ -94,6 +110,7 @@ function testLoadsExplicitOverrides(): void {
   assertEqual(config.authAllowDemoUsers, true, 'Expected explicit demo users override.');
   assertEqual(config.allowLegacyWalletRoutes, false, 'Expected explicit legacy route override.');
   assertEqual(config.externalAuthEnabled, true, 'Expected explicit external auth enablement.');
+  assertEqual(config.externalAuthMode, 'signed_assertion', 'Expected signed assertion mode when unspecified.');
   assertEqual(config.externalAuthIssuer, 'oidc-demo', 'Expected external auth issuer override.');
   assertEqual(config.externalAuthSharedSecret, 'external-secret-123456', 'Expected external auth secret override.');
   assertEqual(
@@ -112,6 +129,86 @@ function testLoadsExplicitOverrides(): void {
     'external-secret-prev-123456',
     'Expected previous external auth secret to be included.',
   );
+}
+
+function testLoadsTrustedHeadersExternalAuthModeOverrides(): void {
+  const config = loadStartupConfig({
+    POKER_EXTERNAL_AUTH_ENABLED: '1',
+    POKER_EXTERNAL_AUTH_MODE: 'trusted_headers',
+    POKER_EXTERNAL_AUTH_ISSUER: 'proxy-issuer',
+    POKER_EXTERNAL_AUTH_PROXY_SHARED_SECRET: 'proxy-shared-secret-123456',
+  });
+
+  assertEqual(config.externalAuthEnabled, true, 'Expected external auth enabled in trusted_headers mode.');
+  assertEqual(config.externalAuthMode, 'trusted_headers', 'Expected trusted_headers external auth mode.');
+  assertEqual(config.externalAuthIssuer, 'proxy-issuer', 'Expected trusted_headers issuer override.');
+  assertEqual(
+    config.externalAuthProxySharedSecret,
+    'proxy-shared-secret-123456',
+    'Expected trusted_headers proxy shared secret override.',
+  );
+  assertEqual(
+    config.externalAuthVerificationSecrets.length,
+    0,
+    'Expected no assertion verification secrets in trusted_headers mode.',
+  );
+}
+
+function testLoadsFirebaseIdTokenExternalAuthModeOverrides(): void {
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'poker-firebase-admin-sa-'));
+  try {
+    const serviceAccountFile = path.join(tempDir, 'firebase-service-account.json');
+    fs.writeFileSync(
+      serviceAccountFile,
+      JSON.stringify({
+        type: 'service_account',
+        project_id: 'poker-firebase-dev',
+        private_key_id: 'test-key-id',
+        private_key: '-----BEGIN PRIVATE KEY-----\nTEST\n-----END PRIVATE KEY-----\n',
+        client_email: 'firebase-adminsdk@test.iam.gserviceaccount.com',
+        client_id: '1234567890',
+        auth_uri: 'https://accounts.google.com/o/oauth2/auth',
+        token_uri: 'https://oauth2.googleapis.com/token',
+        auth_provider_x509_cert_url: 'https://www.googleapis.com/oauth2/v1/certs',
+        client_x509_cert_url: 'https://www.googleapis.com/robot/v1/metadata/x509/test',
+      }),
+      'utf8',
+    );
+
+    const config = loadStartupConfig({
+      POKER_EXTERNAL_AUTH_ENABLED: '1',
+      POKER_EXTERNAL_AUTH_MODE: 'firebase_id_token',
+      POKER_EXTERNAL_AUTH_FIREBASE_PROJECT_ID: 'poker-firebase-dev',
+      POKER_EXTERNAL_AUTH_FIREBASE_AUDIENCE: 'poker-firebase-audience',
+      POKER_EXTERNAL_AUTH_FIREBASE_ISSUER: 'https://securetoken.google.com/poker-firebase-dev',
+      POKER_EXTERNAL_AUTH_FIREBASE_CERTS_URL: 'https://example.test/firebase-certs',
+      POKER_EXTERNAL_AUTH_FIREBASE_VERIFIER: 'admin_sdk',
+      POKER_EXTERNAL_AUTH_FIREBASE_SERVICE_ACCOUNT_FILE: serviceAccountFile,
+    });
+
+    assertEqual(config.externalAuthEnabled, true, 'Expected external auth enabled in firebase_id_token mode.');
+    assertEqual(config.externalAuthMode, 'firebase_id_token', 'Expected firebase_id_token external auth mode.');
+    assertEqual(config.externalAuthFirebaseProjectId, 'poker-firebase-dev', 'Expected Firebase project id override.');
+    assertEqual(config.externalAuthFirebaseAudience, 'poker-firebase-audience', 'Expected Firebase audience override.');
+    assertEqual(
+      config.externalAuthFirebaseIssuer,
+      'https://securetoken.google.com/poker-firebase-dev',
+      'Expected Firebase issuer override.',
+    );
+    assertEqual(
+      config.externalAuthFirebaseCertsUrl,
+      'https://example.test/firebase-certs',
+      'Expected Firebase certs url override.',
+    );
+    assertEqual(config.externalAuthFirebaseVerifier, 'admin_sdk', 'Expected Firebase verifier override.');
+    assertEqual(
+      config.externalAuthFirebaseServiceAccountFile,
+      serviceAccountFile,
+      'Expected Firebase service account file override.',
+    );
+  } finally {
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  }
 }
 
 function testLoadsBootstrapUsersFromArrayAndWrapper(): void {
@@ -209,6 +306,18 @@ function testRejectsInvalidBootstrapUsersAndEnvValues(): void {
     );
 
     assertThrows(
+      () => loadStartupConfig({ POKER_EXTERNAL_AUTH_MODE: 'unknown-mode' }),
+      /Invalid POKER_EXTERNAL_AUTH_MODE value/i,
+      'Expected invalid external auth mode values to fail.',
+    );
+
+    assertThrows(
+      () => loadStartupConfig({ POKER_EXTERNAL_AUTH_FIREBASE_VERIFIER: 'unknown' }),
+      /Invalid POKER_EXTERNAL_AUTH_FIREBASE_VERIFIER value/i,
+      'Expected invalid Firebase verifier mode values to fail.',
+    );
+
+    assertThrows(
       () => loadStartupConfig({ POKER_EXTERNAL_AUTH_ENABLED: '1' }),
       /POKER_EXTERNAL_AUTH_SHARED_SECRET is required/,
       'Expected enabled external auth without shared secret to fail.',
@@ -253,6 +362,49 @@ function testRejectsInvalidBootstrapUsersAndEnvValues(): void {
     );
 
     assertThrows(
+      () =>
+        loadStartupConfig({
+          POKER_EXTERNAL_AUTH_ENABLED: '1',
+          POKER_EXTERNAL_AUTH_MODE: 'trusted_headers',
+        }),
+      /POKER_EXTERNAL_AUTH_PROXY_SHARED_SECRET is required in trusted_headers mode/i,
+      'Expected trusted_headers mode to require proxy shared secret.',
+    );
+
+    assertThrows(
+      () =>
+        loadStartupConfig({
+          POKER_EXTERNAL_AUTH_MODE: 'trusted_headers',
+          POKER_EXTERNAL_AUTH_PROXY_SHARED_SECRET: 'short-proxy',
+        }),
+      /POKER_EXTERNAL_AUTH_PROXY_SHARED_SECRET must be at least 16 characters/i,
+      'Expected short external auth proxy shared secret values to fail.',
+    );
+
+    assertThrows(
+      () =>
+        loadStartupConfig({
+          POKER_EXTERNAL_AUTH_ENABLED: '1',
+          POKER_EXTERNAL_AUTH_MODE: 'firebase_id_token',
+        }),
+      /POKER_EXTERNAL_AUTH_FIREBASE_PROJECT_ID is required in firebase_id_token mode/i,
+      'Expected firebase_id_token mode to require Firebase project id.',
+    );
+
+    assertThrows(
+      () =>
+        loadStartupConfig({
+          POKER_EXTERNAL_AUTH_ENABLED: '1',
+          POKER_EXTERNAL_AUTH_MODE: 'firebase_id_token',
+          POKER_EXTERNAL_AUTH_FIREBASE_PROJECT_ID: 'poker-firebase-dev',
+          POKER_EXTERNAL_AUTH_FIREBASE_VERIFIER: 'admin_sdk',
+          POKER_EXTERNAL_AUTH_FIREBASE_SERVICE_ACCOUNT_FILE: '/tmp/missing-firebase-service-account.json',
+        }),
+      /POKER_EXTERNAL_AUTH_FIREBASE_SERVICE_ACCOUNT_FILE does not exist/i,
+      'Expected missing Firebase admin service account files to fail validation.',
+    );
+
+    assertThrows(
       () => loadStartupConfig({ POKER_AUTH_BOOTSTRAP_USERS_FILE: invalidUsersPath }),
       /must include password or passwordHash/,
       'Expected invalid bootstrap users to fail validation.',
@@ -273,6 +425,8 @@ function runAll(): void {
   testProductionDefaultsDisableCompatibilityModes();
   testProductionRequiresExplicitTokenSecret();
   testLoadsExplicitOverrides();
+  testLoadsTrustedHeadersExternalAuthModeOverrides();
+  testLoadsFirebaseIdTokenExternalAuthModeOverrides();
   testLoadsBootstrapUsersFromArrayAndWrapper();
   testRejectsInvalidBootstrapUsersAndEnvValues();
   console.info('Startup config tests passed (env parsing + bootstrap user validation).');

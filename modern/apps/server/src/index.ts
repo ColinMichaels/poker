@@ -4,13 +4,19 @@ import type { TableCommand } from '@poker/poker-engine';
 import { AuthWalletService } from './auth-wallet-service.ts';
 import { resolveAuditScopeUserId } from './auth-authorization.ts';
 import { verifyExternalAuthAssertion } from './external-auth.ts';
+import {
+  type FirebaseExternalIdentity,
+  type FirebaseIdTokenVerificationOptions,
+} from './firebase-id-token.ts';
+import { createFirebaseIdTokenVerifier } from './firebase-id-token-verifier.ts';
 import { RuntimeStateStore, type RuntimeStateSnapshot } from './runtime-state-store.ts';
-import { loadStartupConfig } from './startup-config.ts';
+import { loadStartupConfig, type ExternalAuthMode, type FirebaseVerifierMode } from './startup-config.ts';
 import { TableService, createDefaultTableState } from './table-service.ts';
 
 const DEFAULT_HOST = '127.0.0.1';
 const DEFAULT_PORT = 8787;
 const MAX_LOG_LIMIT = 500;
+const ALLOWED_USER_ROLES: readonly UserRole[] = ['PLAYER', 'OPERATOR', 'ADMIN'];
 
 class HttpError extends Error {
   public readonly statusCode: number;
@@ -209,6 +215,93 @@ function parseExternalAuthLoginRequest(body: unknown): { assertion: string } {
   };
 }
 
+function isValidUserRole(value: unknown): value is UserRole {
+  return typeof value === 'string' && ALLOWED_USER_ROLES.includes(value as UserRole);
+}
+
+function constantTimeEqual(left: string, right: string): boolean {
+  if (left.length !== right.length) {
+    return false;
+  }
+
+  let mismatch = 0;
+  for (let index = 0; index < left.length; index += 1) {
+    mismatch |= left.charCodeAt(index) ^ right.charCodeAt(index);
+  }
+
+  return mismatch === 0;
+}
+
+function requireTrustedProxyAuth(request: IncomingMessage, expectedSecret: string): void {
+  const providedSecret = getHeaderValue(request, 'x-external-auth-proxy-secret')?.trim() ?? '';
+  if (!providedSecret || !constantTimeEqual(providedSecret, expectedSecret)) {
+    throw new HttpError(401, 'INVALID_EXTERNAL_PROXY_AUTH', 'External auth trusted proxy authentication failed.');
+  }
+}
+
+function parseTrustedHeaderExternalLogin(
+  request: IncomingMessage,
+  expectedIssuer: string,
+): {
+  provider: string;
+  subject: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  role?: UserRole;
+} {
+  const provider = getHeaderValue(request, 'x-external-auth-provider')?.trim() ?? '';
+  const subject = getHeaderValue(request, 'x-external-auth-subject')?.trim() ?? '';
+  const email = getHeaderValue(request, 'x-external-auth-email')?.trim() ?? '';
+  const firstName = getHeaderValue(request, 'x-external-auth-first-name')?.trim() ?? '';
+  const lastName = getHeaderValue(request, 'x-external-auth-last-name')?.trim() ?? '';
+  const roleRaw = getHeaderValue(request, 'x-external-auth-role')?.trim();
+  const issuerHeader = getHeaderValue(request, 'x-external-auth-issuer')?.trim();
+
+  if (!provider) {
+    throw new HttpError(400, 'BAD_REQUEST', 'x-external-auth-provider header is required.');
+  }
+
+  if (!subject) {
+    throw new HttpError(400, 'BAD_REQUEST', 'x-external-auth-subject header is required.');
+  }
+
+  if (!email) {
+    throw new HttpError(400, 'BAD_REQUEST', 'x-external-auth-email header is required.');
+  }
+
+  if (issuerHeader && issuerHeader !== expectedIssuer) {
+    throw new HttpError(401, 'INVALID_EXTERNAL_ASSERTION', 'External auth trusted header issuer is invalid.');
+  }
+
+  if (roleRaw !== undefined && !isValidUserRole(roleRaw)) {
+    throw new HttpError(400, 'BAD_REQUEST', `x-external-auth-role must be PLAYER, OPERATOR, or ADMIN when provided.`);
+  }
+
+  return {
+    provider,
+    subject,
+    email,
+    firstName: firstName || undefined,
+    lastName: lastName || undefined,
+    role: roleRaw as UserRole | undefined,
+  };
+}
+
+function getFirebaseIdToken(request: IncomingMessage): string {
+  const bearer = getBearerToken(request);
+  if (bearer) {
+    return bearer;
+  }
+
+  const headerToken = getHeaderValue(request, 'x-firebase-id-token')?.trim();
+  if (headerToken) {
+    return headerToken;
+  }
+
+  throw new HttpError(401, 'UNAUTHORIZED', 'Firebase ID token is required.');
+}
+
 function parseProfileUpdate(body: unknown): UpdateProfileRequestDTO {
   const record = requireObject(body, 'body');
   const result: UpdateProfileRequestDTO = {};
@@ -285,6 +378,10 @@ function mapToHttpError(error: unknown): HttpError {
     return new HttpError(401, 'INVALID_EXTERNAL_ASSERTION', message);
   }
 
+  if (message.startsWith('Firebase ID token')) {
+    return new HttpError(401, 'INVALID_FIREBASE_ID_TOKEN', message);
+  }
+
   if (message.includes('was not found')) {
     return new HttpError(404, 'NOT_FOUND', message);
   }
@@ -317,8 +414,19 @@ export async function handleRequest(
     authAllowDemoUsers: boolean;
     allowLegacyWalletRoutes: boolean;
     externalAuthEnabled: boolean;
+    externalAuthMode: ExternalAuthMode;
     externalAuthIssuer: string;
+    externalAuthProxySharedSecret: string | undefined;
+    externalAuthFirebaseProjectId: string | undefined;
+    externalAuthFirebaseAudience: string | undefined;
+    externalAuthFirebaseIssuer: string | undefined;
+    externalAuthFirebaseCertsUrl: string;
+    externalAuthFirebaseVerifier: FirebaseVerifierMode;
     externalAuthVerificationSecrets: readonly string[];
+    verifyFirebaseIdTokenFn: (
+      idToken: string,
+      options: FirebaseIdTokenVerificationOptions,
+    ) => Promise<FirebaseExternalIdentity>;
   },
   allowLegacyWalletRoutes: boolean,
   persistRuntimeState: () => void,
@@ -348,7 +456,11 @@ export async function handleRequest(
           authDemoUsersEnabled: runtimeInfo.authAllowDemoUsers,
           legacyWalletRoutesEnabled: runtimeInfo.allowLegacyWalletRoutes,
           externalAuthEnabled: runtimeInfo.externalAuthEnabled,
+          externalAuthMode: runtimeInfo.externalAuthMode,
           externalAuthIssuer: runtimeInfo.externalAuthIssuer,
+          externalAuthFirebaseProjectId: runtimeInfo.externalAuthFirebaseProjectId,
+          externalAuthFirebaseIssuer: runtimeInfo.externalAuthFirebaseIssuer,
+          externalAuthFirebaseVerifier: runtimeInfo.externalAuthFirebaseVerifier,
           externalAuthSecretRotationEnabled: runtimeInfo.externalAuthVerificationSecrets.length > 1,
         },
       });
@@ -369,24 +481,71 @@ export async function handleRequest(
         throw new HttpError(503, 'EXTERNAL_AUTH_DISABLED', 'External auth is not enabled.');
       }
 
-      if (runtimeInfo.externalAuthVerificationSecrets.length === 0) {
-        throw new HttpError(500, 'SERVER_MISCONFIGURED', 'External auth shared secret is not configured.');
+      let loginResponse;
+      if (runtimeInfo.externalAuthMode === 'signed_assertion') {
+        if (runtimeInfo.externalAuthVerificationSecrets.length === 0) {
+          throw new HttpError(500, 'SERVER_MISCONFIGURED', 'External auth shared secret is not configured.');
+        }
+
+        const body = await readJsonBody(request);
+        const { assertion } = parseExternalAuthLoginRequest(body);
+        const payload = verifyExternalAuthAssertion(assertion, {
+          sharedSecrets: runtimeInfo.externalAuthVerificationSecrets,
+          expectedIssuer: runtimeInfo.externalAuthIssuer,
+        });
+        loginResponse = authWalletService.loginWithExternalIdentity({
+          provider: payload.iss,
+          subject: payload.sub,
+          email: payload.email,
+          firstName: payload.firstName,
+          lastName: payload.lastName,
+          role: payload.role,
+        });
+      } else if (runtimeInfo.externalAuthMode === 'trusted_headers') {
+        if (!runtimeInfo.externalAuthProxySharedSecret) {
+          throw new HttpError(
+            500,
+            'SERVER_MISCONFIGURED',
+            'External auth trusted proxy shared secret is not configured.',
+          );
+        }
+
+        requireTrustedProxyAuth(request, runtimeInfo.externalAuthProxySharedSecret);
+        const trustedIdentity = parseTrustedHeaderExternalLogin(request, runtimeInfo.externalAuthIssuer);
+        loginResponse = authWalletService.loginWithExternalIdentity({
+          provider: trustedIdentity.provider,
+          subject: trustedIdentity.subject,
+          email: trustedIdentity.email,
+          firstName: trustedIdentity.firstName,
+          lastName: trustedIdentity.lastName,
+          role: trustedIdentity.role,
+        });
+      } else {
+        if (!runtimeInfo.externalAuthFirebaseProjectId) {
+          throw new HttpError(
+            500,
+            'SERVER_MISCONFIGURED',
+            'External auth Firebase project id is not configured.',
+          );
+        }
+
+        const idToken = getFirebaseIdToken(request);
+        const firebaseIdentity = await runtimeInfo.verifyFirebaseIdTokenFn(idToken, {
+          projectId: runtimeInfo.externalAuthFirebaseProjectId,
+          audience: runtimeInfo.externalAuthFirebaseAudience,
+          issuer: runtimeInfo.externalAuthFirebaseIssuer,
+          certsUrl: runtimeInfo.externalAuthFirebaseCertsUrl,
+        });
+        loginResponse = authWalletService.loginWithExternalIdentity({
+          provider: firebaseIdentity.provider,
+          subject: firebaseIdentity.subject,
+          email: firebaseIdentity.email,
+          firstName: firebaseIdentity.firstName,
+          lastName: firebaseIdentity.lastName,
+          role: firebaseIdentity.role,
+        });
       }
 
-      const body = await readJsonBody(request);
-      const { assertion } = parseExternalAuthLoginRequest(body);
-      const payload = verifyExternalAuthAssertion(assertion, {
-        sharedSecrets: runtimeInfo.externalAuthVerificationSecrets,
-        expectedIssuer: runtimeInfo.externalAuthIssuer,
-      });
-      const loginResponse = authWalletService.loginWithExternalIdentity({
-        provider: payload.iss,
-        subject: payload.sub,
-        email: payload.email,
-        firstName: payload.firstName,
-        lastName: payload.lastName,
-        role: payload.role,
-      });
       persistRuntimeState();
       sendJson(response, 200, loginResponse);
       return;
@@ -573,11 +732,24 @@ const {
   authBootstrapUsers,
   allowLegacyWalletRoutes,
   externalAuthEnabled,
+  externalAuthMode,
   externalAuthIssuer,
   externalAuthSharedSecret,
   externalAuthSharedSecretPrevious,
+  externalAuthProxySharedSecret,
+  externalAuthFirebaseProjectId,
+  externalAuthFirebaseAudience,
+  externalAuthFirebaseIssuer,
+  externalAuthFirebaseCertsUrl,
+  externalAuthFirebaseVerifier,
+  externalAuthFirebaseServiceAccountFile,
   externalAuthVerificationSecrets,
 } = loadStartupConfig(process.env);
+
+const firebaseIdTokenVerifier = createFirebaseIdTokenVerifier({
+  verifierMode: externalAuthFirebaseVerifier,
+  firebaseAdminServiceAccountFile: externalAuthFirebaseServiceAccountFile,
+});
 const runtimeStateStore = persistenceEnabled ? new RuntimeStateStore(stateFilePath) : null;
 
 let persistedRuntimeState: RuntimeStateSnapshot | null = null;
@@ -659,8 +831,16 @@ const server = createServer((request, response) => {
       authAllowDemoUsers,
       allowLegacyWalletRoutes,
       externalAuthEnabled,
+      externalAuthMode,
       externalAuthIssuer,
+      externalAuthProxySharedSecret,
+      externalAuthFirebaseProjectId,
+      externalAuthFirebaseAudience,
+      externalAuthFirebaseIssuer,
+      externalAuthFirebaseCertsUrl,
+      externalAuthFirebaseVerifier,
       externalAuthVerificationSecrets,
+      verifyFirebaseIdTokenFn: firebaseIdTokenVerifier,
     },
     allowLegacyWalletRoutes,
     persistRuntimeState,
@@ -714,10 +894,18 @@ if (process.env.POKER_SERVER_NO_LISTEN !== '1') {
     console.info(`Auth demo users: ${authAllowDemoUsers ? 'enabled' : 'disabled'}`);
     console.info(`Legacy wallet routes: ${allowLegacyWalletRoutes ? 'enabled' : 'disabled'}`);
     console.info(
-      `External auth: ${externalAuthEnabled ? `enabled (issuer: ${externalAuthIssuer})` : 'disabled'}`,
+      `External auth: ${externalAuthEnabled ? `enabled (${externalAuthMode}, issuer: ${externalAuthIssuer})` : 'disabled'}`,
     );
-    if (externalAuthEnabled && externalAuthVerificationSecrets.length > 1) {
+    if (externalAuthEnabled && externalAuthMode === 'signed_assertion' && externalAuthVerificationSecrets.length > 1) {
       console.info('External auth secret rotation: previous verification secret is active.');
+    }
+    if (externalAuthEnabled && externalAuthMode === 'trusted_headers' && externalAuthProxySharedSecret) {
+      console.info('External auth trusted proxy mode: proxy shared secret is configured.');
+    }
+    if (externalAuthEnabled && externalAuthMode === 'firebase_id_token') {
+      console.info(
+        `External auth Firebase mode: verifier=${externalAuthFirebaseVerifier} project=${externalAuthFirebaseProjectId ?? 'unset'} issuer=${externalAuthFirebaseIssuer ?? 'unset'}`,
+      );
     }
     if (isProduction && authAllowDemoUsers) {
       console.warn('Production mode warning: demo users are enabled.');
