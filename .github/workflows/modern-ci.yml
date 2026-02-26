@@ -7,6 +7,7 @@ on:
       - 'modern/**'
       - 'package.json'
       - 'readme.md'
+      - '.npmrc'
       - '.nvmrc'
       - 'scripts/doctor-modern-env.mjs'
   push:
@@ -19,6 +20,7 @@ on:
       - 'modern/**'
       - 'package.json'
       - 'readme.md'
+      - '.npmrc'
       - '.nvmrc'
       - 'scripts/doctor-modern-env.mjs'
   workflow_dispatch:

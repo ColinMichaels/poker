@@ -240,6 +240,11 @@ These are not extraction failures, but they are blockers to deleting the legacy 
   - `.npmrc` with `engine-strict=true`
 - Updated setup docs to clarify required Node/npm versions are enforced during install.
 
+## Completed in PR AB
+
+- Expanded modern CI trigger scope to include npm engine-enforcement config changes:
+  - `.npmrc`
+
 ## Known Intentional Asset Exceptions
 
 - Non-canonical card extras remain excluded from canonical face set:
@@ -319,6 +324,7 @@ Exit criteria:
 25. PR Y: Health endpoint runtime mode diagnostics.
 26. PR Z: Production auth token secret fail-fast enforcement.
 27. PR AA: Repository-level npm engine enforcement.
+28. PR AB: Modern CI trigger coverage for `.npmrc` changes.
 
 ## Cutover Go/No-Go Checklist
 

@@ -558,3 +558,12 @@ Sources:
 - `.npmrc`
 - `README.md`
 - `docs/developer-setup.md`
+
+## PR AB Progress: CI Trigger Coverage for npmrc
+
+- Updated modern CI path filters to trigger when repository npm engine policy changes:
+  - `.npmrc`
+
+Sources:
+
+- `.github/workflows/modern-ci.yml`
