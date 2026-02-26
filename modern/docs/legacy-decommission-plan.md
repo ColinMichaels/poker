@@ -186,6 +186,12 @@ These are not extraction failures, but they are blockers to deleting the legacy 
   - `npm run doctor` (`scripts/doctor-modern-env.mjs`)
 - Updated onboarding docs to run environment doctor before workspace install/build flows.
 
+## Completed in PR T
+
+- Expanded modern CI trigger scope to include root toolchain guardrail files:
+  - `.nvmrc`
+  - `scripts/doctor-modern-env.mjs`
+
 ## Known Intentional Asset Exceptions
 
 - Non-canonical card extras remain excluded from canonical face set:
@@ -257,6 +263,7 @@ Exit criteria:
 17. PR Q: Legacy wallet route toggle with production-safe defaults.
 18. PR R: Extracted startup config parsing + dedicated regression tests.
 19. PR S: Root Node/npm environment doctor and engine alignment.
+20. PR T: Modern CI trigger coverage for root toolchain guardrails.
 
 ## Cutover Go/No-Go Checklist
 

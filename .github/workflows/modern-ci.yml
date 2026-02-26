@@ -7,6 +7,8 @@ on:
       - 'modern/**'
       - 'package.json'
       - 'readme.md'
+      - '.nvmrc'
+      - 'scripts/doctor-modern-env.mjs'
   push:
     branches:
       - main
@@ -17,6 +19,8 @@ on:
       - 'modern/**'
       - 'package.json'
       - 'readme.md'
+      - '.nvmrc'
+      - 'scripts/doctor-modern-env.mjs'
   workflow_dispatch:
 
 permissions:

@@ -452,3 +452,13 @@ Sources:
 - `package.json`
 - `.nvmrc`
 - `README.md`
+
+## PR T Progress: CI Trigger Coverage for Toolchain Guardrails
+
+- Updated modern CI workflow path filters to trigger on root toolchain guardrail updates:
+  - `.nvmrc`
+  - `scripts/doctor-modern-env.mjs`
+
+Sources:
+
+- `.github/workflows/modern-ci.yml`
