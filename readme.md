@@ -34,6 +34,7 @@ Or use root shortcuts:
 - Modern workspace guide: `modern/README.md`
 - Developer setup/troubleshooting: `modern/docs/developer-setup.md`
 - Legacy decommission + cutover status: `modern/docs/legacy-decommission-plan.md`
+- Final legacy removal runbook: `modern/docs/legacy-removal-execution.md`
 
 ## Legacy Codebase
 

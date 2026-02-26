@@ -373,3 +373,18 @@ Sources:
 
 - `scripts/check-legacy-references.mjs`
 - `package.json`
+
+## PR O Progress: Legacy Removal Execution Runbook
+
+- Added explicit final removal runbook for `legacy/` deletion with:
+  - preconditions
+  - pre-removal snapshot/tag workflow
+  - ordered removal tasks
+  - verification checklist
+  - rollback procedure
+- Linked the runbook from root and modern workspace readmes.
+
+Sources:
+
+- `docs/legacy-removal-execution.md`
+- `README.md`

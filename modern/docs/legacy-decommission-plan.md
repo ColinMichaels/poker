@@ -149,6 +149,12 @@ These are not extraction failures, but they are blockers to deleting the legacy 
 - Integrated legacy reference guard into canonical modern CI script:
   - `npm run ci`
 
+## Completed in PR O
+
+- Added final-step execution runbook for removing `legacy/` from default branch:
+  - `modern/docs/legacy-removal-execution.md`
+- Linked removal runbook from root + modern workspace documentation.
+
 ## Known Intentional Asset Exceptions
 
 - Non-canonical card extras remain excluded from canonical face set:
@@ -215,6 +221,7 @@ Exit criteria:
 12. PR L: Explicit acknowledgement wrapper for root legacy commands.
 13. PR M: Canonical modern CI script and workflow alignment.
 14. PR N: Runtime legacy-reference guard in modern CI.
+15. PR O: Legacy removal execution runbook and doc linkage.
 
 ## Cutover Go/No-Go Checklist
 

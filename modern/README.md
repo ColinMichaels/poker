@@ -18,6 +18,7 @@ This directory contains the modernization workspace for rebuilding the legacy po
 
 See `docs/developer-setup.md` for full setup/troubleshooting.
 See `docs/legacy-decommission-plan.md` for the staged plan to make modern the primary codebase.
+See `docs/legacy-removal-execution.md` for the final legacy removal runbook.
 See `docs/deployment-runbook.md` for modern runtime deployment entrypoints/checks.
 
 ## Commands
