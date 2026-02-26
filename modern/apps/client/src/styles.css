@@ -146,12 +146,16 @@ body {
 }
 
 .cta {
+  align-items: center;
   background: linear-gradient(180deg, var(--accent) 0%, var(--accent-strong) 100%);
   border: 0;
   border-radius: 999px;
   color: #fff;
   cursor: pointer;
+  display: inline-flex;
   font-weight: 700;
+  justify-content: center;
+  min-height: 44px;
   padding: 0.6rem 1.02rem;
   transition: transform 120ms ease, filter 120ms ease;
 }

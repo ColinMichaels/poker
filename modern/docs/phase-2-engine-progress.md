@@ -1109,3 +1109,18 @@ Sources:
 - `apps/client/package.json`
 - `package.json`
 - `.github/workflows/modern-ci.yml`
+
+## PR BH Progress: Mobile Reachability + Lobby Flow Browser Assertions
+
+- Expanded browser-level client UI regression coverage with:
+  - lobby seat-selection -> enter-table -> play-view transition assertion
+  - touch-target validation for primary lobby and play controls (>= 44px)
+  - mobile viewport reachability assertion for multi-table action bar placement
+  - mobile action-button and confirm-button touch-target validation (>= 44px)
+- Added browser harness viewport emulation/wait helpers for deterministic mobile assertions.
+- Updated primary CTA styling to enforce large touch-target minimum height (`44px`) for mobile-first ergonomics.
+
+Sources:
+
+- `apps/client/scripts/run-browser-ui-tests.mjs`
+- `apps/client/src/styles.css`

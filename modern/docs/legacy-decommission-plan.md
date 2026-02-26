@@ -548,6 +548,15 @@ These are not extraction failures, but they are blockers to deleting the legacy 
   - `.github/workflows/modern-ci.yml` sets `BROWSER_UI_REQUIRED=1` during `npm run ci`
 - Updated developer docs with browser test prerequisites and overrides (`BROWSER_UI_CHROME_BIN`).
 
+## Completed in PR BH
+
+- Expanded browser-level client UI checks for interaction and mobile ergonomics:
+  - lobby seat-selection and enter-table flow assertion
+  - mobile multi-table action-bar thumb-reach placement assertion
+  - large touch-target minimum assertions for primary CTA/action controls
+- Added viewport emulation and app-ready waiting utilities to the browser harness for stable mobile checks.
+- Updated client primary CTA styling to enforce `44px` minimum touch target height.
+
 ## Known Intentional Asset Exceptions
 
 - Non-canonical card extras remain excluded from canonical face set:
@@ -659,6 +668,7 @@ Exit criteria:
 57. PR BE: Client regression tests for multi-table legality and pending-state controls.
 58. PR BF: Multi-table action-submission integration tests and shared submit helper.
 59. PR BG: Browser-level multi-table UI regression harness and CI enforcement.
+60. PR BH: Mobile reachability and lobby-flow browser assertions with CTA touch-target hardening.
 
 ## Cutover Go/No-Go Checklist
 

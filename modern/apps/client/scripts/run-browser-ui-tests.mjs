@@ -225,6 +225,37 @@ function assertCondition(condition, message, details) {
   throw new Error(`${message}\n${JSON.stringify(details, null, 2)}`);
 }
 
+async function waitForAppReady(cdpClient) {
+  const start = Date.now();
+  while (Date.now() - start < STARTUP_TIMEOUT_MS) {
+    try {
+      const ready = await cdpClient.evaluate(`Boolean(document.querySelector('[data-role="view-multitable"]'))`);
+      if (ready) {
+        return;
+      }
+    } catch {
+      // Wait for runtime availability.
+    }
+    await sleep(120);
+  }
+  throw new Error('Timed out waiting for app shell controls.');
+}
+
+async function setViewport(cdpClient, viewport) {
+  await cdpClient.send('Emulation.setDeviceMetricsOverride', {
+    width: viewport.width,
+    height: viewport.height,
+    deviceScaleFactor: viewport.deviceScaleFactor,
+    mobile: viewport.mobile,
+    screenWidth: viewport.width,
+    screenHeight: viewport.height,
+  });
+  await cdpClient.send('Emulation.setTouchEmulationEnabled', {
+    enabled: viewport.mobile,
+    maxTouchPoints: viewport.mobile ? 5 : 0,
+  });
+}
+
 async function run() {
   if (!existsSync(VITE_BIN)) {
     throw new Error(`Unable to resolve Vite binary at "${VITE_BIN}". Run npm install from modern/.`);
@@ -279,6 +310,43 @@ async function run() {
     await cdpClient.connect();
     await cdpClient.send('Page.enable');
     await cdpClient.send('Runtime.enable');
+    await waitForAppReady(cdpClient);
+
+    const lobbyFlow = await cdpClient.evaluate(`
+      (async () => {
+        const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+        const seatButton = document.querySelector('[data-seat-id="3"]');
+        const enterButton = document.querySelector('[data-role="enter-table"]');
+        if (!seatButton || !enterButton) {
+          return { ok: false, reason: 'missing-lobby-controls' };
+        }
+
+        seatButton.click();
+        await sleep(80);
+        const updatedEnterButton = document.querySelector('[data-role="enter-table"]');
+        if (!updatedEnterButton) {
+          return { ok: false, reason: 'missing-updated-enter-button' };
+        }
+        const enterLabel = updatedEnterButton.textContent?.trim() ?? '';
+        const enterHeight = updatedEnterButton.getBoundingClientRect().height;
+        updatedEnterButton.click();
+        await sleep(120);
+
+        const playLayoutPresent = Boolean(document.querySelector('.play-layout'));
+        const actionHeights = Array.from(document.querySelectorAll('.actions-row .action-btn')).map((button) => button.getBoundingClientRect().height);
+        const minActionHeight = actionHeights.length > 0 ? Math.min(...actionHeights) : 0;
+        return {
+          ok: playLayoutPresent && /Seat\\s3/.test(enterLabel) && enterHeight >= 44 && minActionHeight >= 44,
+          enterLabel,
+          enterHeight,
+          playLayoutPresent,
+          actionButtonCount: actionHeights.length,
+          minActionHeight,
+        };
+      })()
+    `);
+
+    assertCondition(Boolean(lobbyFlow?.ok), 'Lobby flow and touch-target assertions failed.', lobbyFlow);
 
     const baseline = await cdpClient.evaluate(`
       (() => {
@@ -366,6 +434,90 @@ async function run() {
     `);
 
     assertCondition(Boolean(keyboardSubmit?.ok), 'Multi-table keyboard submit assertions failed.', keyboardSubmit);
+
+    await setViewport(cdpClient, {
+      width: 390,
+      height: 844,
+      deviceScaleFactor: 2,
+      mobile: true,
+    });
+    await cdpClient.send('Page.reload', { ignoreCache: true });
+    await waitForAppReady(cdpClient);
+
+    const mobileReachability = await cdpClient.evaluate(`
+      (async () => {
+        const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+        const lobbyEnterButton = document.querySelector('[data-role="enter-table"]');
+        const lobbyEnterHeight = lobbyEnterButton?.getBoundingClientRect().height ?? 0;
+
+        const multiViewButton = document.querySelector('[data-role="view-multitable"]');
+        if (!multiViewButton) {
+          return { ok: false, reason: 'missing-view-button' };
+        }
+        multiViewButton.click();
+
+        for (let index = 0; index < 20; index += 1) {
+          const actingPill = document.querySelector('.multi-table-pill.is-user-turn');
+          if (actingPill) {
+            actingPill.click();
+            break;
+          }
+          await sleep(50);
+        }
+        await sleep(100);
+
+        const actionBar = document.querySelector('.multi-table-action-bar');
+        const submitButton = document.querySelector('[data-role="multi-action-submit"]');
+        const actionButtons = Array.from(document.querySelectorAll('[data-role="multi-action-select"]'));
+        if (!actionBar || !submitButton || actionButtons.length === 0) {
+          return {
+            ok: false,
+            reason: 'missing-mobile-action-controls',
+            actionBar: Boolean(actionBar),
+            submitButton: Boolean(submitButton),
+            actionButtons: actionButtons.length,
+          };
+        }
+
+        const actionBarRect = actionBar.getBoundingClientRect();
+        const submitRect = submitButton.getBoundingClientRect();
+        const minActionHeight = actionButtons.reduce((minimum, button) => {
+          const nextHeight = button.getBoundingClientRect().height;
+          return Math.min(minimum, nextHeight);
+        }, Number.POSITIVE_INFINITY);
+        const computedPosition = getComputedStyle(actionBar).position;
+        const viewportHeight = window.innerHeight;
+        const bottomGap = viewportHeight - actionBarRect.bottom;
+        const actionBarInLowerHalf = actionBarRect.top >= viewportHeight * 0.45;
+        const thumbZoneTop = viewportHeight * 0.62;
+        const submitInThumbZone = submitRect.bottom >= thumbZoneTop;
+        const hasLargeTargets = lobbyEnterHeight >= 44 && submitRect.height >= 44 && minActionHeight >= 44;
+
+        return {
+          ok:
+            computedPosition === 'fixed' &&
+            actionBarInLowerHalf &&
+            bottomGap >= -2 &&
+            bottomGap <= 96 &&
+            submitInThumbZone &&
+            hasLargeTargets,
+          computedPosition,
+          bottomGap,
+          actionBarTop: actionBarRect.top,
+          viewportHeight,
+          submitTop: submitRect.top,
+          submitBottom: submitRect.bottom,
+          thumbZoneTop,
+          lobbyEnterHeight,
+          submitHeight: submitRect.height,
+          minActionHeight,
+          actionBarInLowerHalf,
+          submitInThumbZone,
+        };
+      })()
+    `);
+
+    assertCondition(Boolean(mobileReachability?.ok), 'Mobile action-bar reachability assertions failed.', mobileReachability);
     console.log('[browser-ui] Browser UI tests passed.');
   } finally {
     try {
