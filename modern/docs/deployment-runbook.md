@@ -12,10 +12,7 @@ This runbook describes the current modern runtime entrypoints for staging/produc
 From `modern/`:
 
 1. `npm ci`
-2. `npm run typecheck`
-3. `npm run build`
-4. `npm run test:engine`
-5. `npm run test:server`
+2. `npm run ci`
 
 ## Start Server
 

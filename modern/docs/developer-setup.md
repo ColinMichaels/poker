@@ -22,6 +22,7 @@ From repository root:
 
 - `npm run dev:client` - start Vite client dev server
 - `npm run dev:server` - start authoritative table server (watch mode)
+- `npm run ci` - run full modern CI verification locally (typecheck/build/engine/server tests)
 - `npm run typecheck` - run TypeScript checks in all workspaces
 - `npm run test:engine` - run poker-engine fixtures + reducer tests
 - `npm run test:server` - run server lifecycle + auth/wallet parity tests
@@ -31,6 +32,7 @@ From repository root:
 Root shortcut scripts are also available:
 
 - `npm run dev` (modern client)
+- `npm run ci` (modern full verification)
 - `npm run build` (modern workspace build)
 - `npm run test` (modern engine + server tests)
 
@@ -59,10 +61,7 @@ GitHub Actions workflow: `.github/workflows/modern-ci.yml`
 CI runs the following from `modern/`:
 
 1. `npm ci`
-2. `npm run typecheck`
-3. `npm run build`
-4. `npm run test:engine`
-5. `npm run test:server`
+2. `npm run ci`
 
 ## Troubleshooting
 

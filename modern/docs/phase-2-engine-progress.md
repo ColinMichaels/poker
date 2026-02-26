@@ -343,3 +343,19 @@ Sources:
 - `package.json`
 - `README.md`
 - `legacy/README.md`
+
+## PR M Progress: Canonical CI Script Alignment
+
+- Added canonical modern verification script:
+  - `modern/package.json` -> `ci`
+- Added root wrapper for the same verification flow:
+  - root `package.json` -> `ci`
+- Updated modern GitHub Actions workflow to execute:
+  - `npm run ci`
+
+Sources:
+
+- `modern/package.json`
+- `package.json`
+- `.github/workflows/modern-ci.yml`
+- `docs/developer-setup.md`

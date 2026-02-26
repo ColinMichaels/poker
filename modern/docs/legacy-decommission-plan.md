@@ -132,6 +132,14 @@ These are not extraction failures, but they are blockers to deleting the legacy 
   - `LEGACY_ARCHIVE_ACK=1 npm run legacy:dev`
   - `LEGACY_ARCHIVE_ACK=1 npm run legacy:build`
 
+## Completed in PR M
+
+- Added canonical modern CI verification script:
+  - `modern/package.json` -> `npm run ci`
+- Updated root wrapper to expose same verification entrypoint:
+  - `npm run ci`
+- Updated modern CI workflow to use canonical verification script to reduce drift.
+
 ## Known Intentional Asset Exceptions
 
 - Non-canonical card extras remain excluded from canonical face set:
@@ -196,6 +204,7 @@ Exit criteria:
 10. PR J: CI server-test coverage + root entrypoint trigger expansion.
 11. PR K: Legacy archive read-only CI guardrail.
 12. PR L: Explicit acknowledgement wrapper for root legacy commands.
+13. PR M: Canonical modern CI script and workflow alignment.
 
 ## Cutover Go/No-Go Checklist
 

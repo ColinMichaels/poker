@@ -4,6 +4,7 @@
     "dev": "npm run dev:client --prefix modern",
     "dev:client": "npm run dev:client --prefix modern",
     "dev:server": "npm run dev:server --prefix modern",
+    "ci": "npm run ci --prefix modern",
     "typecheck": "npm run typecheck --prefix modern",
     "build": "npm run build --prefix modern",
     "test": "npm run test:engine --prefix modern && npm run test:server --prefix modern",

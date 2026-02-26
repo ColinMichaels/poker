@@ -28,7 +28,7 @@ concurrency:
 
 jobs:
   modern-ci:
-    name: Typecheck, Build, Engine + Server Tests
+    name: Modern CI Verify
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -48,14 +48,5 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Typecheck
-        run: npm run typecheck
-
-      - name: Build
-        run: npm run build
-
-      - name: Engine Tests
-        run: npm run test:engine
-
-      - name: Server Tests
-        run: npm run test:server
+      - name: Verify
+        run: npm run ci

@@ -23,6 +23,7 @@
     "build": "npm run build --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
+    "ci": "npm run typecheck && npm run build && npm run test:engine && npm run test:server",
     "generate:howto-content": "node ./scripts/generate-howto-content.mjs",
     "generate:assets": "npm run generate --workspace @poker/asset-manifest",
     "generate:assets:normalize": "npm run generate:normalize --workspace @poker/asset-manifest",
