@@ -61,4 +61,4 @@ Auth/wallet sanity checks:
 - If production overrides enable demo users or legacy wallet routes, server startup logs explicit warnings.
 - Bootstrap file format accepts either a JSON array of user records or `{ "users": [...] }`. Each user requires `email` and `password` (or `passwordHash` in `scrypt$<salt-hex>$<digest-hex>` format).
 - Current auth API supports session revocation (`/api/auth/revoke-others`) and per-user audit logs.
-- Remaining production hardening: external identity provider, secret management/rotation, and role-based audit governance.
+- Remaining production hardening: external identity provider and secret management/rotation.

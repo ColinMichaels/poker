@@ -1154,3 +1154,32 @@ Sources:
 - `apps/client/src/win-odds.ts`
 - `apps/client/src/main.ts`
 - `apps/client/src/styles.css`
+
+## PR BK Progress: Role-Based Audit Visibility Boundaries
+
+- Added role primitives to shared auth contracts:
+  - `UserRole`: `PLAYER`, `OPERATOR`, `ADMIN`
+  - `UserProfileDTO` now includes `role`
+- Added server-side role normalization + defaults for auth users:
+  - default role is `PLAYER` when omitted
+  - invalid role values are rejected during bootstrap/restore normalization
+  - default demo users now include explicit roles (`colin@example.com` as `ADMIN`)
+- Added role-aware auth-audit visibility enforcement:
+  - `PLAYER` sessions can query only own-user audit records
+  - `OPERATOR`/`ADMIN` sessions can query cross-user or unscoped audit records
+- Added dedicated authorization helper + regression tests and included them in `test:server`.
+- Updated bootstrap-user docs/examples to include optional role configuration.
+
+Sources:
+
+- `packages/game-contracts/src/index.ts`
+- `apps/server/src/auth-wallet-service.ts`
+- `apps/server/src/auth-authorization.ts`
+- `apps/server/src/auth-authorization.test.ts`
+- `apps/server/src/index.ts`
+- `apps/server/src/startup-config.ts`
+- `apps/server/src/startup-config.test.ts`
+- `apps/server/src/auth-wallet-service.test.ts`
+- `apps/server/package.json`
+- `apps/server/bootstrap-users.example.json`
+- `apps/server/README.md`

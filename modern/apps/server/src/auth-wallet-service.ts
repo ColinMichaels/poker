@@ -4,6 +4,7 @@ import type {
   LoginRequestDTO,
   LoginResponseDTO,
   PlayerWalletDTO,
+  UserRole,
   UpdateProfileRequestDTO,
   UserProfileDTO,
   WalletAdjustmentRequestDTO,
@@ -19,6 +20,7 @@ const PASSWORD_HASH_KEY_LENGTH = 32;
 const PASSWORD_SALT_BYTES = 16;
 const MAX_AUTH_AUDIT_LIMIT = 500;
 const MAX_AUTH_AUDIT_ENTRIES = 2000;
+const ALLOWED_USER_ROLES: readonly UserRole[] = ['PLAYER', 'OPERATOR', 'ADMIN'];
 
 export type AuthAuditEvent =
   | 'LOGIN_SUCCESS'
@@ -45,6 +47,7 @@ export interface PersistedUserRecord {
   passwordHash: string;
   firstName: string;
   lastName: string;
+  role: UserRole;
   walletBalance: number;
   wins: number;
   gamesPlayed: number;
@@ -71,6 +74,7 @@ export interface AuthUserSeedRecord {
   password?: string;
   firstName?: string;
   lastName?: string;
+  role?: UserRole;
   walletBalance?: number;
   wins?: number;
   gamesPlayed?: number;
@@ -114,6 +118,22 @@ function cloneDeep<T>(value: T): T {
 
 function normalizeEmail(value: string): string {
   return value.trim().toLowerCase();
+}
+
+function isValidUserRole(value: unknown): value is UserRole {
+  return typeof value === 'string' && ALLOWED_USER_ROLES.includes(value as UserRole);
+}
+
+function normalizeUserRole(value: unknown): UserRole {
+  if (value === undefined || value === null) {
+    return 'PLAYER';
+  }
+
+  if (!isValidUserRole(value)) {
+    throw new Error(`Invalid user role: ${String(value)}`);
+  }
+
+  return value;
 }
 
 function requirePositiveInteger(value: number, label: string): void {
@@ -329,6 +349,7 @@ function normalizePersistedUserRecord(
   const lastName = typeof user.lastName === 'string' && user.lastName.trim().length > 0
     ? user.lastName.trim()
     : derivedName.lastName;
+  const role = normalizeUserRole(user.role);
 
   const walletBalance = Number.isInteger(user.walletBalance) && (user.walletBalance as number) >= 0
     ? (user.walletBalance as number)
@@ -344,6 +365,7 @@ function normalizePersistedUserRecord(
     passwordHash,
     firstName,
     lastName,
+    role,
     walletBalance,
     wins,
     gamesPlayed,
@@ -364,6 +386,7 @@ function buildDefaultUsers(): PersistedUserRecord[] {
       passwordHash: hashPassword('demo'),
       firstName: 'Colin',
       lastName: 'Player',
+      role: 'ADMIN',
       walletBalance: 500,
       wins: 0,
       gamesPlayed: 0,
@@ -376,6 +399,7 @@ function buildDefaultUsers(): PersistedUserRecord[] {
       passwordHash: hashPassword('demo'),
       firstName: 'Luna',
       lastName: 'Bot',
+      role: 'PLAYER',
       walletBalance: 500,
       wins: 0,
       gamesPlayed: 0,
@@ -788,6 +812,7 @@ export class AuthWalletService {
       firstName: user.firstName,
       lastName: user.lastName,
       displayName: `${user.firstName} ${user.lastName}`,
+      role: user.role,
       wallet: this.toWalletDTO(user),
     };
   }

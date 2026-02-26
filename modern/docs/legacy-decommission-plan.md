@@ -21,7 +21,6 @@ Purpose: make `modern/` the primary codebase without losing reusable legacy func
 These are not extraction failures, but they are blockers to deleting the legacy app:
 
 1. External identity integration is still pending (current auth is local account/session management only).
-2. Operational role/authorization boundaries are still pending for broader audit visibility requirements.
 
 ## Completed in PR A
 
@@ -577,6 +576,16 @@ These are not extraction failures, but they are blockers to deleting the legacy 
   - player HUD win-percent and best-hand context
 - Added dedicated client win-odds module (`apps/client/src/win-odds.ts`) to isolate odds logic from rendering concerns.
 
+## Completed in PR BK
+
+- Added role primitives to modern auth profile/session contracts (`PLAYER`, `OPERATOR`, `ADMIN`).
+- Added server-side role normalization + validation for bootstrap/restored users.
+- Added role-aware audit visibility boundaries:
+  - `PLAYER`: own auth-audit records only
+  - `OPERATOR`/`ADMIN`: cross-user or unscoped auth-audit visibility
+- Added dedicated auth-authorization regression tests and integrated them into `test:server`.
+- Updated server bootstrap-user documentation/examples to include role fields.
+
 ## Known Intentional Asset Exceptions
 
 - Non-canonical card extras remain excluded from canonical face set:
@@ -691,6 +700,7 @@ Exit criteria:
 60. PR BH: Mobile reachability and lobby-flow browser assertions with CTA touch-target hardening.
 61. PR BI: HowTo flip-card browser regression assertions.
 62. PR BJ: Winner-focused play-table UX and live win-chance mechanics.
+63. PR BK: Role-based auth audit visibility boundaries and contract role support.
 
 ## Cutover Go/No-Go Checklist
 

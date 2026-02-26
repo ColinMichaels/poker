@@ -1,9 +1,11 @@
 import fs from 'node:fs';
+import type { UserRole } from '@poker/game-contracts';
 import type { AuthUserSeedRecord } from './auth-wallet-service.ts';
 
 const DEFAULT_HOST = '127.0.0.1';
 const DEFAULT_PORT = 8787;
 const DEFAULT_TABLE_ID = 'table-1';
+const ALLOWED_USER_ROLES: readonly UserRole[] = ['PLAYER', 'OPERATOR', 'ADMIN'];
 
 function parsePort(rawValue: string | undefined): number {
   if (!rawValue) {
@@ -83,6 +85,10 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
 }
 
+function isValidUserRole(value: unknown): value is UserRole {
+  return typeof value === 'string' && ALLOWED_USER_ROLES.includes(value as UserRole);
+}
+
 function loadBootstrapUsersFromFile(filePathValue: string | undefined): AuthUserSeedRecord[] | undefined {
   const filePath = filePathValue?.trim();
   if (!filePath) {
@@ -129,6 +135,10 @@ function loadBootstrapUsersFromFile(filePathValue: string | undefined): AuthUser
     const hasPasswordHash = typeof entry.passwordHash === 'string' && entry.passwordHash.length > 0;
     if (!hasPassword && !hasPasswordHash) {
       throw new Error(`Bootstrap user at index ${index} must include password or passwordHash.`);
+    }
+
+    if (entry.role !== undefined && !isValidUserRole(entry.role)) {
+      throw new Error(`Bootstrap user at index ${index} must use role PLAYER, OPERATOR, or ADMIN when provided.`);
     }
 
     return entry as unknown as AuthUserSeedRecord;

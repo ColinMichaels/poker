@@ -55,13 +55,14 @@ Auth/session behavior:
 
 - Passwords are stored as salted `scrypt` hashes.
 - Session tokens are HMAC-signed and expire by ttl.
+- User profiles include a role (`PLAYER`, `OPERATOR`, or `ADMIN`).
 
 ## HTTP API
 
 - `POST /api/auth/login`
 - `POST /api/auth/logout`
 - `GET /api/auth/session`
-- `GET /api/auth/audit?limit=100`
+- `GET /api/auth/audit?limit=100&userId=<id>`
 - `POST /api/auth/revoke-others`
 - `GET /api/users/me`
 - `PATCH /api/users/me`
@@ -100,4 +101,10 @@ Bootstrap users file:
 - Record fields:
   - required: `email` and one of `password` or `passwordHash`
   - `passwordHash` must be a salted `scrypt$<salt-hex>$<digest-hex>` value
-  - optional: `id`, `firstName`, `lastName`, `walletBalance`, `wins`, `gamesPlayed`, `walletUpdatedAt`, `walletLedger`
+  - optional: `id`, `firstName`, `lastName`, `role`, `walletBalance`, `wins`, `gamesPlayed`, `walletUpdatedAt`, `walletLedger`
+  - when provided, `role` must be one of `PLAYER`, `OPERATOR`, or `ADMIN`
+
+Auth audit authorization:
+
+- `PLAYER` sessions can only read their own auth-audit records.
+- `OPERATOR` and `ADMIN` sessions can read cross-user records (`userId`) or all records (no `userId` filter).

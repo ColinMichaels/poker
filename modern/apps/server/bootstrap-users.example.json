@@ -6,6 +6,7 @@
       "password": "change-me",
       "firstName": "Admin",
       "lastName": "User",
+      "role": "ADMIN",
       "walletBalance": 1000,
       "wins": 0,
       "gamesPlayed": 0
@@ -13,6 +14,7 @@
     {
       "email": "qa.player@example.com",
       "password": "change-me",
+      "role": "PLAYER",
       "walletBalance": 500
     }
   ]

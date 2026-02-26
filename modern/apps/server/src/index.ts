@@ -1,7 +1,8 @@
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
-import type { LoginRequestDTO, UpdateProfileRequestDTO, WalletAdjustmentRequestDTO } from '@poker/game-contracts';
+import type { LoginRequestDTO, UpdateProfileRequestDTO, UserRole, WalletAdjustmentRequestDTO } from '@poker/game-contracts';
 import type { TableCommand } from '@poker/poker-engine';
 import { AuthWalletService } from './auth-wallet-service.ts';
+import { resolveAuditScopeUserId } from './auth-authorization.ts';
 import { RuntimeStateStore, type RuntimeStateSnapshot } from './runtime-state-store.ts';
 import { loadStartupConfig } from './startup-config.ts';
 import { TableService, createDefaultTableState } from './table-service.ts';
@@ -278,6 +279,7 @@ function mapToHttpError(error: unknown): HttpError {
 function requireAuthenticatedContext(request: IncomingMessage, authWalletService: AuthWalletService): {
   token: string;
   userId: number;
+  role: UserRole;
 } {
   const token = getBearerToken(request);
   const context = authWalletService.requireAuth(token);
@@ -285,6 +287,7 @@ function requireAuthenticatedContext(request: IncomingMessage, authWalletService
   return {
     token: context.token,
     userId: context.user.id,
+    role: context.user.role,
   };
 }
 
@@ -356,16 +359,18 @@ async function handleRequest(
     }
 
     if (method === 'GET' && pathname === '/api/auth/audit') {
-      const { userId } = requireAuthenticatedContext(request, authWalletService);
+      const { userId, role } = requireAuthenticatedContext(request, authWalletService);
       const limit = parseLogLimit(requestUrl.searchParams.get('limit'), 100);
       const requestedUserId = parseOptionalPositiveInteger(requestUrl.searchParams.get('userId'), 'userId');
-
-      if (requestedUserId !== undefined && requestedUserId !== userId) {
-        throw new HttpError(403, 'FORBIDDEN', 'Cannot access audit logs for another user.');
+      let auditFilterUserId: number | undefined;
+      try {
+        auditFilterUserId = resolveAuditScopeUserId(userId, role, requestedUserId);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        throw new HttpError(403, 'FORBIDDEN', message);
       }
-
       sendJson(response, 200, {
-        records: authWalletService.getAuthAuditLog(limit, requestedUserId ?? userId),
+        records: authWalletService.getAuthAuditLog(limit, auditFilterUserId),
       });
       return;
     }

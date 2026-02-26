@@ -146,6 +146,21 @@ function testRejectsInvalidBootstrapUsersAndEnvValues(): void {
       'utf8',
     );
 
+    const invalidRoleUsersPath = path.join(tempDir, 'users-invalid-role.json');
+    fs.writeFileSync(
+      invalidRoleUsersPath,
+      JSON.stringify({
+        users: [
+          {
+            email: 'invalid-role@example.com',
+            password: 'demo',
+            role: 'INVALID',
+          },
+        ],
+      }),
+      'utf8',
+    );
+
     assertThrows(
       () => loadStartupConfig({ PORT: '0' }),
       /Invalid PORT value/,
@@ -162,6 +177,12 @@ function testRejectsInvalidBootstrapUsersAndEnvValues(): void {
       () => loadStartupConfig({ POKER_AUTH_BOOTSTRAP_USERS_FILE: invalidUsersPath }),
       /must include password or passwordHash/,
       'Expected invalid bootstrap users to fail validation.',
+    );
+
+    assertThrows(
+      () => loadStartupConfig({ POKER_AUTH_BOOTSTRAP_USERS_FILE: invalidRoleUsersPath }),
+      /must use role PLAYER, OPERATOR, or ADMIN/i,
+      'Expected invalid bootstrap role values to fail validation.',
     );
   } finally {
     fs.rmSync(tempDir, { recursive: true, force: true });

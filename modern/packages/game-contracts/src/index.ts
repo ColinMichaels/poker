@@ -73,12 +73,15 @@ export interface PlayerWalletDTO {
   updatedAt: string;
 }
 
+export type UserRole = 'PLAYER' | 'OPERATOR' | 'ADMIN';
+
 export interface UserProfileDTO {
   id: number;
   email: string;
   firstName: string;
   lastName: string;
   displayName: string;
+  role: UserRole;
   wallet: PlayerWalletDTO;
 }
 

@@ -177,6 +177,7 @@ function testBootstrapsUsersFromSeedRecords(): void {
         password: 'bravo',
         firstName: 'Sam',
         lastName: 'Seeder',
+        role: 'OPERATOR',
         walletBalance: 650,
         wins: 3,
         gamesPlayed: 7,
@@ -189,7 +190,9 @@ function testBootstrapsUsersFromSeedRecords(): void {
 
   assertEqual(alexLogin.session.user.id, 1, 'Expected first bootstrap user without id to get fallback id 1.');
   assertEqual(alexLogin.session.user.displayName, 'Alex Smith', 'Expected default display name to derive from email.');
+  assertEqual(alexLogin.session.user.role, 'PLAYER', 'Expected missing bootstrap role to default to PLAYER.');
   assertEqual(samLogin.session.user.id, 10, 'Expected explicit bootstrap user id to be preserved.');
+  assertEqual(samLogin.session.user.role, 'OPERATOR', 'Expected bootstrap role override to persist.');
 
   const alexWallet = service.getWallet(alexLogin.session.user.id);
   const samWallet = service.getWallet(samLogin.session.user.id);
@@ -202,6 +205,33 @@ function testBootstrapsUsersFromSeedRecords(): void {
   assert(
     alexSnapshot.passwordHash.startsWith('scrypt$'),
     'Expected bootstrap plaintext password to be persisted as scrypt hash.',
+  );
+}
+
+function testDefaultDemoUserRoles(): void {
+  const service = new AuthWalletService();
+  const colinSession = service.login({ email: 'colin@example.com', password: 'demo' }).session;
+  const lunaSession = service.login({ email: 'luna@example.com', password: 'demo' }).session;
+
+  assertEqual(colinSession.user.role, 'ADMIN', 'Expected default primary demo user to have ADMIN role.');
+  assertEqual(lunaSession.user.role, 'PLAYER', 'Expected secondary demo user to have PLAYER role.');
+}
+
+function testRejectsInvalidUserRoleValues(): void {
+  assertThrows(
+    () => new AuthWalletService({
+      allowDefaultUsers: false,
+      users: [
+        {
+          id: 140,
+          email: 'invalid-role@example.com',
+          password: 'demo',
+          role: 'INVALID' as unknown as 'PLAYER',
+        },
+      ],
+    }),
+    /Invalid user role/,
+    'Expected invalid role values to be rejected during normalization.',
   );
 }
 
@@ -315,6 +345,8 @@ function runAll(): void {
   testSessionExpiry();
   testCanDisableDefaultUsers();
   testBootstrapsUsersFromSeedRecords();
+  testDefaultDemoUserRoles();
+  testRejectsInvalidUserRoleValues();
   testRestoresLegacyPlaintextUserRecords();
   testRestoresLegacyPlaintextPasswordHashField();
   testRejectsUnsupportedPasswordHashFormat();
