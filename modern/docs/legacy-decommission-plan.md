@@ -260,6 +260,14 @@ These are not extraction failures, but they are blockers to deleting the legacy 
   - `scripts/check-legacy-cutover-readiness.mjs`
 - Linked readiness command from root and legacy-removal execution docs.
 
+## Completed in PR AE
+
+- Added root legacy-reference inventory command:
+  - `npm run audit:legacy-references`
+- Added script:
+  - `scripts/audit-legacy-references.mjs`
+- Linked command from root and legacy-removal execution docs.
+
 ## Known Intentional Asset Exceptions
 
 - Non-canonical card extras remain excluded from canonical face set:
@@ -342,6 +350,7 @@ Exit criteria:
 28. PR AB: Modern CI trigger coverage for `.npmrc` changes.
 29. PR AC: Production compatibility-override startup warnings.
 30. PR AD: Legacy cutover readiness command.
+31. PR AE: Legacy-reference inventory command for cutover planning.
 
 ## Cutover Go/No-Go Checklist
 

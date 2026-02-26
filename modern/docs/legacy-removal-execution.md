@@ -16,6 +16,7 @@ Before removing `legacy/`, all items below must be true:
 Quick helper:
 
 - From repository root, run `npm run readiness:legacy-cutover` for baseline static checks before opening the removal PR.
+- From repository root, run `npm run audit:legacy-references` to inventory remaining non-archive `legacy/` path references.
 
 ## Pre-Removal Snapshot
 

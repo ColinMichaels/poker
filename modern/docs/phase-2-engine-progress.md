@@ -594,3 +594,15 @@ Sources:
 - `scripts/check-legacy-cutover-readiness.mjs`
 - `package.json`
 - `docs/legacy-removal-execution.md`
+
+## PR AE Progress: Legacy Reference Inventory Command
+
+- Added root inventory command for cutover prep:
+  - `npm run audit:legacy-references`
+- Command reports files containing `legacy/` references outside the archived `legacy/` directory.
+
+Sources:
+
+- `scripts/audit-legacy-references.mjs`
+- `package.json`
+- `README.md`

@@ -29,6 +29,7 @@ Or use root shortcuts:
 - `npm run dev` (modern client)
 - `npm run dev:server`
 - `npm run ci` (doctor + modern typecheck/build/engine/server tests)
+- `npm run audit:legacy-references` (inventory `legacy/` path references outside archive)
 - `npm run readiness:legacy-cutover` (legacy-removal static readiness checks)
 - `npm run typecheck`
 - `npm run build`
