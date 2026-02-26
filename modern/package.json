@@ -18,7 +18,7 @@
     "preview": "npm run preview --workspace @poker/client",
     "build:client": "npm run build --workspace @poker/client",
     "build:server": "npm run build --workspace @poker/server",
-    "test:client": "npm run test --workspace @poker/client",
+    "test:client": "npm run test --workspace @poker/client && npm run test:browser-ui --workspace @poker/client",
     "test:engine": "npm run test --workspace @poker/poker-engine",
     "test:server": "npm run test --workspace @poker/server",
     "build": "npm run build --workspaces --if-present",

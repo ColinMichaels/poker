@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:browser-ui": "node ./scripts/run-browser-ui-tests.mjs"
   },
   "dependencies": {
     "@poker/game-contracts": "file:../../packages/game-contracts",

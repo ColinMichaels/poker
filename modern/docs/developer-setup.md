@@ -25,10 +25,12 @@ From repository root:
 
 - `npm run dev:client` - start Vite client dev server
 - `npm run dev:server` - start authoritative table server (watch mode)
-- `npm run ci` - run full modern CI verification locally (typecheck/build/engine/server tests)
+- `npm run ci` - run full modern CI verification locally (typecheck/build/client browser + unit tests/engine/server tests)
 - `npm run check:legacy-refs` - ensure runtime source stays independent from `legacy/` paths
 - `npm run check:server-env-template` - verify server env template includes required keys
 - `npm run typecheck` - run TypeScript checks in all workspaces
+- `npm run test:client` - run client unit tests and browser-level UI checks
+- `npm run test:browser-ui --workspace @poker/client` - run browser-level UI assertions against built client output (`apps/client/dist`)
 - `npm run test:engine` - run poker-engine fixtures + reducer tests
 - `npm run test:server` - run server lifecycle + auth/wallet parity tests
 - `npm run generate:howto-content` - regenerate migrated legacy HowTo content
@@ -105,3 +107,10 @@ If install still fails with engine constraints, run:
 ### DNS/network install failures
 
 If npm cannot resolve `registry.npmjs.org` (`ENOTFOUND`), this is a network/DNS/proxy issue outside project config.
+
+### Browser UI test skips or fails
+
+- `test:browser-ui` requires a Chrome/Chromium binary plus built client output (`apps/client/dist/index.html`).
+- If Chrome is not auto-detected, set:
+  - `BROWSER_UI_CHROME_BIN=/absolute/path/to/chrome`
+- In CI, `BROWSER_UI_REQUIRED=1` is enabled so missing browser binaries fail fast instead of skipping.

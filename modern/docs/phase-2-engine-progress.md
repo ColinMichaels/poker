@@ -1068,3 +1068,44 @@ Sources:
 - `apps/client/src/main.ts`
 - `apps/client/package.json`
 - `package.json`
+
+## PR BF Progress: Multi-Table Action Submission Integration Tests
+
+- Extracted multi-table action submission flow into a dedicated runtime helper:
+  - legal/illegal submission guards
+  - target-bet amount clamping at submit time
+  - action-specific activity-note generation
+  - controller invocation boundary for `performUserAction`
+- Rewired `main.ts` multi-table submit path to use the shared submission helper.
+- Added integration-style client tests for submit flow:
+  - illegal action request path
+  - not-on-turn rejection path
+  - raise amount clamp behavior
+  - raise-intent mapped to `BET` submission behavior
+
+Sources:
+
+- `apps/client/src/multi-table-action-submit.ts`
+- `apps/client/tests/multi-table-action-submit.test.ts`
+- `apps/client/src/main.ts`
+
+## PR BG Progress: Browser-Level Multi-Table UI Regression Harness
+
+- Added a headless Chrome + CDP browser test harness for client UI runtime assertions:
+  - spins up `vite preview` against built client output
+  - validates multi-table action-bar legality/disabled-state alignment
+  - validates desktop keyboard `Enter` submit flow updates activity feed
+- Added explicit CI enforcement mode for browser availability:
+  - local default: skip browser checks if Chrome/Chromium is unavailable
+  - CI mode (`BROWSER_UI_REQUIRED=1`): fail fast when browser binary is unavailable
+- Updated modern client test scripting:
+  - `apps/client/package.json` includes `test:browser-ui`
+  - `modern/package.json` `test:client` runs unit tests plus browser-level UI checks
+- Updated modern CI workflow to require browser-level UI checks during canonical verification.
+
+Sources:
+
+- `apps/client/scripts/run-browser-ui-tests.mjs`
+- `apps/client/package.json`
+- `package.json`
+- `.github/workflows/modern-ci.yml`

@@ -525,6 +525,29 @@ These are not extraction failures, but they are blockers to deleting the legacy 
 - Extracted shared multi-table legality helpers into a dedicated client module and wired `main.ts` to consume it.
 - Updated canonical modern CI script to include client tests (`npm run test:client`).
 
+## Completed in PR BF
+
+- Extracted multi-table action-submission execution into a dedicated helper module:
+  - controller availability/turn-ownership/legality guards
+  - target-bet amount clamp at submit boundary
+  - action-specific activity-note generation
+- Updated multi-table submit flow in client screen wiring to consume the shared helper.
+- Added integration-style client tests for multi-table submit behavior:
+  - legal vs illegal submit transitions
+  - not-on-turn rejection
+  - raise/bet amount clamping and intent mapping correctness.
+
+## Completed in PR BG
+
+- Added browser-level client UI regression coverage using a headless Chrome + CDP harness:
+  - validates multi-table action-bar legality/disabled-state alignment in a real browser runtime
+  - validates desktop keyboard submit flow (`Enter`) updates live activity feed state
+- Integrated browser-level UI assertions into canonical client test script:
+  - `modern/package.json` -> `test:client` now runs unit tests plus browser checks
+- Enforced non-skipping browser coverage in GitHub modern CI:
+  - `.github/workflows/modern-ci.yml` sets `BROWSER_UI_REQUIRED=1` during `npm run ci`
+- Updated developer docs with browser test prerequisites and overrides (`BROWSER_UI_CHROME_BIN`).
+
 ## Known Intentional Asset Exceptions
 
 - Non-canonical card extras remain excluded from canonical face set:
@@ -634,11 +657,14 @@ Exit criteria:
 55. PR BC: Multi-table pending-decision urgency and action-confirmation feedback.
 56. PR BD: Multi-table live runtime wiring for pending state and legal actions.
 57. PR BE: Client regression tests for multi-table legality and pending-state controls.
+58. PR BF: Multi-table action-submission integration tests and shared submit helper.
+59. PR BG: Browser-level multi-table UI regression harness and CI enforcement.
 
 ## Cutover Go/No-Go Checklist
 
 - `npm run typecheck` passes in `modern/`.
 - `npm run build` passes in `modern/`.
+- `npm run test:client` passes in `modern/`.
 - `npm run test:engine` passes in `modern/`.
 - `npm run test:server` passes in `modern/`.
 - Required user journeys validated in modern app.

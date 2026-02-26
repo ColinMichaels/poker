@@ -34,7 +34,8 @@ From `modern/`:
 - `npm run check:legacy-refs` - verify modern runtime source does not introduce new `legacy/` path references
 - `npm run check:server-env-template` - verify `apps/server/.env.example` includes required server env keys
 - `npm run typecheck` - run TypeScript checks across all workspaces
-- `npm run test:client` - run client regression tests (multi-table legality/runtime wiring)
+- `npm run test:client` - run client unit + browser-level UI regression tests
+- `npm run test:browser-ui --workspace @poker/client` - run browser-level UI assertions against built client output
 - `npm run build:server` - compile the server workspace
 - `npm run test:server` - run server hand lifecycle + auth/wallet tests
 - `npm run generate:howto-content` - extract legacy `HowTo` Vue content into modern typed guide data
