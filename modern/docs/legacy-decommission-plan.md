@@ -564,6 +564,19 @@ These are not extraction failures, but they are blockers to deleting the legacy 
   - verifies second click restores the original state
 - Extended browser UI harness coverage so restored HowTo card interactivity remains protected in CI/local browser verification.
 
+## Completed in PR BJ
+
+- Added live player-facing win-chance mechanics to modern play-table UX:
+  - deterministic seeded simulations for incomplete-board win percentages
+  - deterministic showdown odds when board is complete
+  - payout-share rendering mode for hand-complete outcomes
+- Added winner-forward visual UX in play table:
+  - prominent hand outcome winner/split banner
+  - turn-panel per-seat win probability bars
+  - seat-card odds leader/winner highlights and outcome pills
+  - player HUD win-percent and best-hand context
+- Added dedicated client win-odds module (`apps/client/src/win-odds.ts`) to isolate odds logic from rendering concerns.
+
 ## Known Intentional Asset Exceptions
 
 - Non-canonical card extras remain excluded from canonical face set:
@@ -677,6 +690,7 @@ Exit criteria:
 59. PR BG: Browser-level multi-table UI regression harness and CI enforcement.
 60. PR BH: Mobile reachability and lobby-flow browser assertions with CTA touch-target hardening.
 61. PR BI: HowTo flip-card browser regression assertions.
+62. PR BJ: Winner-focused play-table UX and live win-chance mechanics.
 
 ## Cutover Go/No-Go Checklist
 

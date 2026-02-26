@@ -76,18 +76,36 @@ body {
   animation: shell-cue-settle var(--motion-mid) var(--easing-soft);
 }
 
-.table-header {
+.app-topbar {
+  align-items: center;
   border-bottom: 1px solid var(--line-soft);
-  display: grid;
-  gap: 0.7rem;
-  padding-bottom: 0.75rem;
+  display: flex;
+  gap: 0.6rem;
+  justify-content: space-between;
+  padding-bottom: 0.58rem;
 }
 
-.table-header h1 {
+.app-topbar-brand {
+  display: grid;
+  gap: 0.1rem;
+}
+
+.app-badge {
+  color: #25536a;
   font-family: var(--display);
-  font-size: clamp(1.45rem, 6.4vw, 2.35rem);
-  letter-spacing: 0.03em;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
   margin: 0;
+}
+
+.app-status {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.04em;
+  margin: 0;
+  text-transform: uppercase;
 }
 
 .eyebrow {
@@ -99,16 +117,12 @@ body {
   text-transform: uppercase;
 }
 
-.status-line {
-  font-size: 0.92rem;
-  margin: 0;
-}
-
-.header-actions {
+.app-topbar-nav {
   align-items: center;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.45rem;
+  gap: 0.38rem;
+  justify-content: flex-end;
 }
 
 .view-tab,
@@ -167,6 +181,12 @@ body {
   transform: translateY(-1px);
 }
 
+.cta-compact {
+  font-size: 0.72rem;
+  min-height: 36px;
+  padding: 0.35rem 0.7rem;
+}
+
 .table-metrics {
   display: grid;
   gap: 0.55rem;
@@ -175,6 +195,30 @@ body {
 
 .table-metrics.is-refresh {
   animation: metrics-flash 320ms ease-out;
+}
+
+.hand-outcome-banner {
+  background: linear-gradient(150deg, #fff9e8 0%, #f3e2c1 100%);
+  border: 1px solid #d7b27a;
+  border-radius: 16px;
+  box-shadow: 0 10px 22px rgb(88 54 19 / 14%);
+  padding: 0.72rem 0.8rem;
+}
+
+.hand-outcome-banner h3 {
+  font-family: var(--display);
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.hand-outcome-banner p {
+  color: #62411c;
+  margin: 0.2rem 0 0;
+}
+
+.hand-outcome-banner.is-uncontested {
+  background: linear-gradient(150deg, #f1ffec 0%, #d4f0d6 100%);
+  border-color: #94be9b;
 }
 
 .metric-pill {
@@ -631,8 +675,8 @@ body {
 
 .turn-panel,
 .controls-panel,
-.event-log,
-.howto-panel {
+.howto-panel,
+.audit-log {
   background: #fff;
   border: 1px solid var(--line-soft);
   border-radius: 18px;
@@ -640,8 +684,7 @@ body {
 }
 
 .turn-panel h2,
-.controls-panel h2,
-.event-log h2 {
+.controls-panel h2 {
   font-family: var(--display);
   font-size: 1.12rem;
   letter-spacing: 0.01em;
@@ -681,6 +724,114 @@ body {
 
 .turn-panel.is-shift {
   animation: turn-shift var(--motion-mid) var(--easing-soft);
+}
+
+.turn-odds {
+  border-top: 1px dashed #dfc7a3;
+  margin-top: 0.65rem;
+  padding-top: 0.58rem;
+}
+
+.turn-odds-head {
+  align-items: baseline;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: space-between;
+}
+
+.turn-odds-head h3 {
+  font-family: var(--display);
+  font-size: 0.98rem;
+  margin: 0;
+}
+
+.turn-odds-head p {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.04em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.turn-odds-list {
+  display: grid;
+  gap: 0.38rem;
+  margin-top: 0.48rem;
+}
+
+.turn-odds-row {
+  background: #fff;
+  border: 1px solid #e7d7be;
+  border-radius: 12px;
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.36rem 0.42rem;
+}
+
+.turn-odds-row.is-leader {
+  border-color: #cc9148;
+  box-shadow: 0 0 0 1px rgb(204 145 72 / 16%);
+}
+
+.turn-odds-row.is-winner {
+  border-color: #76a77d;
+  box-shadow: 0 0 0 1px rgb(118 167 125 / 20%);
+}
+
+.turn-odds-row.is-out {
+  opacity: 0.72;
+}
+
+.turn-odds-meta {
+  align-items: baseline;
+  display: flex;
+  justify-content: space-between;
+}
+
+.turn-odds-seat {
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.04em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.turn-odds-percent {
+  font-size: 0.84rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.turn-odds-bar {
+  background: #f0e4d2;
+  border-radius: 999px;
+  height: 7px;
+  overflow: hidden;
+}
+
+.turn-odds-bar span {
+  background: linear-gradient(90deg, #cf7a26 0%, #f3bc74 100%);
+  border-radius: inherit;
+  display: block;
+  height: 100%;
+}
+
+.turn-odds-foot {
+  align-items: baseline;
+  display: flex;
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  justify-content: space-between;
+}
+
+.turn-odds-foot span {
+  color: #7a5f3e;
+}
+
+.turn-odds-foot small {
+  color: var(--muted);
+  font-size: 0.58rem;
 }
 
 .player-hud {
@@ -752,7 +903,7 @@ body {
 .player-hud-stats {
   display: grid;
   gap: 0.32rem;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .player-hud-stats p {
@@ -819,6 +970,16 @@ body {
   border-color: var(--success);
 }
 
+.seat-card.is-odds-leader {
+  border-color: #d39849;
+  box-shadow: 0 0 0 2px rgb(211 152 73 / 15%);
+}
+
+.seat-card.is-winner {
+  border-color: #6eac74;
+  box-shadow: 0 0 0 2px rgb(110 172 116 / 20%);
+}
+
 .seat-card header {
   align-items: center;
   display: grid;
@@ -869,6 +1030,80 @@ body {
   gap: 0.35rem;
   grid-template-columns: repeat(2, minmax(56px, 76px));
   margin: 0.58rem 0;
+}
+
+.seat-outcome-pill {
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.04em;
+  margin: 0 0 0.42rem;
+  padding: 0.18rem 0.52rem;
+  text-transform: uppercase;
+  width: fit-content;
+}
+
+.seat-outcome-pill.is-leader {
+  background: #f7e7cc;
+  color: #714014;
+}
+
+.seat-outcome-pill.is-winner {
+  background: #dff2e2;
+  color: #1b6130;
+}
+
+.seat-outcome-pill.is-muted {
+  background: #ece7da;
+  color: #6b6458;
+}
+
+.seat-win-meter {
+  display: grid;
+  gap: 0.26rem;
+  margin-bottom: 0.45rem;
+}
+
+.seat-win-meter p {
+  align-items: baseline;
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+}
+
+.seat-win-meter span {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.seat-win-meter strong {
+  font-size: 0.8rem;
+}
+
+.seat-win-track {
+  background: #efdfc7;
+  border-radius: 999px;
+  height: 8px;
+  overflow: hidden;
+}
+
+.seat-win-track span {
+  background: linear-gradient(90deg, #cf7a26 0%, #efb362 100%);
+  border-radius: inherit;
+  display: block;
+  height: 100%;
+}
+
+.seat-showdown-label {
+  color: #62411c;
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.04em;
+  margin: 0 0 0.46rem;
+  text-transform: uppercase;
 }
 
 .seat-card dl {
@@ -1015,6 +1250,13 @@ body {
 .controls-head {
   display: grid;
   gap: 0.28rem;
+}
+
+.controls-head-row {
+  align-items: center;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: space-between;
 }
 
 .controls-head p {
@@ -1172,7 +1414,53 @@ body {
   padding-top: 0.58rem;
 }
 
-.event-log ul {
+.audit-log {
+  margin-top: 0.2rem;
+  overflow: hidden;
+  padding: 0;
+}
+
+.audit-log summary {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  list-style: none;
+  padding: 0.62rem 0.8rem;
+  user-select: none;
+}
+
+.audit-log summary::-webkit-details-marker {
+  display: none;
+}
+
+.audit-log summary span {
+  font-family: var(--display);
+  font-size: 1rem;
+}
+
+.audit-log summary small {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.audit-log-body {
+  border-top: 1px solid #ead7b8;
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.66rem 0.8rem 0.8rem;
+}
+
+.audit-log-body p {
+  color: var(--muted);
+  font-size: 0.78rem;
+  margin: 0;
+}
+
+.audit-log-body ul {
   display: grid;
   gap: 0.33rem;
   list-style: none;
@@ -1182,7 +1470,7 @@ body {
   padding: 0;
 }
 
-.event-log li {
+.audit-log-body li {
   align-items: baseline;
   border-bottom: 1px solid #f2e6d1;
   column-gap: 0.4rem;
@@ -1193,33 +1481,33 @@ body {
   padding-bottom: 0.24rem;
 }
 
-.event-log.is-animate li {
+.audit-log.is-animate .audit-log-body li {
   animation: log-enter 220ms ease-out;
 }
 
-.event-log li time {
+.audit-log-body li time {
   color: var(--muted);
 }
 
-.event-log li span {
+.audit-log-body li span {
   font-weight: 700;
 }
 
-.event-log li code {
+.audit-log-body li code {
   font-family: inherit;
   overflow-wrap: anywhere;
   white-space: pre-wrap;
 }
 
-.event-log .log-error {
+.audit-log .log-error {
   color: var(--danger);
 }
 
-.event-log .log-command {
+.audit-log .log-command {
   color: #1f6c4f;
 }
 
-.event-log .log-system {
+.audit-log .log-system {
   color: #1d4f81;
 }
 
@@ -2155,13 +2443,11 @@ body {
     padding: 0.95rem;
   }
 
-  .table-header {
-    align-items: center;
-    display: flex;
-    justify-content: space-between;
+  .app-topbar {
+    gap: 0.8rem;
   }
 
-  .header-actions {
+  .app-topbar-nav {
     justify-content: flex-end;
   }
 
@@ -2241,7 +2527,7 @@ body {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .event-log ul {
+  .audit-log-body ul {
     max-height: 290px;
   }
 }
@@ -2369,7 +2655,7 @@ body {
     flex: 1 1 160px;
   }
 
-  .event-log ul {
+  .audit-log-body ul {
     max-height: 340px;
   }
 }

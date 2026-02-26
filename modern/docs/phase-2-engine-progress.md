@@ -1135,3 +1135,22 @@ Sources:
 Sources:
 
 - `apps/client/scripts/run-browser-ui-tests.mjs`
+
+## PR BJ Progress: Winner UX + Live Win-Chance Mechanics
+
+- Added a deterministic client-side win-odds engine for play-table UX:
+  - simulation-based win chance estimates for incomplete boards (seeded for stable rerenders)
+  - deterministic/tie-aware odds when all board cards are known
+  - hand-complete payout-share mode for final result presentation
+- Integrated win-odds into modern play-table UX:
+  - new hand outcome banner emphasizing winner/split-pot resolution
+  - live turn-panel "Win Chances" rows with per-seat percentage bars
+  - seat-card win chance meter, odds-leader highlight, and winner highlight/pill
+  - player HUD win percentage + best-hand label when available
+- Added a dedicated client runtime module for reuse and future tuning of simulation depth and presentation modes.
+
+Sources:
+
+- `apps/client/src/win-odds.ts`
+- `apps/client/src/main.ts`
+- `apps/client/src/styles.css`

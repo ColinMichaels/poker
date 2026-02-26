@@ -335,13 +335,30 @@ async function run() {
         const playLayoutPresent = Boolean(document.querySelector('.play-layout'));
         const actionHeights = Array.from(document.querySelectorAll('.actions-row .action-btn')).map((button) => button.getBoundingClientRect().height);
         const minActionHeight = actionHeights.length > 0 ? Math.min(...actionHeights) : 0;
+        const oddsRows = Array.from(document.querySelectorAll('.turn-odds-row'));
+        const hasOddsPercent = oddsRows.some((row) => /%/.test(row.querySelector('.turn-odds-percent')?.textContent ?? ''));
+        const auditLog = document.querySelector('[data-role="audit-log"]');
+        const auditLogPresent = Boolean(auditLog);
+        const auditLogCollapsed = auditLog ? !auditLog.hasAttribute('open') : false;
         return {
-          ok: playLayoutPresent && /Seat\\s3/.test(enterLabel) && enterHeight >= 44 && minActionHeight >= 44,
+          ok:
+            playLayoutPresent &&
+            /Seat\\s3/.test(enterLabel) &&
+            enterHeight >= 44 &&
+            minActionHeight >= 44 &&
+            oddsRows.length >= 2 &&
+            hasOddsPercent &&
+            auditLogPresent &&
+            auditLogCollapsed,
           enterLabel,
           enterHeight,
           playLayoutPresent,
           actionButtonCount: actionHeights.length,
           minActionHeight,
+          oddsRowCount: oddsRows.length,
+          hasOddsPercent,
+          auditLogPresent,
+          auditLogCollapsed,
         };
       })()
     `);

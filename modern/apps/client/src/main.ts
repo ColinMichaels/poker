@@ -10,6 +10,8 @@ import {
   resolveMultiTableActionOptionForIntent,
   type MultiTableActionId,
 } from './multi-table-logic';
+import { executeMultiTableAction } from './multi-table-action-submit';
+import { buildWinOddsSnapshot, type SeatWinOdds, type WinOddsSnapshot } from './win-odds';
 
 const root = document.getElementById('app');
 
@@ -412,14 +414,15 @@ function render(container: HTMLElement, model: TableViewModel): void {
     normalizeMultiTableActionSelection();
     setMultiTableBetAmount(multiTableState.targetBetAmount);
   }
-  const statusText =
+  const winOddsSnapshot = activeView === 'play' ? buildWinOddsSnapshot(model.state) : null;
+  const topbarStatus =
     activeView === 'play'
-      ? buildStatusText(model, isUserTurn)
+      ? `Hand #${model.handNumber} · Pot ${chips(model.state.pot)}`
       : activeView === 'lobby'
-        ? 'Select a table and seat to begin a hand.'
+        ? 'Lobby'
         : activeView === 'multitable'
-          ? 'Monitor multiple active tables and execute your next move from one thumb-reach action bar.'
-      : 'Legacy HowTo content is now available in the modern client.';
+          ? 'Multi-Table'
+          : 'Rules';
 
   const shellClasses = ['table-shell', motionClasses.shellClass].filter((value) => value.length > 0);
   if (!hasCompletedInitialRender) {
@@ -428,21 +431,17 @@ function render(container: HTMLElement, model: TableViewModel): void {
 
   container.innerHTML = [
     `  <div class="${shellClasses.join(' ')}">`,
-    '  <header class="table-header">',
-    '    <div>',
-    `      <p class="eyebrow">Modernization Prototype</p>`,
-    `      <h1>Texas Hold'em Local Simulation</h1>`,
-    `      <p class="status-line">${escapeHtml(statusText)}</p>`,
+    '  <header class="app-topbar">',
+    '    <div class="app-topbar-brand">',
+    '      <p class="app-badge">Poker App</p>',
+    `      <p class="app-status">${escapeHtml(topbarStatus)}</p>`,
     '    </div>',
-    '    <div class="header-actions">',
+    '    <nav class="app-topbar-nav" aria-label="Primary views">',
     `      <button class="${activeView === 'lobby' ? 'view-tab is-active' : 'view-tab'}" data-role="view-lobby" aria-pressed="${activeView === 'lobby' ? 'true' : 'false'}">Lobby</button>`,
-    `      <button class="${activeView === 'play' ? 'view-tab is-active' : 'view-tab'}" data-role="view-play" aria-pressed="${activeView === 'play' ? 'true' : 'false'}">Play Table</button>`,
+    `      <button class="${activeView === 'play' ? 'view-tab is-active' : 'view-tab'}" data-role="view-play" aria-pressed="${activeView === 'play' ? 'true' : 'false'}">Table</button>`,
     `      <button class="${activeView === 'multitable' ? 'view-tab is-active' : 'view-tab'}" data-role="view-multitable" aria-pressed="${activeView === 'multitable' ? 'true' : 'false'}">Multi Table</button>`,
-    `      <button class="${activeView === 'howto' ? 'view-tab is-active' : 'view-tab'}" data-role="view-howto" aria-pressed="${activeView === 'howto' ? 'true' : 'false'}">How To</button>`,
-    activeView === 'play'
-      ? `      <button class="cta" data-role="next-hand">${model.state.phase === 'HAND_COMPLETE' ? 'Deal Next Hand' : 'Reset Hand'}</button>`
-      : '',
-    '    </div>',
+    `      <button class="${activeView === 'howto' ? 'view-tab is-active' : 'view-tab'}" data-role="view-howto" aria-pressed="${activeView === 'howto' ? 'true' : 'false'}">Rules</button>`,
+    '    </nav>',
     '  </header>',
     activeView === 'play'
       ? renderPlayView(
@@ -451,19 +450,20 @@ function render(container: HTMLElement, model: TableViewModel): void {
           isUserTurn,
           amountOption,
           targetBetInputAmount,
+          winOddsSnapshot as WinOddsSnapshot,
           transitionState,
           boardDealPlan,
           chipFlowPlan,
           motionClasses,
           isDesktopViewport,
           dockExpanded,
-          shouldAnimateEventLog,
         )
       : activeView === 'lobby'
         ? renderLobbyView(model)
         : activeView === 'multitable'
           ? renderMultiTableView(motionClasses, chipFlowPlan)
           : renderHowToView(),
+    activeView === 'play' ? renderAuditLog(model, shouldAnimateEventLog) : '',
     '</div>',
   ].join('\n');
   hasCompletedInitialRender = true;
@@ -792,17 +792,18 @@ function renderPlayView(
   isUserTurn: boolean,
   amountOption: ActionOptionDTO | null,
   targetBetInputAmount: number,
+  winOddsSnapshot: WinOddsSnapshot,
   transitionState: PlayTransitionState,
   boardDealPlan: BoardDealAnimationPlan,
   chipFlowPlan: ChipFlowAnimationPlan,
   motionClasses: MotionClassSet,
   isDesktopViewport: boolean,
   dockExpanded: boolean,
-  shouldAnimateEventLog: boolean,
 ): string {
   const dockContentId = 'action-dock-content';
   const quickAmounts = buildQuickAmountPresets(amountOption, targetBetInputAmount, model.state.pot);
   const actingSeatLabel = model.state.actingSeatId > 0 ? `Seat ${model.state.actingSeatId}` : 'No active seat';
+  const userWinChance = getSeatWinOdds(winOddsSnapshot, model.userSeatId)?.percentage ?? 0;
   const metricsClass = transitionState.handAdvanced ? 'table-metrics is-refresh' : 'table-metrics';
   const feltClasses = ['felt-table'];
   if (motionClasses.playFeltClass.length > 0) {
@@ -850,8 +851,9 @@ function renderPlayView(
     metricPill('Hand', `#${model.handNumber} (${model.state.handId})`),
     metricPill('Phase', formatPhaseLabel(model.state.phase)),
     metricPill('Pot', chips(model.state.pot)),
-    metricPill('Acting Seat', actingSeatLabel),
+    metricPill('Your Win %', formatWinPercentage(userWinChance)),
     '  </section>',
+    `  ${renderHandOutcomeBanner(model, winOddsSnapshot)}`,
     '  <div class="play-layout">',
     '    <div class="play-main">',
     '      <section class="table-stage">',
@@ -873,10 +875,11 @@ function renderPlayView(
     `            <p><span>Button</span><strong>Seat ${model.state.buttonSeatId}</strong></p>`,
     `            <p><span>Blinds</span><strong>SB ${model.state.smallBlindSeatId} / BB ${model.state.bigBlindSeatId}</strong></p>`,
     '          </div>',
+    `          ${renderWinOddsPanel(model, winOddsSnapshot)}`,
     '        </aside>',
     '      </section>',
-    `      ${renderPlayerHud(model, allowedActions, isUserTurn, transitionState)}`,
-    `      <section class="seats-grid">${renderSeats(model, transitionState)}</section>`,
+    `      ${renderPlayerHud(model, allowedActions, isUserTurn, transitionState, winOddsSnapshot)}`,
+    `      <section class="seats-grid">${renderSeats(model, transitionState, winOddsSnapshot)}</section>`,
     '    </div>',
     '    <aside class="play-side">',
     `      <section class="${controlsPanelClasses}">`,
@@ -887,7 +890,10 @@ function renderPlayView(
     '        </button>',
     `        <div id="${dockContentId}" class="${dockExpanded ? 'dock-content is-open' : 'dock-content'}">`,
     '        <div class="controls-head">',
-    '          <h2>Action Dock</h2>',
+    '          <div class="controls-head-row">',
+    '            <h2>Action Dock</h2>',
+    `            <button class="cta cta-compact" data-role="next-hand">${model.state.phase === 'HAND_COMPLETE' ? 'Deal Next Hand' : 'Reset Hand'}</button>`,
+    '          </div>',
     `          <p>${escapeHtml(isUserTurn ? 'Tap an action to keep the hand moving.' : 'The dock updates as soon as it is your turn.')}</p>`,
     '        </div>',
     amountOption
@@ -902,10 +908,6 @@ function renderPlayView(
     `        <div class="actions-row">${renderActionButtons(allowedActions, isUserTurn)}</div>`,
     `        ${renderPayouts(model)}`,
     '        </div>',
-    '      </section>',
-    `      <section class="${shouldAnimateEventLog ? 'event-log is-animate' : 'event-log'}">`,
-    '        <h2>Event Log</h2>',
-    `        <ul>${renderLogs(model)}</ul>`,
     '      </section>',
     '    </aside>',
     '  </div>',
@@ -1166,6 +1168,7 @@ function renderPlayerHud(
   allowedActions: readonly ActionOptionDTO[],
   isUserTurn: boolean,
   transitionState: PlayTransitionState,
+  winOddsSnapshot: WinOddsSnapshot,
 ): string {
   const userSeat = model.state.seats.find((seat) => seat.seatId === model.userSeatId);
   const userActionSeat = model.actionState.seats.find((seat) => seat.seatId === model.userSeatId);
@@ -1181,6 +1184,8 @@ function renderPlayerHud(
   const legalActions = allowedActions.length > 0
     ? allowedActions.map((option) => formatActionLabel(option.action)).join(' · ')
     : 'None';
+  const userWinOdds = getSeatWinOdds(winOddsSnapshot, model.userSeatId);
+  const userWinLabel = userWinOdds?.isContender ? formatWinPercentage(userWinOdds.percentage) : '--';
   const playerHudClasses = [
     'player-hud',
     transitionState.userTurnChanged && isUserTurn ? 'is-enter-turn' : '',
@@ -1205,7 +1210,9 @@ function renderPlayerHud(
     `          <p><span>Stack</span><strong>${escapeHtml(chips(userSeat.stack))}</strong></p>`,
     `          <p><span>Street Bet</span><strong>${escapeHtml(chips(userSeat.currentBet))}</strong></p>`,
     `          <p><span>To Call</span><strong>${escapeHtml(chips(userActionSeat.toCall))}</strong></p>`,
+    `          <p><span>Win %</span><strong>${escapeHtml(userWinLabel)}</strong></p>`,
     '        </div>',
+    userWinOdds?.handLabel ? `        <p class="player-hud-actions"><span>Best Hand:</span> ${escapeHtml(userWinOdds.handLabel)}</p>` : '',
     `        <p class="player-hud-actions"><span>Legal:</span> ${escapeHtml(legalActions)}</p>`,
     '      </section>',
   ].join('\n');
@@ -1226,7 +1233,7 @@ function renderHowToView(): string {
     }),
     '  </div>',
     '  <article class="howto-card">',
-    `    <p class="eyebrow">Guide Source: ${escapeHtml(selectedGuide.sourceFile)}</p>`,
+    '    <p class="eyebrow">Game Rules Reference</p>',
     `    <h2>${escapeHtml(selectedGuide.title)}</h2>`,
     `    <p>${escapeHtml(selectedGuide.description)}</p>`,
     selectedGuide.cardExamples.length > 0
@@ -1241,13 +1248,13 @@ function renderHowToView(): string {
     '      <h3>Rounds</h3>',
     selectedGuide.rounds.length > 0
       ? `      <ol>${selectedGuide.rounds.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ol>`
-      : '      <p class="muted">No round sequence listed in legacy source.</p>',
+      : '      <p class="muted">No round sequence listed.</p>',
     '    </section>',
     '    <section>',
     '      <h3>Rules</h3>',
     selectedGuide.rules.length > 0
       ? `      <ul>${selectedGuide.rules.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`
-      : '      <p class="muted">No explicit rules list in legacy source.</p>',
+      : '      <p class="muted">No explicit rules list available.</p>',
     '    </section>',
     '  </article>',
     '</section>',
@@ -1483,14 +1490,14 @@ function renderBoardCards(
   return slots.join('');
 }
 
-function renderSeats(model: TableViewModel, transitionState: PlayTransitionState): string {
+function renderSeats(model: TableViewModel, transitionState: PlayTransitionState, winOddsSnapshot: WinOddsSnapshot): string {
   const seatCards = model.state.seats.map((seat) => {
     const seatAction = model.actionState.seats.find((candidate) => candidate.seatId === seat.seatId);
     if (!seatAction) {
       return '';
     }
 
-    return renderSeatCard(model, seat, seatAction, transitionState);
+    return renderSeatCard(model, seat, seatAction, transitionState, winOddsSnapshot);
   });
 
   return seatCards.join('');
@@ -1501,9 +1508,13 @@ function renderSeatCard(
   seatState: SeatState,
   actionState: SeatActionStateDTO,
   transitionState: PlayTransitionState,
+  winOddsSnapshot: WinOddsSnapshot,
 ): string {
   const revealCards = seatState.seatId === model.userSeatId || model.state.phase === 'HAND_COMPLETE';
   const seatClasses = ['seat-card'];
+  const seatWinOdds = getSeatWinOdds(winOddsSnapshot, seatState.seatId);
+  const payoutAmount = seatWinOdds?.payoutAmount ?? 0;
+  const isWinner = model.state.phase === 'HAND_COMPLETE' && payoutAmount > 0;
 
   if (actionState.isActingSeat) {
     seatClasses.push('is-acting');
@@ -1517,12 +1528,22 @@ function renderSeatCard(
   if (transitionState.actingSeatChanged && actionState.isActingSeat) {
     seatClasses.push('is-actor-pop');
   }
+  if (seatWinOdds?.isLeader && !isWinner && model.state.phase !== 'HAND_COMPLETE') {
+    seatClasses.push('is-odds-leader');
+  }
+  if (isWinner) {
+    seatClasses.push('is-winner');
+  }
 
   const avatarId = seatAvatarById[seatState.seatId] ?? 'player_02';
   const badges = buildSeatBadges(model, seatState.seatId);
   const holeCards = seatState.holeCards.length > 0
     ? seatState.holeCards.map((card) => renderCard(revealCards ? card.code : null, !revealCards)).join('')
     : `${renderCard(null, true)}${renderCard(null, true)}`;
+  const winLabel = seatWinOdds?.isContender ? formatWinPercentage(seatWinOdds.percentage) : '--';
+  const winMeterWidth = seatWinOdds?.isContender ? Math.max(0, Math.min(100, seatWinOdds.percentage)) : 0;
+  const winMeterBarStyle = ` style="width:${winMeterWidth.toFixed(2)}%"`;
+  const outcomePill = renderSeatOutcomePill(model, seatWinOdds);
 
   return [
     `<article class="${seatClasses.join(' ')}">`,
@@ -1535,6 +1556,12 @@ function renderSeatCard(
     `    <p class="seat-badges">${escapeHtml(badges)}</p>`,
     '  </header>',
     `  <div class="hole-cards">${holeCards}</div>`,
+    outcomePill.length > 0 ? `  ${outcomePill}` : '',
+    '  <div class="seat-win-meter">',
+    `    <p><span>Win Chance</span><strong>${escapeHtml(winLabel)}</strong></p>`,
+    `    <div class="seat-win-track" aria-hidden="true"><span${winMeterBarStyle}></span></div>`,
+    '  </div>',
+    seatWinOdds?.handLabel ? `  <p class="seat-showdown-label">${escapeHtml(seatWinOdds.handLabel)}</p>` : '',
     '  <dl>',
     `    <div><dt>Stack</dt><dd>${chips(seatState.stack)}</dd></div>`,
     `    <div><dt>Street Bet</dt><dd>${chips(seatState.currentBet)}</dd></div>`,
@@ -1826,63 +1853,31 @@ function applyMultiTableAction(): void {
   const tableController = multiTableControllerById.get(table.id);
   const actionOption = resolveMultiTableActionOption(table.id, selectedAction.id);
   const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  if (!tableController) {
-    multiTableState.activityNote = `${timestamp} • ${table.name} controller is unavailable.`;
-    return;
-  }
-  if (!isTableUserActing(table.id)) {
-    multiTableState.activityNote = `${timestamp} • Waiting for your turn on ${table.name}.`;
-    return;
-  }
-  if (!actionOption || !actionOption.allowed) {
+  const userSeatAction = getMultiTableUserSeatActionState(table.id);
+  const result = executeMultiTableAction({
+    controller: tableController ?? null,
+    tableName: table.name,
+    selectedActionId: selectedAction.id,
+    selectedActionLabel: formatActionLabel(selectedAction.id),
+    actionOption,
+    isUserActing: isTableUserActing(table.id),
+    targetBetAmount: multiTableState.targetBetAmount,
+    userStack: userSeatAction?.stack ?? null,
+    timestampLabel: timestamp,
+  });
+
+  multiTableState.targetBetAmount = result.clampedTargetBetAmount;
+  multiTableState.activityNote = result.activityNote;
+
+  if (result.illegalActionRequested) {
     normalizeMultiTableActionSelection();
-    multiTableState.activityNote = `${timestamp} • ${formatActionLabel(selectedAction.id)} is not legal on ${table.name} right now.`;
-    return;
   }
 
-  let amount: number | undefined;
-  if (actionOption.amountSemantics === 'TARGET_BET') {
-    const min = actionOption.minAmount ?? multiTableState.targetBetAmount;
-    const max = actionOption.maxAmount ?? min;
-    const clampedAmount = clampWholeNumberAmount(multiTableState.targetBetAmount, min, max);
-    multiTableState.targetBetAmount = clampedAmount;
-    amount = clampedAmount;
+  if (result.submitted && result.submittedActionId) {
+    multiTableState.lastSubmittedActionId = result.submittedActionId;
+    multiTableState.lastSubmittedAtMs = Date.now();
+    queueMultiActionConfirmationReset();
   }
-
-  tableController.performUserAction({ action: actionOption.action, amount });
-  multiTableState.lastSubmittedActionId = selectedAction.id;
-  multiTableState.lastSubmittedAtMs = Date.now();
-  queueMultiActionConfirmationReset();
-
-  if (actionOption.action === 'RAISE') {
-    multiTableState.activityNote = `${timestamp} • You raised to ${chips(amount ?? 0)} on ${table.name}.`;
-    return;
-  }
-  if (actionOption.action === 'BET') {
-    multiTableState.activityNote = `${timestamp} • You bet ${chips(amount ?? 0)} on ${table.name}.`;
-    return;
-  }
-  if (actionOption.action === 'CALL') {
-    const callAmount = actionOption.minAmount ?? getMultiTableUserSeatActionState(table.id)?.toCall ?? 0;
-    multiTableState.activityNote = `${timestamp} • You called ${chips(callAmount)} on ${table.name}.`;
-    return;
-  }
-  if (actionOption.action === 'CHECK') {
-    multiTableState.activityNote = `${timestamp} • You checked on ${table.name}.`;
-    return;
-  }
-  if (actionOption.action === 'FOLD') {
-    multiTableState.activityNote = `${timestamp} • You folded on ${table.name}.`;
-    return;
-  }
-
-  if (actionOption.action === 'ALL_IN') {
-    const stackAmount = getMultiTableUserSeatActionState(table.id)?.stack ?? amount ?? multiTableState.targetBetAmount;
-    multiTableState.activityNote = `${timestamp} • You moved all in for ${chips(stackAmount)} on ${table.name}.`;
-    return;
-  }
-
-  multiTableState.activityNote = `${timestamp} • You acted on ${table.name}.`;
 }
 
 function hasRecentMultiActionConfirmation(actionId?: MultiTableActionId): boolean {
@@ -1981,6 +1976,146 @@ function renderSeatRadar(model: TableViewModel, transitionState: PlayTransitionS
     .join('');
 }
 
+function getSeatWinOdds(snapshot: WinOddsSnapshot, seatId: number): SeatWinOdds | null {
+  return snapshot.seats.find((seat) => seat.seatId === seatId) ?? null;
+}
+
+function formatWinPercentage(value: number): string {
+  return `${value.toFixed(1)}%`;
+}
+
+function renderSeatOutcomePill(model: TableViewModel, seatWinOdds: SeatWinOdds | null): string {
+  if (!seatWinOdds) {
+    return '';
+  }
+
+  if (model.state.phase === 'HAND_COMPLETE') {
+    if (seatWinOdds.payoutAmount > 0) {
+      return `<p class="seat-outcome-pill is-winner">Winner +${escapeHtml(chips(seatWinOdds.payoutAmount))}</p>`;
+    }
+    return '<p class="seat-outcome-pill is-muted">No payout</p>';
+  }
+
+  if (seatWinOdds.isLeader && seatWinOdds.isContender) {
+    return '<p class="seat-outcome-pill is-leader">Odds Leader</p>';
+  }
+
+  if (!seatWinOdds.isContender || seatWinOdds.isFolded) {
+    return '<p class="seat-outcome-pill is-muted">Out of hand</p>';
+  }
+
+  return '';
+}
+
+function renderHandOutcomeBanner(model: TableViewModel, snapshot: WinOddsSnapshot): string {
+  if (model.state.phase !== 'HAND_COMPLETE' || model.state.payouts.length === 0) {
+    return '';
+  }
+
+  const winners = snapshot.seats.filter((seat) => seat.payoutAmount > 0);
+  if (winners.length === 0) {
+    return '';
+  }
+
+  const reasons = new Set(model.state.payouts.map((payout) => payout.reason));
+  const isShowdown = reasons.has('SHOWDOWN');
+  const classes = ['hand-outcome-banner', isShowdown ? 'is-showdown' : 'is-uncontested'];
+
+  if (winners.length === 1) {
+    const winner = winners[0];
+    const winnerName = winner.seatId === model.userSeatId ? 'You' : winner.playerId;
+    const detail = isShowdown
+      ? winner.handLabel
+        ? `${winnerName} wins with ${winner.handLabel}.`
+        : `${winnerName} wins at showdown.`
+      : `${winnerName} wins uncontested.`;
+    return [
+      `  <section class="${classes.join(' ')}" aria-live="polite">`,
+      `    <h3>Seat ${winner.seatId} wins ${escapeHtml(chips(winner.payoutAmount))}</h3>`,
+      `    <p>${escapeHtml(detail)}</p>`,
+      '  </section>',
+    ].join('\n');
+  }
+
+  const splitSummary = winners
+    .map((winner) => {
+      const label = winner.seatId === model.userSeatId ? 'You' : `Seat ${winner.seatId}`;
+      const handDetail = winner.handLabel ? ` (${winner.handLabel})` : '';
+      return `${label}: +${chips(winner.payoutAmount)}${handDetail}`;
+    })
+    .join(' · ');
+
+  return [
+    `  <section class="${classes.join(' ')}" aria-live="polite">`,
+    '    <h3>Split Pot</h3>',
+    `    <p>${escapeHtml(splitSummary)}</p>`,
+    '  </section>',
+  ].join('\n');
+}
+
+function renderWinOddsPanel(model: TableViewModel, snapshot: WinOddsSnapshot): string {
+  const description =
+    snapshot.mode === 'SIMULATED'
+      ? `${snapshot.simulations} runouts simulated`
+      : snapshot.mode === 'DETERMINISTIC'
+        ? 'All community cards dealt'
+        : snapshot.mode === 'PAYOUT'
+          ? 'Final pot share'
+          : snapshot.mode === 'SINGLE_CONTENDER'
+            ? 'Single contender remains'
+            : 'Waiting for dealt cards';
+
+  return [
+    '          <section class="turn-odds">',
+    '            <header class="turn-odds-head">',
+    '              <h3>Win Chances</h3>',
+    `              <p>${escapeHtml(description)}</p>`,
+    '            </header>',
+    '            <div class="turn-odds-list">',
+    ...snapshot.seats.map((seat) => {
+      const rowClasses = ['turn-odds-row'];
+      if (seat.isLeader && seat.isContender) {
+        rowClasses.push('is-leader');
+      }
+      if (seat.payoutAmount > 0 && model.state.phase === 'HAND_COMPLETE') {
+        rowClasses.push('is-winner');
+      }
+      if (!seat.isContender || seat.isFolded) {
+        rowClasses.push('is-out');
+      }
+
+      const label = seat.seatId === model.userSeatId ? `Seat ${seat.seatId} (You)` : `Seat ${seat.seatId}`;
+      const percentLabel = seat.isContender ? formatWinPercentage(seat.percentage) : '--';
+      const meterWidth = seat.isContender ? Math.max(0, Math.min(100, seat.percentage)) : 0;
+      const outcomeText =
+        model.state.phase === 'HAND_COMPLETE'
+          ? seat.payoutAmount > 0
+            ? `+${chips(seat.payoutAmount)}`
+            : 'No payout'
+          : seat.isFolded
+            ? 'Folded'
+            : seat.isContender
+              ? 'Live'
+              : 'Out';
+      return [
+        `              <article class="${rowClasses.join(' ')}">`,
+        '                <div class="turn-odds-meta">',
+        `                  <p class="turn-odds-seat">${escapeHtml(label)}</p>`,
+        `                  <p class="turn-odds-percent">${escapeHtml(percentLabel)}</p>`,
+        '                </div>',
+        `                <div class="turn-odds-bar" aria-hidden="true"><span style="width:${meterWidth.toFixed(2)}%"></span></div>`,
+        '                <div class="turn-odds-foot">',
+        `                  <span>${escapeHtml(outcomeText)}</span>`,
+        seat.handLabel ? `                  <small>${escapeHtml(seat.handLabel)}</small>` : '                  <small>&nbsp;</small>',
+        '                </div>',
+        '              </article>',
+      ].join('\n');
+    }),
+    '            </div>',
+    '          </section>',
+  ].join('\n');
+}
+
 function renderPayouts(model: TableViewModel): string {
   if (model.state.payouts.length === 0) {
     return '';
@@ -2027,6 +2162,25 @@ function renderLogs(model: TableViewModel): string {
         `<li class="log-${entry.kind.toLowerCase()}"><time>${entry.timestamp}</time><span>${escapeHtml(entry.kind)}:</span><code>${escapeHtml(entry.message)}</code></li>`,
     )
     .join('');
+}
+
+function renderAuditLog(model: TableViewModel, shouldAnimateEventLog: boolean): string {
+  const latestLog = model.logs.at(-1);
+  const latestSummary = latestLog ? `${latestLog.kind} ${latestLog.timestamp}` : 'No entries yet';
+  const auditClasses = ['audit-log'];
+  if (shouldAnimateEventLog) {
+    auditClasses.push('is-animate');
+  }
+
+  return [
+    `  <details class="${auditClasses.join(' ')}" data-role="audit-log">`,
+    `    <summary><span>Audit Log</span><small>${escapeHtml(`${model.logs.length} entries · ${latestSummary}`)}</small></summary>`,
+    '    <div class="audit-log-body">',
+    '      <p>Command and event timeline for audit trails and move replay checks.</p>',
+    `      <ul>${renderLogs(model)}</ul>`,
+    '    </div>',
+    '  </details>',
+  ].join('\n');
 }
 
 function resolveMotionCue(
@@ -2409,30 +2563,6 @@ function buildMotionClassSet(cue: MotionCue): MotionClassSet {
       return _never;
     }
   }
-}
-
-function buildStatusText(model: TableViewModel, isUserTurn: boolean): string {
-  if (model.state.phase === 'HAND_COMPLETE') {
-    if (model.state.payouts.length === 0) {
-      return 'Hand complete. No payouts recorded.';
-    }
-    const winners = model.state.payouts.map((payout) => `Seat ${payout.seatId} (+${payout.amount})`).join(', ');
-    return `Hand complete. Winners: ${winners}.`;
-  }
-
-  if (isUserTurn) {
-    return `Seat ${model.userSeatId} to act. Pot: ${model.state.pot}.`;
-  }
-
-  if (isBettingPhase(model.state.phase)) {
-    return `Seat ${model.state.actingSeatId} is acting.`;
-  }
-
-  if (model.state.phase.startsWith('DEAL_')) {
-    return 'Auto-dealing next street.';
-  }
-
-  return 'Simulation is running.';
 }
 
 function buildPlayTransitionState(model: TableViewModel, isUserTurn: boolean): PlayTransitionState {
