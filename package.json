@@ -7,7 +7,7 @@
     "typecheck": "npm run typecheck --prefix modern",
     "build": "npm run build --prefix modern",
     "test": "npm run test:engine --prefix modern && npm run test:server --prefix modern",
-    "legacy:dev": "npm run dev --prefix legacy",
-    "legacy:build": "npm run prod --prefix legacy"
+    "legacy:dev": "node ./scripts/run-legacy-archive-command.mjs dev",
+    "legacy:build": "node ./scripts/run-legacy-archive-command.mjs prod"
   }
 }

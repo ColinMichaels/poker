@@ -326,3 +326,20 @@ Sources:
 - `.github/workflows/legacy-archive-guard.yml`
 - `README.md`
 - `docs/legacy-decommission-plan.md`
+
+## PR L Progress: Legacy Command Acknowledgement Gate
+
+- Added root wrapper script for legacy command execution:
+  - `scripts/run-legacy-archive-command.mjs`
+- Updated root `package.json` legacy scripts to require explicit acknowledgement:
+  - `legacy:dev`
+  - `legacy:build`
+- Added documentation for acknowledgement env usage:
+  - `LEGACY_ARCHIVE_ACK=1`
+
+Sources:
+
+- `scripts/run-legacy-archive-command.mjs`
+- `package.json`
+- `README.md`
+- `legacy/README.md`

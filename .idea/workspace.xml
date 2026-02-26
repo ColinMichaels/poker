@@ -8,12 +8,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1eee6476-c5d8-4dc1-b068-da2be4a7c407" name="Default Changelist" comment="feat: add auth bootstrap and demo user controls&#10;&#10;Add `POKER_AUTH_BOOTSTRAP_USERS_FILE` for JSON-based seed user initialization and `POKER_AUTH_ALLOW_DEMO_USERS` to control demo user access. Update docs, tests, and examples for auth bootstrap and production guardrails.">
+      <change afterPath="$PROJECT_DIR$/.github/workflows/legacy-archive-guard.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.github/workflows/modern-ci.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/modern-ci.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/legacy/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/legacy/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/docs/developer-setup.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/docs/developer-setup.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/docs/legacy-decommission-plan.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/docs/legacy-decommission-plan.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/docs/phase-2-engine-progress.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/docs/phase-2-engine-progress.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/readme.md" beforeDir="false" afterPath="$PROJECT_DIR$/readme.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

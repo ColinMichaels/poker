@@ -124,6 +124,14 @@ These are not extraction failures, but they are blockers to deleting the legacy 
 - Added explicit emergency override path:
   - PR label: `allow-legacy-change`
 
+## Completed in PR L
+
+- Added root legacy command acknowledgement wrapper:
+  - `scripts/run-legacy-archive-command.mjs`
+- Root legacy scripts now require explicit opt-in:
+  - `LEGACY_ARCHIVE_ACK=1 npm run legacy:dev`
+  - `LEGACY_ARCHIVE_ACK=1 npm run legacy:build`
+
 ## Known Intentional Asset Exceptions
 
 - Non-canonical card extras remain excluded from canonical face set:
@@ -187,6 +195,7 @@ Exit criteria:
 9. PR I: Bootstrap users + production demo-user controls.
 10. PR J: CI server-test coverage + root entrypoint trigger expansion.
 11. PR K: Legacy archive read-only CI guardrail.
+12. PR L: Explicit acknowledgement wrapper for root legacy commands.
 
 ## Cutover Go/No-Go Checklist
 

@@ -20,8 +20,8 @@ Node frontend build commands run from `legacy/`:
 
 Root shortcut wrappers:
 
-- `npm run legacy:dev`
-- `npm run legacy:build`
+- `LEGACY_ARCHIVE_ACK=1 npm run legacy:dev`
+- `LEGACY_ARCHIVE_ACK=1 npm run legacy:build`
 
 PHP/composer runtime remains legacy and is intentionally not part of the modern default flow.
 
@@ -32,3 +32,4 @@ Legacy code is treated as read-only by default in pull requests.
 - Guard workflow: `.github/workflows/legacy-archive-guard.yml`
 - Allowed routine edits: `legacy/README.md`, `legacy/laravel-readme.md`
 - Emergency override: apply PR label `allow-legacy-change`
+- Root legacy command acknowledgement env: `LEGACY_ARCHIVE_ACK=1`
