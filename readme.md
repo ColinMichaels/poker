@@ -22,6 +22,8 @@ From repository root:
 8. `npm run test:engine`
 9. `npm run test:server`
 
+Note: installs are engine-enforced (`.npmrc` with `engine-strict=true`), so use Node 22-24 and npm 10+.
+
 Or use root shortcuts:
 
 - `npm run dev` (modern client)

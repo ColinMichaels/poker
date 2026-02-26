@@ -7,6 +7,7 @@ This setup is for the `modern/` npm workspace.
 - `nvm` installed and loaded in your shell
 - Node `22` LTS (see `modern/.nvmrc`)
 - npm `10+`
+- repository install uses engine enforcement (`.npmrc`: `engine-strict=true`)
 
 ## Quick Start
 
@@ -96,6 +97,10 @@ If they do not:
 1. Ensure `nvm` is loaded in `~/.zshrc`
 2. Open a new terminal
 3. Run `nvm use`
+
+If install still fails with engine constraints, run:
+
+- `npm run doctor`
 
 ### DNS/network install failures
 

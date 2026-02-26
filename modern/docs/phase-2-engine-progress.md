@@ -545,3 +545,16 @@ Sources:
 - `apps/server/src/startup-config.test.ts`
 - `apps/server/README.md`
 - `docs/deployment-runbook.md`
+
+## PR AA Progress: npm Engine Enforcement
+
+- Added repository `.npmrc`:
+  - `engine-strict=true`
+- This enforces `package.json` engine requirements at install time.
+- Updated root/developer setup docs to call out enforced Node/npm constraints and doctor workflow.
+
+Sources:
+
+- `.npmrc`
+- `README.md`
+- `docs/developer-setup.md`

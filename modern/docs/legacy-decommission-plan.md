@@ -234,6 +234,12 @@ These are not extraction failures, but they are blockers to deleting the legacy 
 - Added startup-config regression coverage for the new production secret guard.
 - Updated server/deployment docs to reflect fail-fast behavior.
 
+## Completed in PR AA
+
+- Added repository-level npm engine enforcement:
+  - `.npmrc` with `engine-strict=true`
+- Updated setup docs to clarify required Node/npm versions are enforced during install.
+
 ## Known Intentional Asset Exceptions
 
 - Non-canonical card extras remain excluded from canonical face set:
@@ -312,6 +318,7 @@ Exit criteria:
 24. PR X: CI guard for server env-template key coverage.
 25. PR Y: Health endpoint runtime mode diagnostics.
 26. PR Z: Production auth token secret fail-fast enforcement.
+27. PR AA: Repository-level npm engine enforcement.
 
 ## Cutover Go/No-Go Checklist
 
