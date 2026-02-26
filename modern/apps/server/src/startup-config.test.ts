@@ -44,10 +44,19 @@ function testLoadsDevelopmentDefaults(): void {
 function testProductionDefaultsDisableCompatibilityModes(): void {
   const config = loadStartupConfig({
     NODE_ENV: 'production',
+    POKER_AUTH_TOKEN_SECRET: 'prod-secret-value',
   });
 
   assertEqual(config.authAllowDemoUsers, false, 'Expected demo users disabled by default in production.');
   assertEqual(config.allowLegacyWalletRoutes, false, 'Expected legacy routes disabled by default in production.');
+}
+
+function testProductionRequiresExplicitTokenSecret(): void {
+  assertThrows(
+    () => loadStartupConfig({ NODE_ENV: 'production' }),
+    /POKER_AUTH_TOKEN_SECRET is required when NODE_ENV=production/,
+    'Expected production mode without auth token secret to fail.',
+  );
 }
 
 function testLoadsExplicitOverrides(): void {
@@ -160,6 +169,7 @@ function testRejectsInvalidBootstrapUsersAndEnvValues(): void {
 function runAll(): void {
   testLoadsDevelopmentDefaults();
   testProductionDefaultsDisableCompatibilityModes();
+  testProductionRequiresExplicitTokenSecret();
   testLoadsExplicitOverrides();
   testLoadsBootstrapUsersFromArrayAndWrapper();
   testRejectsInvalidBootstrapUsersAndEnvValues();

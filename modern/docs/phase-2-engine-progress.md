@@ -530,3 +530,18 @@ Sources:
 - `apps/server/src/index.ts`
 - `apps/server/README.md`
 - `docs/deployment-runbook.md`
+
+## PR Z Progress: Production Secret Fail-Fast
+
+- Added startup validation that fails when:
+  - `NODE_ENV=production`
+  - `POKER_AUTH_TOKEN_SECRET` is missing/empty
+- Added startup-config test coverage for production secret requirement.
+- Updated server/deployment docs to reflect fail-fast production startup behavior.
+
+Sources:
+
+- `apps/server/src/startup-config.ts`
+- `apps/server/src/startup-config.test.ts`
+- `apps/server/README.md`
+- `docs/deployment-runbook.md`

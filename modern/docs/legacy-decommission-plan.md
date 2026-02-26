@@ -227,6 +227,13 @@ These are not extraction failures, but they are blockers to deleting the legacy 
   - legacy-wallet-route mode status
 - Updated server/deployment docs to reflect expanded health diagnostics.
 
+## Completed in PR Z
+
+- Enforced production auth secret requirements at startup:
+  - `NODE_ENV=production` now requires `POKER_AUTH_TOKEN_SECRET`
+- Added startup-config regression coverage for the new production secret guard.
+- Updated server/deployment docs to reflect fail-fast behavior.
+
 ## Known Intentional Asset Exceptions
 
 - Non-canonical card extras remain excluded from canonical face set:
@@ -304,6 +311,7 @@ Exit criteria:
 23. PR W: Server environment template and doc alignment.
 24. PR X: CI guard for server env-template key coverage.
 25. PR Y: Health endpoint runtime mode diagnostics.
+26. PR Z: Production auth token secret fail-fast enforcement.
 
 ## Cutover Go/No-Go Checklist
 

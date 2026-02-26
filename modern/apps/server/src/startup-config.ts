@@ -156,7 +156,13 @@ export interface StartupConfig {
 }
 
 export function loadStartupConfig(env: Record<string, string | undefined>): StartupConfig {
+  const normalizedNodeEnv = env.NODE_ENV?.trim().toLowerCase();
   const authBootstrapUsersFile = env.POKER_AUTH_BOOTSTRAP_USERS_FILE?.trim();
+  const authTokenSecret = env.POKER_AUTH_TOKEN_SECRET?.trim();
+
+  if (normalizedNodeEnv === 'production' && !authTokenSecret) {
+    throw new Error('POKER_AUTH_TOKEN_SECRET is required when NODE_ENV=production.');
+  }
 
   return {
     port: parsePort(env.PORT),
@@ -164,7 +170,7 @@ export function loadStartupConfig(env: Record<string, string | undefined>): Star
     tableId: env.TABLE_ID ?? DEFAULT_TABLE_ID,
     persistenceEnabled: parsePersistenceEnabled(env.POKER_STATE_PERSIST),
     stateFilePath: env.POKER_STATE_FILE ?? defaultStateFilePath(),
-    authTokenSecret: env.POKER_AUTH_TOKEN_SECRET,
+    authTokenSecret: authTokenSecret || undefined,
     authSessionTtlMs: parseSessionTtlMs(env.POKER_SESSION_TTL_MS),
     authAllowDemoUsers: parseAllowDemoUsers(env.POKER_AUTH_ALLOW_DEMO_USERS, env.NODE_ENV),
     authBootstrapUsersFile,
