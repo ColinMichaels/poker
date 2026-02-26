@@ -87,6 +87,15 @@ function parseAllowDemoUsers(rawValue: string | undefined, nodeEnv: string | und
   return normalizedNodeEnv !== 'production';
 }
 
+function parseAllowLegacyWalletRoutes(rawValue: string | undefined, nodeEnv: string | undefined): boolean {
+  if (rawValue !== undefined) {
+    return parseBooleanEnv(rawValue, 'POKER_ENABLE_LEGACY_WALLET_ROUTES');
+  }
+
+  const normalizedNodeEnv = nodeEnv?.trim().toLowerCase();
+  return normalizedNodeEnv !== 'production';
+}
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
 }
@@ -421,6 +430,7 @@ async function handleRequest(
   response: ServerResponse,
   tableService: TableService,
   authWalletService: AuthWalletService,
+  allowLegacyWalletRoutes: boolean,
   persistRuntimeState: () => void,
 ): Promise<void> {
   const method = request.method ?? 'GET';
@@ -542,13 +552,13 @@ async function handleRequest(
     }
 
     // Legacy compatibility route parity for old wallet calls.
-    if (method === 'GET' && pathname === '/wallet') {
+    if (allowLegacyWalletRoutes && method === 'GET' && pathname === '/wallet') {
       const { userId } = requireAuthenticatedContext(request, authWalletService);
       sendJson(response, 200, authWalletService.getLegacyWalletAmount(userId));
       return;
     }
 
-    if (method === 'PATCH' && /^\/wallet\/[^/]+$/.test(pathname)) {
+    if (allowLegacyWalletRoutes && method === 'PATCH' && /^\/wallet\/[^/]+$/.test(pathname)) {
       const { userId } = requireAuthenticatedContext(request, authWalletService);
       const body = await readJsonBody(request);
       const result = authWalletService.adjustWallet(userId, parseWalletAdjustment(body));
@@ -631,6 +641,10 @@ const authSessionTtlMs = parseSessionTtlMs(process.env.POKER_SESSION_TTL_MS);
 const authAllowDemoUsers = parseAllowDemoUsers(process.env.POKER_AUTH_ALLOW_DEMO_USERS, process.env.NODE_ENV);
 const authBootstrapUsersFile = process.env.POKER_AUTH_BOOTSTRAP_USERS_FILE?.trim();
 const authBootstrapUsers = loadBootstrapUsersFromFile(authBootstrapUsersFile);
+const allowLegacyWalletRoutes = parseAllowLegacyWalletRoutes(
+  process.env.POKER_ENABLE_LEGACY_WALLET_ROUTES,
+  process.env.NODE_ENV,
+);
 const runtimeStateStore = persistenceEnabled ? new RuntimeStateStore(stateFilePath) : null;
 
 let persistedRuntimeState: RuntimeStateSnapshot | null = null;
@@ -702,7 +716,14 @@ function persistRuntimeState(): void {
 }
 
 const server = createServer((request, response) => {
-  void handleRequest(request, response, tableService, authWalletService, persistRuntimeState);
+  void handleRequest(
+    request,
+    response,
+    tableService,
+    authWalletService,
+    allowLegacyWalletRoutes,
+    persistRuntimeState,
+  );
 });
 
 server.listen(port, host, () => {
@@ -718,6 +739,7 @@ server.listen(port, host, () => {
     console.warn('Auth token secret: using development default. Set POKER_AUTH_TOKEN_SECRET for non-dev environments.');
   }
   console.info(`Auth demo users: ${authAllowDemoUsers ? 'enabled' : 'disabled'}`);
+  console.info(`Legacy wallet routes: ${allowLegacyWalletRoutes ? 'enabled' : 'disabled'}`);
   if (authBootstrapUsersFile) {
     if (persistedRuntimeState) {
       console.info('Auth bootstrap users: file configured but ignored because persisted auth state was restored.');

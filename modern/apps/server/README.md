@@ -35,6 +35,7 @@ Environment overrides:
 - `POKER_SESSION_TTL_MS` (session ttl in milliseconds, default `28800000`)
 - `POKER_AUTH_ALLOW_DEMO_USERS` (`1`/`0`, default `1` unless `NODE_ENV=production`)
 - `POKER_AUTH_BOOTSTRAP_USERS_FILE` (path to JSON file with bootstrap auth users)
+- `POKER_ENABLE_LEGACY_WALLET_ROUTES` (`1`/`0`, default `1` unless `NODE_ENV=production`)
 
 Runtime persistence:
 

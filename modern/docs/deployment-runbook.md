@@ -31,6 +31,7 @@ Environment variables:
 - `POKER_SESSION_TTL_MS` (default: `28800000`)
 - `POKER_AUTH_ALLOW_DEMO_USERS` (`1`/`0`, default: `0` when `NODE_ENV=production`)
 - `POKER_AUTH_BOOTSTRAP_USERS_FILE` (JSON seed file used when no persisted auth state exists)
+- `POKER_ENABLE_LEGACY_WALLET_ROUTES` (`1`/`0`, default: `0` when `NODE_ENV=production`)
 
 ## Health + Readiness Checks
 
@@ -49,6 +50,7 @@ Auth/wallet sanity checks:
 - Current runtime persists table/auth/wallet state to local JSON for restart continuity.
 - Current auth/session uses signed, expiring bearer tokens and salted scrypt password hashes.
 - In production (`NODE_ENV=production`), demo users are disabled by default. Set `POKER_AUTH_BOOTSTRAP_USERS_FILE` for first boot or explicitly set `POKER_AUTH_ALLOW_DEMO_USERS=1` for temporary environments.
+- In production (`NODE_ENV=production`), legacy wallet compatibility routes are disabled by default. Use `POKER_ENABLE_LEGACY_WALLET_ROUTES=1` only for temporary migration compatibility windows.
 - Bootstrap file format accepts either a JSON array of user records or `{ "users": [...] }`. Each user requires `email` and `password` (or `passwordHash` in `scrypt$<salt-hex>$<digest-hex>` format).
 - Current auth API supports session revocation (`/api/auth/revoke-others`) and per-user audit logs.
 - Remaining production hardening: external identity provider, secret management/rotation, and role-based audit governance.

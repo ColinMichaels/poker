@@ -163,6 +163,13 @@ These are not extraction failures, but they are blockers to deleting the legacy 
   - rejects unsupported hash formats at service startup
 - Added regression tests for password-hash compatibility and format rejection.
 
+## Completed in PR Q
+
+- Added explicit control for legacy wallet compatibility routes:
+  - `POKER_ENABLE_LEGACY_WALLET_ROUTES`
+- Default behavior is now production-safe (`NODE_ENV=production` disables legacy wallet routes unless explicitly enabled).
+- Updated server/deployment docs for legacy wallet route toggles.
+
 ## Known Intentional Asset Exceptions
 
 - Non-canonical card extras remain excluded from canonical face set:
@@ -231,6 +238,7 @@ Exit criteria:
 14. PR N: Runtime legacy-reference guard in modern CI.
 15. PR O: Legacy removal execution runbook and doc linkage.
 16. PR P: Password-hash format validation and legacy credential migration hardening.
+17. PR Q: Legacy wallet route toggle with production-safe defaults.
 
 ## Cutover Go/No-Go Checklist
 

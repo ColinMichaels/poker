@@ -405,3 +405,16 @@ Sources:
 - `apps/server/src/auth-wallet-service.test.ts`
 - `apps/server/README.md`
 - `docs/deployment-runbook.md`
+
+## PR Q Progress: Legacy Wallet Route Toggle
+
+- Added environment control for legacy wallet compatibility routes:
+  - `POKER_ENABLE_LEGACY_WALLET_ROUTES`
+- Updated server route handling to enforce this toggle.
+- Added production-safe default behavior (`NODE_ENV=production` disables legacy wallet routes unless explicitly enabled).
+
+Sources:
+
+- `apps/server/src/index.ts`
+- `apps/server/README.md`
+- `docs/deployment-runbook.md`
