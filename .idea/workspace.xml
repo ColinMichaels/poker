@@ -7,24 +7,18 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1eee6476-c5d8-4dc1-b068-da2be4a7c407" name="Default Changelist" comment="feat(client): add server session store with localStorage support and Firebase integration&#10;&#10;- Introduced `server-session-store` for managing server sessions in the client.&#10;- Added utility functions to read, write, and clear sessions from localStorage.&#10;- Updated dependencies with Firebase SDK for session handling and storage integration.">
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/src/server-table-controller.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/src/table-controller-factory.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/tests/server-table-controller.test.ts" afterDir="false" />
+    <list default="true" id="1eee6476-c5d8-4dc1-b068-da2be4a7c407" name="Default Changelist" comment="feat(server): add seat ownership enforcement and session-gated table actions&#10;&#10;- Introduced APIs for seat claims (`GET`, `POST`, `DELETE /api/table/seat`) with snapshot persistence.&#10;- Enforced seat ownership for `PLAYER_ACTION` commands.&#10;- Updated logout to release seat claims for the authenticated user.&#10;- Extended client integration with server runtime table controller for auto seat claiming.&#10;- Added extensive tests for seat claim lifecycle, conflicts, and restore behavior.">
+      <change afterPath="$PROJECT_DIR$/modern/apps/client/tests/table-controller-factory.test.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/apps/client/.env.example" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/.env.example" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/apps/client/src/client-runtime-config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/src/client-runtime-config.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/apps/client/src/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/src/main.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/apps/client/src/table-controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/src/table-controller.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/apps/client/src/vite-env.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/src/vite-env.d.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/apps/client/tests/client-runtime-config.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/tests/client-runtime-config.test.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/client/src/server-table-controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/src/server-table-controller.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/client/src/table-controller-factory.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/src/table-controller-factory.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/apps/server/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/apps/server/src/http-routes.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/http-routes.test.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/apps/server/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/index.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/apps/server/src/runtime-state-store.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/runtime-state-store.test.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/apps/server/src/table-service.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/table-service.test.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/apps/server/src/table-service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/table-service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/server/src/runtime-state-store.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/runtime-state-store.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/docs/deployment-runbook.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/docs/deployment-runbook.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/docs/developer-setup.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/docs/developer-setup.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/docs/legacy-decommission-plan.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/docs/legacy-decommission-plan.md" afterDir="false" />
@@ -507,7 +501,15 @@
       <option name="project" value="LOCAL" />
       <updated>1772144711293</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="feat(server): add seat ownership enforcement and session-gated table actions&#10;&#10;- Introduced APIs for seat claims (`GET`, `POST`, `DELETE /api/table/seat`) with snapshot persistence.&#10;- Enforced seat ownership for `PLAYER_ACTION` commands.&#10;- Updated logout to release seat claims for the authenticated user.&#10;- Extended client integration with server runtime table controller for auto seat claiming.&#10;- Added extensive tests for seat claim lifecycle, conflicts, and restore behavior.">
+      <option name="closed" value="true" />
+      <created>1772150109748</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1772150109748</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -547,7 +549,8 @@
     <MESSAGE value="feat(server): add Firebase ID token verification and external auth mode&#10;&#10;- Added support for Firebase ID tokens as an external auth mode (`firebase_id_token`).&#10;- Introduced `verifyFirebaseIdToken` with JWT-based signature and claim validations.&#10;- Added an alternate Firebase Admin SDK verifier for token validation" />
     <MESSAGE value="feat(server): add Firebase ID token verification and external auth mode&#10;&#10;- Added support for Firebase ID tokens as an external auth mode (`firebase_id_token`).&#10;- Introduced `verifyFirebaseIdToken` with JWT-based signature and claim validations.&#10;- Added an alternate Firebase Admin SDK verifier for token validation Firebase Hosting starter configuration for SPAs." />
     <MESSAGE value="feat(client): add server session store with localStorage support and Firebase integration&#10;&#10;- Introduced `server-session-store` for managing server sessions in the client.&#10;- Added utility functions to read, write, and clear sessions from localStorage.&#10;- Updated dependencies with Firebase SDK for session handling and storage integration." />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(client): add server session store with localStorage support and Firebase integration&#10;&#10;- Introduced `server-session-store` for managing server sessions in the client.&#10;- Added utility functions to read, write, and clear sessions from localStorage.&#10;- Updated dependencies with Firebase SDK for session handling and storage integration." />
+    <MESSAGE value="feat(server): add seat ownership enforcement and session-gated table actions&#10;&#10;- Introduced APIs for seat claims (`GET`, `POST`, `DELETE /api/table/seat`) with snapshot persistence.&#10;- Enforced seat ownership for `PLAYER_ACTION` commands.&#10;- Updated logout to release seat claims for the authenticated user.&#10;- Extended client integration with server runtime table controller for auto seat claiming.&#10;- Added extensive tests for seat claim lifecycle, conflicts, and restore behavior." />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(server): add seat ownership enforcement and session-gated table actions&#10;&#10;- Introduced APIs for seat claims (`GET`, `POST`, `DELETE /api/table/seat`) with snapshot persistence.&#10;- Enforced seat ownership for `PLAYER_ACTION` commands.&#10;- Updated logout to release seat claims for the authenticated user.&#10;- Extended client integration with server runtime table controller for auto seat claiming.&#10;- Added extensive tests for seat claim lifecycle, conflicts, and restore behavior." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

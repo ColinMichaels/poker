@@ -79,7 +79,9 @@ Template reference:
 
 - `GET /health` (liveness)
   - includes runtime flags for persistence/demo-users/legacy-wallet-route/external-auth, including mode and rotation fallback status
+- `GET /api/table/list` (server-fed table catalog for lobby + multi-table cards)
 - `GET /api/table/state` (authoritative table snapshot)
+  - optional `?tableId=<id>` targets non-default table session
 
 Auth/wallet sanity checks:
 
@@ -105,6 +107,10 @@ Auth/wallet sanity checks:
 1. `POST /api/table/seat` claims seat ownership for authenticated user.
 2. `PLAYER` sessions can only submit `PLAYER_ACTION` on their claimed seat.
 3. logout (`POST /api/auth/logout`) releases current authenticated user seat claim.
+4. `PLAYER` sessions cannot submit non-player lifecycle commands (`START_HAND`, deal/showdown controls).
+- Table runtime is table-scoped by query id:
+1. `/health` and `/api/table/*` accept optional `tableId` query.
+2. Unknown table ids are lazily initialized and persisted as isolated table sessions.
 - External identity login is available via `POST /api/auth/external/login` (`signed_assertion`, `trusted_headers`, or `firebase_id_token` mode).
 - External auth secret rotation can be performed without downtime:
 1. Deploy with new key at `POKER_EXTERNAL_AUTH_SHARED_SECRET` and old key at `POKER_EXTERNAL_AUTH_SHARED_SECRET_PREVIOUS`.

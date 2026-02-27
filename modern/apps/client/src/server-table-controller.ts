@@ -416,7 +416,7 @@ export class ServerTableController implements TableController {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
-        ...this.buildAuthHeaders(),
+        ...this.buildCommandAuthHeaders(command),
       },
       body: JSON.stringify(command),
     });
@@ -499,6 +499,14 @@ export class ServerTableController implements TableController {
     return {
       authorization: `Bearer ${sessionToken}`,
     };
+  }
+
+  private buildCommandAuthHeaders(command: TableCommand): Record<string, string> {
+    if (command.type !== 'PLAYER_ACTION') {
+      return {};
+    }
+
+    return this.buildAuthHeaders();
   }
 
   private readSessionToken(): string | null {

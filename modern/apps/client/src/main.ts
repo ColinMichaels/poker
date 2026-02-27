@@ -1,7 +1,7 @@
 import type { ActionOptionDTO, PokerAction, SeatActionStateDTO, SeatState, TablePhase } from '@poker/poker-engine';
 import './styles.css';
 import { HOW_TO_GUIDES } from './content/howto-content';
-import { LocalTableController, type TableController, type TableViewModel } from './table-controller';
+import type { TableController, TableViewModel } from './table-controller';
 import {
   getAvailableMultiTableActionIdsFromActionState,
   getPendingDecisionCountFromState,
@@ -15,6 +15,7 @@ import { buildWinOddsSnapshot, type SeatWinOdds, type WinOddsSnapshot } from './
 import { createClientAuthBridge } from './client-auth.ts';
 import type { ExternalAuthSessionState } from './auth/external-auth-session-bridge.ts';
 import { createRuntimeTableController } from './table-controller-factory.ts';
+import { loadClientRuntimeConfig } from './client-runtime-config.ts';
 
 const root = document.getElementById('app');
 
@@ -93,7 +94,19 @@ interface MultiTableUiState {
   lastSubmittedAtMs: number | null;
 }
 
-const LOBBY_TABLES: readonly LobbyTableCard[] = [
+interface ServerTableCatalogRecord {
+  tableId: string;
+  name: string;
+  stakesLabel: string;
+  occupancyLabel: string;
+  paceLabel: string;
+  avgPot: number;
+  minRaise: number;
+  maxRaise: number;
+  callAmount: number;
+}
+
+const DEFAULT_LOBBY_TABLES: readonly LobbyTableCard[] = [
   {
     id: 'table-emerald',
     name: 'Emerald Rush',
@@ -117,7 +130,7 @@ const LOBBY_TABLES: readonly LobbyTableCard[] = [
   },
 ];
 
-const MULTI_TABLE_CARDS: readonly MultiTableCard[] = [
+const DEFAULT_MULTI_TABLE_CARDS: readonly MultiTableCard[] = [
   {
     id: 'atlas-01',
     name: 'Atlas 01',
@@ -166,10 +179,13 @@ const MULTI_TABLE_ACTIONS: readonly MultiTableActionOption[] = [
 ];
 
 const MULTI_TABLE_DESKTOP_MEDIA_QUERY = '(min-width: 1024px)';
+const runtimeConfig = loadClientRuntimeConfig();
+let lobbyTableCards: LobbyTableCard[] = [...DEFAULT_LOBBY_TABLES];
+let multiTableCards: MultiTableCard[] = [...DEFAULT_MULTI_TABLE_CARDS];
 let multiTableState: MultiTableUiState = {
-  selectedTableId: MULTI_TABLE_CARDS[0]?.id ?? '',
+  selectedTableId: multiTableCards[0]?.id ?? '',
   selectedActionId: 'CALL',
-  targetBetAmount: MULTI_TABLE_CARDS[0]?.minRaise ?? 0,
+  targetBetAmount: multiTableCards[0]?.minRaise ?? 0,
   activityNote: 'Seat 1 to act. Use action shortcuts on desktop (F/K/C/R/A + Enter).',
   lastSubmittedActionId: null,
   lastSubmittedAtMs: null,
@@ -179,8 +195,9 @@ let controller: TableController | null = null;
 let removeControllerListener: (() => void) | null = null;
 let activeView: 'lobby' | 'play' | 'howto' | 'multitable' = 'lobby';
 let selectedGuideId = HOW_TO_GUIDES[0]?.id ?? '';
-let selectedLobbyTableId = LOBBY_TABLES[0]?.id ?? '';
+let selectedLobbyTableId = lobbyTableCards[0]?.id ?? '';
 let selectedLobbySeatId = 1;
+let activePlayTableId = selectedLobbyTableId;
 let previousPlaySnapshot: PlaySnapshot | null = null;
 let lastRenderedModel: TableViewModel | null = null;
 let resizeRenderQueued = false;
@@ -194,7 +211,7 @@ const MULTI_ACTION_CONFIRM_MS = 440;
 const MULTI_TABLE_USER_SEAT_ID = 1;
 const MULTI_TABLE_AUTO_NEXT_HAND_DELAY_MS = 850;
 let multiActionConfirmTimerId: number | null = null;
-const multiTableControllerById = new Map<string, LocalTableController>();
+const multiTableControllerById = new Map<string, TableController>();
 const multiTableModelByTableId = new Map<string, TableViewModel>();
 const multiTableAutoNextHandTimerById = new Map<string, number>();
 const clientAuthBridge = createClientAuthBridge();
@@ -258,9 +275,148 @@ interface ChipFlowAnimationPlan {
   activityText: string | null;
 }
 
+function getLobbyTables(): readonly LobbyTableCard[] {
+  return lobbyTableCards.length > 0 ? lobbyTableCards : DEFAULT_LOBBY_TABLES;
+}
+
+function getMultiTableCards(): readonly MultiTableCard[] {
+  return multiTableCards.length > 0 ? multiTableCards : DEFAULT_MULTI_TABLE_CARDS;
+}
+
+function joinApiPath(path: string): string {
+  const baseUrl = runtimeConfig.apiBaseUrl.trim();
+  if (!baseUrl) {
+    return path;
+  }
+  return `${baseUrl}${path}`;
+}
+
+function toRecord(value: unknown): Record<string, unknown> | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null;
+  }
+  return value as Record<string, unknown>;
+}
+
+function readString(record: Record<string, unknown>, key: string, fallback: string): string {
+  const raw = record[key];
+  return typeof raw === 'string' && raw.trim().length > 0 ? raw.trim() : fallback;
+}
+
+function readNonNegativeNumber(record: Record<string, unknown>, key: string, fallback: number): number {
+  const raw = record[key];
+  return typeof raw === 'number' && Number.isFinite(raw) && raw >= 0 ? raw : fallback;
+}
+
+function parseServerTableCatalog(payload: unknown): ServerTableCatalogRecord[] {
+  const record = toRecord(payload);
+  if (!record || !Array.isArray(record.records)) {
+    return [];
+  }
+
+  return record.records
+    .map<ServerTableCatalogRecord | null>((entry) => {
+      const row = toRecord(entry);
+      if (!row) {
+        return null;
+      }
+
+      const tableId = readString(row, 'tableId', '');
+      if (!tableId) {
+        return null;
+      }
+
+      return {
+        tableId,
+        name: readString(row, 'name', tableId),
+        stakesLabel: readString(row, 'stakesLabel', '5 / 10'),
+        occupancyLabel: readString(row, 'occupancyLabel', '4 max'),
+        paceLabel: readString(row, 'paceLabel', 'Standard'),
+        avgPot: readNonNegativeNumber(row, 'avgPot', 0),
+        minRaise: readNonNegativeNumber(row, 'minRaise', 10),
+        maxRaise: readNonNegativeNumber(row, 'maxRaise', 400),
+        callAmount: readNonNegativeNumber(row, 'callAmount', 0),
+      };
+    })
+    .filter((entry): entry is ServerTableCatalogRecord => entry !== null);
+}
+
+function syncRuntimeTableSelections(): void {
+  const lobbyTables = getLobbyTables();
+  const multiTables = getMultiTableCards();
+  const firstLobbyId = lobbyTables[0]?.id ?? '';
+  const firstMulti = multiTables[0];
+
+  if (!lobbyTables.some((table) => table.id === selectedLobbyTableId)) {
+    selectedLobbyTableId = firstLobbyId;
+  }
+
+  if (!multiTables.some((table) => table.id === multiTableState.selectedTableId)) {
+    multiTableState.selectedTableId = firstMulti?.id ?? '';
+    multiTableState.targetBetAmount = firstMulti?.minRaise ?? 0;
+  }
+
+  if (!lobbyTables.some((table) => table.id === activePlayTableId)) {
+    activePlayTableId = selectedLobbyTableId;
+  }
+}
+
+async function hydrateServerTableCatalog(): Promise<void> {
+  if (runtimeConfig.tableRuntimeMode !== 'server') {
+    return;
+  }
+
+  try {
+    const response = await fetch(joinApiPath('/api/table/list'), {
+      method: 'GET',
+      cache: 'no-store',
+    });
+    if (!response.ok) {
+      return;
+    }
+
+    const payload = await response.json();
+    const records = parseServerTableCatalog(payload);
+    if (records.length === 0) {
+      return;
+    }
+
+    lobbyTableCards = records.map((record) => ({
+      id: record.tableId,
+      name: record.name,
+      stakesLabel: record.stakesLabel,
+      occupancyLabel: record.occupancyLabel,
+      paceLabel: record.paceLabel,
+    }));
+    multiTableCards = records.map((record) => ({
+      id: record.tableId,
+      name: record.name,
+      stakesLabel: record.stakesLabel,
+      occupancyLabel: record.occupancyLabel,
+      avgPot: Math.round(record.avgPot),
+      minRaise: Math.round(record.minRaise),
+      maxRaise: Math.round(Math.max(record.maxRaise, record.minRaise)),
+      callAmount: Math.round(record.callAmount),
+    }));
+    syncRuntimeTableSelections();
+  } catch {
+    // Keep local fallback cards when server catalog is unavailable.
+  }
+}
+
 function initializeMultiTableControllers(): void {
-  for (const table of MULTI_TABLE_CARDS) {
-    const tableController = new LocalTableController({ userSeatId: MULTI_TABLE_USER_SEAT_ID });
+  for (const timerId of multiTableAutoNextHandTimerById.values()) {
+    window.clearTimeout(timerId);
+  }
+  multiTableAutoNextHandTimerById.clear();
+  multiTableControllerById.clear();
+  multiTableModelByTableId.clear();
+
+  for (const table of getMultiTableCards()) {
+    const tableController = createRuntimeTableController({
+      userSeatId: MULTI_TABLE_USER_SEAT_ID,
+      tableId: table.id,
+    });
     multiTableControllerById.set(table.id, tableController);
 
     tableController.subscribe((model) => {
@@ -298,16 +454,26 @@ function scheduleMultiTableAutoNextHand(tableId: string, model: TableViewModel):
   multiTableAutoNextHandTimerById.set(tableId, timerId);
 }
 
-initializeMultiTableControllers();
-mountControllerForSeat(selectedLobbySeatId);
-clientAuthBridge.subscribe((state) => {
-  clientAuthState = state;
-  if (!lastRenderedModel) {
-    return;
+async function bootstrapClientRuntime(): Promise<void> {
+  await hydrateServerTableCatalog();
+  initializeMultiTableControllers();
+  mountControllerForSeat(selectedLobbySeatId, selectedLobbyTableId);
+  clientAuthBridge.subscribe((state) => {
+    clientAuthState = state;
+    if (!lastRenderedModel) {
+      return;
+    }
+    render(appRoot, lastRenderedModel);
+  });
+  try {
+    await clientAuthBridge.start();
+  } catch {
+    // Keep runtime interactive even when external auth bridge startup fails.
   }
-  render(appRoot, lastRenderedModel);
-});
-void clientAuthBridge.start();
+}
+
+void bootstrapClientRuntime();
+
 window.addEventListener('beforeunload', () => {
   clientAuthBridge.stop();
 });
@@ -378,12 +544,13 @@ window.addEventListener('keydown', (event) => {
   render(appRoot, lastRenderedModel);
 });
 
-function mountControllerForSeat(userSeatId: number): void {
+function mountControllerForSeat(userSeatId: number, tableId: string): void {
   previousPlaySnapshot = null;
   draftTargetBetAmount = null;
   lastProcessedEventLogId = null;
+  activePlayTableId = tableId;
   removeControllerListener?.();
-  controller = createRuntimeTableController({ userSeatId });
+  controller = createRuntimeTableController({ userSeatId, tableId });
   removeControllerListener = controller.subscribe((model) => {
     render(appRoot, model);
   });
@@ -486,9 +653,10 @@ function render(container: HTMLElement, model: TableViewModel): void {
   const enterTableButton = container.querySelector<HTMLButtonElement>('[data-role="enter-table"]');
   enterTableButton?.addEventListener('click', () => {
     const selectedSeat = selectedLobbySeatId;
+    const selectedTableId = selectedLobbyTableId;
     activeView = 'play';
-    if (model.userSeatId !== selectedSeat) {
-      mountControllerForSeat(selectedSeat);
+    if (model.userSeatId !== selectedSeat || activePlayTableId !== selectedTableId) {
+      mountControllerForSeat(selectedSeat, selectedTableId);
       return;
     }
     render(container, model);
@@ -523,8 +691,8 @@ function render(container: HTMLElement, model: TableViewModel): void {
   const playViewButton = container.querySelector<HTMLButtonElement>('[data-role="view-play"]');
   playViewButton?.addEventListener('click', () => {
     activeView = 'play';
-    if (model.userSeatId !== selectedLobbySeatId) {
-      mountControllerForSeat(selectedLobbySeatId);
+    if (model.userSeatId !== selectedLobbySeatId || activePlayTableId !== selectedLobbyTableId) {
+      mountControllerForSeat(selectedLobbySeatId, selectedLobbyTableId);
       return;
     }
     render(container, model);
@@ -583,7 +751,7 @@ function render(container: HTMLElement, model: TableViewModel): void {
           return;
         }
 
-        const table = MULTI_TABLE_CARDS.find((candidate) => candidate.id === tableId);
+        const table = getMultiTableCards().find((candidate) => candidate.id === tableId);
         if (!table) {
           return;
         }
@@ -859,7 +1027,8 @@ function renderPlayView(
 }
 
 function renderLobbyView(model: TableViewModel): string {
-  const selectedTable = LOBBY_TABLES.find((table) => table.id === selectedLobbyTableId) ?? LOBBY_TABLES[0];
+  const lobbyTables = getLobbyTables();
+  const selectedTable = lobbyTables.find((table) => table.id === selectedLobbyTableId) ?? lobbyTables[0];
 
   return [
     '  <section class="lobby-shell">',
@@ -870,7 +1039,7 @@ function renderLobbyView(model: TableViewModel): string {
     '        <p>Choose your table pace, then lock in a seat before entering the action.</p>',
     '      </div>',
     '      <div class="lobby-tables">',
-    ...LOBBY_TABLES.map((table) => {
+    ...lobbyTables.map((table) => {
       const classes = table.id === selectedTable?.id ? 'lobby-table-card is-selected' : 'lobby-table-card';
       return [
         `        <button class="${classes}" data-table-id="${table.id}" type="button" aria-pressed="${table.id === selectedTable?.id ? 'true' : 'false'}">`,
@@ -974,7 +1143,7 @@ function renderMultiTableView(motionClasses: MotionClassSet, chipFlowPlan: ChipF
     '          <p>Jump between active tables without leaving your current hand context.</p>',
     '        </header>',
     '        <div class="multi-table-rail-list" role="tablist" aria-label="Active tables">',
-    ...MULTI_TABLE_CARDS.map((table) => {
+    ...getMultiTableCards().map((table) => {
       const selected = table.id === selectedTable.id;
       const tableModel = getMultiTableModel(table.id);
       const pendingDecisions = getTablePendingDecisionCount(table.id);
@@ -1608,7 +1777,8 @@ function clampWholeNumberAmount(value: number, min: number, max: number): number
 }
 
 function getSelectedMultiTableCard(): MultiTableCard {
-  return MULTI_TABLE_CARDS.find((table) => table.id === multiTableState.selectedTableId) ?? MULTI_TABLE_CARDS[0];
+  const tableCards = getMultiTableCards();
+  return tableCards.find((table) => table.id === multiTableState.selectedTableId) ?? tableCards[0];
 }
 
 function getSelectedMultiTableAction(): MultiTableActionOption {
@@ -1642,7 +1812,7 @@ function normalizeMultiTableActionSelection(): void {
 }
 
 function getMultiTableRaiseBounds(tableId: string): { min: number; max: number } {
-  const table = MULTI_TABLE_CARDS.find((candidate) => candidate.id === tableId);
+  const table = getMultiTableCards().find((candidate) => candidate.id === tableId);
   const fallbackMin = table?.minRaise ?? 0;
   const fallbackMax = table?.maxRaise ?? fallbackMin;
   const actionState = getMultiTableUserSeatActionState(tableId);
@@ -1668,7 +1838,7 @@ function isTableUserActing(tableId: string): boolean {
 }
 
 function countTotalPendingDecisions(): number {
-  return MULTI_TABLE_CARDS.reduce((total, table) => total + getTablePendingDecisionCount(table.id), 0);
+  return getMultiTableCards().reduce((total, table) => total + getTablePendingDecisionCount(table.id), 0);
 }
 
 function buildMultiTableBoardCards(tableId: string): string {
@@ -2419,13 +2589,6 @@ function buildPayoutTransfers(
       direction: 'FROM_POT' as const,
       delayMs: 0,
     }));
-}
-
-function toRecord(value: unknown): Record<string, unknown> | null {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) {
-    return null;
-  }
-  return value as Record<string, unknown>;
 }
 
 function readInteger(record: Record<string, unknown>, key: string): number | null {

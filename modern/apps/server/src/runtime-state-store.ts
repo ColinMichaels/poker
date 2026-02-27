@@ -6,7 +6,8 @@ import type { TableServiceStateSnapshot } from './table-service.ts';
 export interface RuntimeStateSnapshot {
   version: 1;
   updatedAt: string;
-  table: TableServiceStateSnapshot;
+  table?: TableServiceStateSnapshot;
+  tables?: TableServiceStateSnapshot[];
   auth: AuthWalletStateSnapshot;
 }
 
@@ -27,8 +28,18 @@ function assertSnapshotShape(value: unknown): asserts value is RuntimeStateSnaps
     throw new Error('Runtime state payload is missing updatedAt.');
   }
 
-  if (!isRecord(value.table) || typeof value.table.tableId !== 'string') {
-    throw new Error('Runtime state payload is missing table snapshot.');
+  const hasLegacyTable = isRecord(value.table) && typeof value.table.tableId === 'string';
+  if (
+    value.tables !== undefined
+    && (!Array.isArray(value.tables)
+      || !value.tables.every((tableSnapshot) => isRecord(tableSnapshot) && typeof tableSnapshot.tableId === 'string'))
+  ) {
+    throw new Error('Runtime state payload tables must be an array of table snapshots when present.');
+  }
+
+  const hasTableList = Array.isArray(value.tables) && value.tables.length > 0;
+  if (!hasLegacyTable && !hasTableList) {
+    throw new Error('Runtime state payload is missing table snapshot(s).');
   }
 
   if (!isRecord(value.auth) || !Array.isArray(value.auth.users) || !Array.isArray(value.auth.sessions)) {

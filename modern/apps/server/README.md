@@ -90,6 +90,7 @@ Auth/session behavior:
 - `PATCH /api/wallet`
 - `GET /api/wallet/ledger?limit=50`
 - `GET /health`
+- `GET /api/table/list`
 - `GET /api/table/state`
 - `GET /api/table/seat`
 - `POST /api/table/seat`
@@ -100,6 +101,13 @@ Auth/session behavior:
 - `GET /api/table/hands`
 - `GET /api/table/hands/:handId`
 - `GET /api/table/hands/:handId/replay`
+
+Table routing:
+
+- `/health` and all `/api/table/*` routes support optional `?tableId=<id>` query.
+- When omitted, routes target configured default table (`TABLE_ID`).
+- Server keeps isolated runtime state per table id and lazily initializes unknown table ids.
+- Seat claims are scoped per table id.
 
 Legacy compatibility wallet routes:
 
@@ -119,6 +127,7 @@ Seat ownership and table command authorization:
 - `PLAYER_ACTION` command rules:
   - unauthenticated requests can only act on unclaimed seats
   - `PLAYER` sessions must claim a seat and may only act for that claimed seat
+  - `PLAYER` sessions cannot submit non-player table lifecycle commands (`START_HAND`, deal/showdown commands)
   - `OPERATOR`/`ADMIN` sessions bypass player-seat restriction for moderation/operations
 - seat claims are persisted with runtime state and cleared on logout for the active user.
 

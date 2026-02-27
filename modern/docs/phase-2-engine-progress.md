@@ -503,6 +503,74 @@ Sources:
 - `docs/developer-setup.md`
 - `docs/deployment-runbook.md`
 
+## PR BU Progress: Query-Scoped Table Sessions + Multi-Table Runtime Wiring
+
+- Added table-id query routing for authoritative table endpoints:
+  - `/health?tableId=<id>`
+  - `/api/table/*?tableId=<id>`
+- Added multi-table runtime hydration/persistence support in server runtime state:
+  - runtime snapshot now supports `tables[]` while preserving compatibility `table` field
+  - startup now restores all persisted table sessions and lazily initializes missing table ids
+- Updated request handling to resolve table-specific `TableService` per request and to clear seat claims across all active tables on logout.
+- Updated client runtime controller factory to produce table-scoped server URLs.
+- Switched multi-table screen controllers to runtime factory controllers (server-backed when runtime mode is `server`, local fallback otherwise).
+- Added regression coverage:
+  - server route tests for table-id scoping and invalid table-id handling
+  - runtime-state store multi-table restore path
+  - client route URL construction for table-scoped runtime endpoints
+
+Sources:
+
+- `apps/server/src/index.ts`
+- `apps/server/src/runtime-state-store.ts`
+- `apps/server/src/runtime-state-store.test.ts`
+- `apps/server/src/http-routes.test.ts`
+- `apps/client/src/main.ts`
+- `apps/client/src/table-controller-factory.ts`
+- `apps/client/tests/table-controller-factory.test.ts`
+- `apps/server/README.md`
+- `docs/developer-setup.md`
+- `docs/deployment-runbook.md`
+- `docs/legacy-decommission-plan.md`
+
+## PR BV Progress: Role-Gated Non-Player Table Command Enforcement
+
+- Added explicit authorization guard for non-player table lifecycle commands:
+  - authenticated `PLAYER` sessions are rejected for non-player command types
+  - `OPERATOR` and `ADMIN` sessions retain command access
+- Updated client server-runtime command submission behavior to send bearer auth only for `PLAYER_ACTION` commands.
+- Added route-level regression coverage for role-based rejection/allowance behavior.
+
+Sources:
+
+- `apps/server/src/index.ts`
+- `apps/server/src/http-routes.test.ts`
+- `apps/client/src/server-table-controller.ts`
+- `apps/server/README.md`
+- `docs/developer-setup.md`
+- `docs/deployment-runbook.md`
+- `docs/legacy-decommission-plan.md`
+
+## PR BW Progress: Server-Fed Table Catalog for Lobby + Multi-Table UI
+
+- Added server table catalog route:
+  - `GET /api/table/list`
+  - exposes table metadata derived from live runtime snapshots (id/name/stakes/occupancy/pace and action bounds)
+- Added route-level regression coverage for table catalog listing across routed table services.
+- Replaced static client table-card metadata with runtime catalog hydration when `VITE_TABLE_RUNTIME_MODE=server`.
+- Kept local static fallback metadata for non-server runtime mode and server-unavailable startup conditions.
+
+Sources:
+
+- `apps/server/src/index.ts`
+- `apps/server/src/http-routes.test.ts`
+- `apps/client/src/main.ts`
+- `apps/server/README.md`
+- `README.md`
+- `docs/developer-setup.md`
+- `docs/deployment-runbook.md`
+- `docs/legacy-decommission-plan.md`
+
 ## PR X Progress: Env Template Sync Guard
 
 - Added script to verify required server environment keys are present in:

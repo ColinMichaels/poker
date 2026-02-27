@@ -145,6 +145,12 @@ async function invokeRoute(options: {
     tableService: TableService;
     authWalletService: AuthWalletService;
   };
+  tableRouting?: {
+    defaultTableId?: string;
+    resolveTableService?: (tableId: string) => TableService;
+    releaseSeatClaimsForUser?: (userId: number) => void;
+    listTableServices?: () => TableService[];
+  };
 }): Promise<MockServerResponse> {
   const { tableService, authWalletService } = options.services ?? createServices();
   const response = new MockServerResponse();
@@ -157,6 +163,7 @@ async function invokeRoute(options: {
     options.runtimeInfo,
     options.allowLegacyWalletRoutes,
     () => {},
+    options.tableRouting,
   );
 
   return response;
@@ -608,6 +615,58 @@ async function testSeatClaimRoutesAndOwnershipEnforcement(): Promise<void> {
   assertEqual(forbiddenPayload.error, 'SEAT_FORBIDDEN', 'Expected seat ownership error code.');
 }
 
+async function testPlayerSessionCannotSubmitNonPlayerCommands(): Promise<void> {
+  const services = createServices();
+  const playerSession = services.authWalletService.login({ email: 'luna@example.com', password: 'demo' }).session;
+  const adminSession = services.authWalletService.login({ email: 'colin@example.com', password: 'demo' }).session;
+
+  const playerResponse = await invokeRoute({
+    request: new MockIncomingMessage({
+      method: 'POST',
+      url: '/api/table/command',
+      headers: {
+        host: '127.0.0.1:8787',
+        authorization: `Bearer ${playerSession.token}`,
+        'content-type': 'application/json',
+      },
+      body: {
+        type: 'START_HAND',
+        handId: 'player-attempt-hand',
+        seed: 321,
+      },
+    }),
+    runtimeInfo: createRuntimeInfo(),
+    allowLegacyWalletRoutes: false,
+    services,
+  });
+  assertEqual(playerResponse.statusCode, 403, 'Expected PLAYER session non-player command to return HTTP 403.');
+  const playerPayload = playerResponse.json() as {
+    error: string;
+  };
+  assertEqual(playerPayload.error, 'COMMAND_FORBIDDEN', 'Expected non-player command error code for PLAYER session.');
+
+  const adminResponse = await invokeRoute({
+    request: new MockIncomingMessage({
+      method: 'POST',
+      url: '/api/table/command',
+      headers: {
+        host: '127.0.0.1:8787',
+        authorization: `Bearer ${adminSession.token}`,
+        'content-type': 'application/json',
+      },
+      body: {
+        type: 'START_HAND',
+        handId: 'admin-approved-hand',
+        seed: 654,
+      },
+    }),
+    runtimeInfo: createRuntimeInfo(),
+    allowLegacyWalletRoutes: false,
+    services,
+  });
+  assertEqual(adminResponse.statusCode, 200, 'Expected ADMIN session non-player command to remain allowed.');
+}
+
 async function testLogoutReleasesSeatClaim(): Promise<void> {
   const services = createServices();
   const lunaSession = services.authWalletService.login({ email: 'luna@example.com', password: 'demo' }).session;
@@ -653,6 +712,301 @@ async function testLogoutReleasesSeatClaim(): Promise<void> {
   );
 }
 
+async function testTableRoutesResolveByQueryTableId(): Promise<void> {
+  const services = createServices();
+  const secondaryTable = new TableService({
+    tableId: 'blaze-04',
+    initialState: createDefaultTableState({
+      handId: 'boot-blaze',
+      seed: 902,
+    }),
+  });
+  const tableServiceById = new Map<string, TableService>([
+    [services.tableService.getSnapshot().tableId, services.tableService],
+    [secondaryTable.getSnapshot().tableId, secondaryTable],
+  ]);
+  const tableRouting = {
+    defaultTableId: services.tableService.getSnapshot().tableId,
+    resolveTableService: (tableId: string): TableService => {
+      const existing = tableServiceById.get(tableId);
+      if (existing) {
+        return existing;
+      }
+
+      const created = new TableService({
+        tableId,
+        initialState: createDefaultTableState({
+          handId: `${tableId}-boot`,
+          seed: 903,
+        }),
+      });
+      tableServiceById.set(tableId, created);
+      return created;
+    },
+    releaseSeatClaimsForUser: (userId: number): void => {
+      for (const scopedTable of tableServiceById.values()) {
+        scopedTable.releaseSeatForUser(userId);
+      }
+    },
+    listTableServices: (): TableService[] => Array.from(tableServiceById.values()),
+  };
+
+  const commandResponse = await invokeRoute({
+    request: new MockIncomingMessage({
+      method: 'POST',
+      url: '/api/table/command?tableId=blaze-04',
+      headers: {
+        host: '127.0.0.1:8787',
+        'content-type': 'application/json',
+      },
+      body: {
+        type: 'START_HAND',
+        handId: 'blaze-hand-1',
+        seed: 777,
+      },
+    }),
+    runtimeInfo: createRuntimeInfo(),
+    allowLegacyWalletRoutes: false,
+    services,
+    tableRouting,
+  });
+  assertEqual(commandResponse.statusCode, 200, 'Expected scoped table command route to return HTTP 200.');
+
+  const defaultStateResponse = await invokeRoute({
+    request: new MockIncomingMessage({
+      method: 'GET',
+      url: '/api/table/state',
+      headers: {
+        host: '127.0.0.1:8787',
+      },
+    }),
+    runtimeInfo: createRuntimeInfo(),
+    allowLegacyWalletRoutes: false,
+    services,
+    tableRouting,
+  });
+  const defaultState = defaultStateResponse.json() as {
+    tableId: string;
+    state: {
+      handId: string;
+    };
+  };
+  assertEqual(defaultState.tableId, 'http-test-table', 'Expected default state route to use default table id.');
+  assertEqual(defaultState.state.handId, 'boot-http-test', 'Expected default table hand id to remain unchanged.');
+
+  const secondaryStateResponse = await invokeRoute({
+    request: new MockIncomingMessage({
+      method: 'GET',
+      url: '/api/table/state?tableId=blaze-04',
+      headers: {
+        host: '127.0.0.1:8787',
+      },
+    }),
+    runtimeInfo: createRuntimeInfo(),
+    allowLegacyWalletRoutes: false,
+    services,
+    tableRouting,
+  });
+  const secondaryState = secondaryStateResponse.json() as {
+    tableId: string;
+    state: {
+      handId: string;
+    };
+  };
+  assertEqual(secondaryState.tableId, 'blaze-04', 'Expected scoped state route to resolve target table id.');
+  assertEqual(secondaryState.state.handId, 'blaze-hand-1', 'Expected scoped table command to mutate scoped table state.');
+}
+
+async function testInvalidTableIdQueryRejected(): Promise<void> {
+  const response = await invokeRoute({
+    request: new MockIncomingMessage({
+      method: 'GET',
+      url: '/api/table/state?tableId=bad%20table!',
+      headers: {
+        host: '127.0.0.1:8787',
+      },
+    }),
+    runtimeInfo: createRuntimeInfo(),
+    allowLegacyWalletRoutes: false,
+  });
+
+  assertEqual(response.statusCode, 400, 'Expected invalid table id query to return HTTP 400.');
+  const payload = response.json() as {
+    error: string;
+  };
+  assertEqual(payload.error, 'BAD_REQUEST', 'Expected invalid table id query to return BAD_REQUEST.');
+}
+
+async function testTableListRouteReturnsServerFedMetadata(): Promise<void> {
+  const services = createServices();
+  const secondaryTable = new TableService({
+    tableId: 'drift-09',
+    initialState: createDefaultTableState({
+      handId: 'boot-drift',
+      seed: 932,
+    }),
+  });
+  secondaryTable.applyCommand({ type: 'START_HAND', handId: 'drift-hand-1', seed: 933 });
+  secondaryTable.applyCommand({ type: 'POST_BLINDS' });
+
+  const tableServiceById = new Map<string, TableService>([
+    [services.tableService.getSnapshot().tableId, services.tableService],
+    [secondaryTable.getSnapshot().tableId, secondaryTable],
+  ]);
+  const tableRouting = {
+    defaultTableId: services.tableService.getSnapshot().tableId,
+    resolveTableService: (tableId: string): TableService => {
+      const existing = tableServiceById.get(tableId);
+      if (existing) {
+        return existing;
+      }
+      return services.tableService;
+    },
+    releaseSeatClaimsForUser: (userId: number): void => {
+      for (const scopedTable of tableServiceById.values()) {
+        scopedTable.releaseSeatForUser(userId);
+      }
+    },
+    listTableServices: (): TableService[] => Array.from(tableServiceById.values()),
+  };
+
+  const response = await invokeRoute({
+    request: new MockIncomingMessage({
+      method: 'GET',
+      url: '/api/table/list',
+      headers: {
+        host: '127.0.0.1:8787',
+      },
+    }),
+    runtimeInfo: createRuntimeInfo(),
+    allowLegacyWalletRoutes: false,
+    services,
+    tableRouting,
+  });
+
+  assertEqual(response.statusCode, 200, 'Expected table list route to return HTTP 200.');
+  const payload = response.json() as {
+    records: Array<{
+      tableId: string;
+      name: string;
+      stakesLabel: string;
+      occupancyLabel: string;
+      paceLabel: string;
+      avgPot: number;
+      minRaise: number;
+      maxRaise: number;
+      callAmount: number;
+      phase: string;
+      handId: string;
+    }>;
+  };
+  assertEqual(payload.records.length, 2, 'Expected table list to return all routed table services.');
+  const driftRecord = payload.records.find((record) => record.tableId === 'drift-09');
+  assert(driftRecord !== undefined, 'Expected list route to include secondary table record.');
+  assertEqual(driftRecord.name, 'Drift 09', 'Expected list route to expose formatted table name.');
+  assertEqual(driftRecord.stakesLabel, '5 / 10', 'Expected stakes label to derive from table blind config.');
+  assertEqual(driftRecord.phase, 'BLINDS_POSTED', 'Expected phase field to mirror scoped table snapshot phase.');
+}
+
+async function testLogoutReleasesClaimsAcrossScopedTables(): Promise<void> {
+  const services = createServices();
+  const secondaryTable = new TableService({
+    tableId: 'atlas-01',
+    initialState: createDefaultTableState({
+      handId: 'boot-atlas',
+      seed: 910,
+    }),
+  });
+  const tableServiceById = new Map<string, TableService>([
+    [services.tableService.getSnapshot().tableId, services.tableService],
+    [secondaryTable.getSnapshot().tableId, secondaryTable],
+  ]);
+  const tableRouting = {
+    defaultTableId: services.tableService.getSnapshot().tableId,
+    resolveTableService: (tableId: string): TableService => {
+      const existing = tableServiceById.get(tableId);
+      if (existing) {
+        return existing;
+      }
+
+      const created = new TableService({
+        tableId,
+        initialState: createDefaultTableState({
+          handId: `${tableId}-boot`,
+          seed: 911,
+        }),
+      });
+      tableServiceById.set(tableId, created);
+      return created;
+    },
+    releaseSeatClaimsForUser: (userId: number): void => {
+      for (const scopedTable of tableServiceById.values()) {
+        scopedTable.releaseSeatForUser(userId);
+      }
+    },
+    listTableServices: (): TableService[] => Array.from(tableServiceById.values()),
+  };
+  const session = services.authWalletService.login({ email: 'luna@example.com', password: 'demo' }).session;
+
+  const defaultClaim = await invokeRoute({
+    request: new MockIncomingMessage({
+      method: 'POST',
+      url: '/api/table/seat',
+      headers: {
+        host: '127.0.0.1:8787',
+        authorization: `Bearer ${session.token}`,
+        'content-type': 'application/json',
+      },
+      body: {
+        seatId: 1,
+      },
+    }),
+    runtimeInfo: createRuntimeInfo(),
+    allowLegacyWalletRoutes: false,
+    services,
+    tableRouting,
+  });
+  assertEqual(defaultClaim.statusCode, 200, 'Expected default table seat claim to succeed.');
+
+  const scopedClaim = await invokeRoute({
+    request: new MockIncomingMessage({
+      method: 'POST',
+      url: '/api/table/seat?tableId=atlas-01',
+      headers: {
+        host: '127.0.0.1:8787',
+        authorization: `Bearer ${session.token}`,
+        'content-type': 'application/json',
+      },
+      body: {
+        seatId: 2,
+      },
+    }),
+    runtimeInfo: createRuntimeInfo(),
+    allowLegacyWalletRoutes: false,
+    services,
+    tableRouting,
+  });
+  assertEqual(scopedClaim.statusCode, 200, 'Expected scoped table seat claim to succeed.');
+
+  const logoutResponse = await invokeRoute({
+    request: new MockIncomingMessage({
+      method: 'POST',
+      url: '/api/auth/logout',
+      headers: {
+        host: '127.0.0.1:8787',
+        authorization: `Bearer ${session.token}`,
+      },
+    }),
+    runtimeInfo: createRuntimeInfo(),
+    allowLegacyWalletRoutes: false,
+    services,
+    tableRouting,
+  });
+  assertEqual(logoutResponse.statusCode, 204, 'Expected logout to succeed with scoped table routing.');
+  assertEqual(services.tableService.getSeatClaimForUser(session.user.id), null, 'Expected default table claim to clear on logout.');
+  assertEqual(secondaryTable.getSeatClaimForUser(session.user.id), null, 'Expected scoped table claim to clear on logout.');
+}
+
 async function runAll(): Promise<void> {
   await testHealthRouteIncludesExternalAuthRotationFlag();
   await testExternalLoginAcceptsPreviousRotationSecret();
@@ -663,8 +1017,13 @@ async function runAll(): Promise<void> {
   await testClaimedSeatRejectsAnonymousPlayerAction();
   await testAuthenticatedPlayerActionRequiresSeatClaim();
   await testSeatClaimRoutesAndOwnershipEnforcement();
+  await testPlayerSessionCannotSubmitNonPlayerCommands();
   await testLogoutReleasesSeatClaim();
-  console.info('HTTP route tests passed (external auth login + health runtime diagnostics + table seat auth).');
+  await testTableRoutesResolveByQueryTableId();
+  await testInvalidTableIdQueryRejected();
+  await testTableListRouteReturnsServerFedMetadata();
+  await testLogoutReleasesClaimsAcrossScopedTables();
+  console.info('HTTP route tests passed (external auth login + health diagnostics + seat auth + table routing).');
 }
 
 await runAll();

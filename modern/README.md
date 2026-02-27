@@ -63,3 +63,5 @@ From `modern/`:
 - Client env template: `apps/client/.env.example`.
 - Firebase Hosting config: `firebase.json` (`.firebaserc.example` template).
 - To run play view against authoritative server runtime, set `VITE_TABLE_RUNTIME_MODE=server` in `apps/client/.env.local`.
+- In server runtime mode, multi-table controllers use table-scoped `/api/table/*?tableId=<id>` sessions.
+- In server runtime mode, lobby/multi-table cards are sourced from `/api/table/list` metadata instead of static client constants.

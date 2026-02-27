@@ -41,6 +41,10 @@ function testSaveAndRestoreRoundTrip(): void {
       tableId: 'table-test',
       initialState: createDefaultTableState({ handId: 'boot-hand', seed: 500 }),
     });
+    const secondaryTableService = new TableService({
+      tableId: 'table-secondary',
+      initialState: createDefaultTableState({ handId: 'boot-secondary', seed: 700 }),
+    });
     const authWalletService = new AuthWalletService();
 
     const login = authWalletService.login({ email: 'colin@example.com', password: 'demo' });
@@ -51,20 +55,29 @@ function testSaveAndRestoreRoundTrip(): void {
     tableService.applyCommand({ type: 'START_HAND', handId: 'hand-1000', seed: 501 });
     tableService.applyCommand({ type: 'POST_BLINDS' });
     tableService.applyCommand({ type: 'DEAL_HOLE' });
+    secondaryTableService.applyCommand({ type: 'START_HAND', handId: 'secondary-1000', seed: 701 });
 
     store.save({
       version: 1,
       updatedAt: new Date().toISOString(),
       table: tableService.exportState(),
+      tables: [tableService.exportState(), secondaryTableService.exportState()],
       auth: authWalletService.exportState(),
     });
 
     const loaded = store.load();
     assert(loaded !== null, 'Expected persisted state to load.');
+    assert(loaded.table !== undefined, 'Expected persisted legacy table snapshot to be present.');
+    const secondaryTableSnapshot = (loaded.tables ?? []).find((snapshot) => snapshot.tableId === 'table-secondary');
+    assert(secondaryTableSnapshot !== undefined, 'Expected persisted table list to include secondary table.');
 
     const restoredTableService = new TableService({
       tableId: 'table-test',
       restoredState: loaded.table,
+    });
+    const restoredSecondaryTableService = new TableService({
+      tableId: 'table-secondary',
+      restoredState: secondaryTableSnapshot,
     });
     const restoredAuthService = new AuthWalletService(loaded.auth);
 
@@ -72,6 +85,7 @@ function testSaveAndRestoreRoundTrip(): void {
     const restoredSession = restoredAuthService.getSession(login.session.token);
     const restoredAudit = restoredAuthService.getAuthAuditLog(20, userId);
     const restoredTableSnapshot = restoredTableService.getSnapshot();
+    const restoredSecondarySnapshot = restoredSecondaryTableService.getSnapshot();
     const restoredSeatClaim = restoredTableService.getSeatClaimForUser(userId);
 
     assertEqual(restoredWallet.balance, 540, 'Expected restored wallet balance to match persisted value.');
@@ -84,6 +98,7 @@ function testSaveAndRestoreRoundTrip(): void {
       'Expected restored table command sequence to match persisted commands.',
     );
     assertEqual(restoredTableSnapshot.state.handId, 'hand-1000', 'Expected restored hand id to match persisted state.');
+    assertEqual(restoredSecondarySnapshot.state.handId, 'secondary-1000', 'Expected restored secondary table hand id to match.');
   } finally {
     fs.rmSync(tempDir, { recursive: true, force: true });
   }

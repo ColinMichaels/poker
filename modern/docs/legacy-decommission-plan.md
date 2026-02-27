@@ -724,6 +724,40 @@ These are not extraction failures, but they are blockers to deleting the legacy 
   - authenticated server-mode controller auto-claims selected seat via `/api/table/seat`
 - Added server regression coverage for seat-claim authorization and conflict behavior.
 
+## Completed in PR BU
+
+- Added query-scoped table routing for authoritative runtime endpoints:
+  - `/health?tableId=<id>` and `/api/table/*?tableId=<id>`
+- Added multi-table server runtime storage model:
+  - persisted runtime snapshot now stores `tables[]` (while keeping legacy `table` compatibility field)
+  - restored server runtime now hydrates all persisted table sessions
+  - unknown table ids are lazily initialized as isolated table sessions
+- Wired server request handling to resolve table routes per `tableId` and release seat claims across all active tables on logout.
+- Upgraded client runtime table controller factory to build table-scoped server endpoints.
+- Converted multi-table screen controllers from local-only simulation to runtime-factory controllers, allowing server-backed multi-table state when `VITE_TABLE_RUNTIME_MODE=server`.
+- Added server route regression coverage for table routing scoping and invalid table-id validation.
+- Added client regression tests for table-scoped route URL construction.
+
+## Completed in PR BV
+
+- Hardened table-command authorization for authenticated player sessions:
+  - `PLAYER` sessions are now blocked from non-player lifecycle commands (`START_HAND`, deal/showdown controls)
+  - `OPERATOR`/`ADMIN` sessions retain lifecycle command access for operational control paths
+- Updated client server-runtime command submission behavior:
+  - server controller now attaches bearer auth only for `PLAYER_ACTION` commands
+  - avoids lifecycle-command rejection when a linked player session is present
+- Added route regression coverage for role-based non-player command restrictions.
+
+## Completed in PR BW
+
+- Added server-fed table catalog route for UI metadata:
+  - `GET /api/table/list`
+  - includes table id/name, stakes, occupancy, pace, and betting-control bounds from live table state
+- Replaced static client lobby/multi-table table cards with runtime catalog hydration in server mode:
+  - `VITE_TABLE_RUNTIME_MODE=server` now loads table cards from `/api/table/list`
+  - local mode keeps static fallback card metadata
+- Added route-level regression coverage for table catalog listing across routed tables.
+
 ## Known Intentional Asset Exceptions
 
 - Non-canonical card extras remain excluded from canonical face set:
@@ -848,6 +882,9 @@ Exit criteria:
 70. PR BR: Firebase deploy scripts and client external-auth bridge wiring.
 71. PR BS: Client server-runtime table controller integration pass.
 72. PR BT: Server seat ownership enforcement + client seat-claim integration.
+73. PR BU: Query-scoped table sessions + multi-table server-runtime wiring.
+74. PR BV: Role-gated non-player command enforcement for player sessions.
+75. PR BW: Server-fed table catalog + client runtime table-card hydration.
 
 ## Cutover Go/No-Go Checklist
 
