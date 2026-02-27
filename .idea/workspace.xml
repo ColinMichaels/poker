@@ -7,17 +7,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1eee6476-c5d8-4dc1-b068-da2be4a7c407" name="Default Changelist" comment="feat(client): implement WebSocket command channel with HTTP fallback, telemetry, and updated docs&#10;&#10;- Added `VITE_TABLE_WS_COMMANDS_ENABLED` to enable WebSocket-based `APPLY_COMMAND` handling with automatic HTTP fallback.&#10;- Introduced `VITE_TABLE_WS_COMMAND_TELEMETRY_ENABLED` for detailed telemetry on WebSocket command flow.&#10;- Updated `server-table-controller` to support command streaming with fallback, idempotency, and error handling.&#10;- Enhanced developer setup and deployment docs with WebSocket configuration details.&#10;- Added comprehensive tests for WebSocket command functionality and fallback scenarios.">
+    <list default="true" id="1eee6476-c5d8-4dc1-b068-da2be4a7c407" name="Default Changelist" comment="feat(client): enhance play view keyboard shortcuts and refine control dock layout&#10;&#10;- Added keyboard shortcuts for play actions (e.g., `F` for Fold, `K` for Check).&#10;- Adjusted control docks to ensure fixed bottom placement across breakpoints for consistent user reach.&#10;- Updated styles for compact spacing and better visual hierarchy.&#10;- Refined action button labels with shortcuts and betting range metadata.&#10;- Improved `multi-table` action dock layout with grid-based scaling.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/apps/server/.env.example" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/.env.example" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/apps/server/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/apps/server/src/http-routes.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/http-routes.test.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/apps/server/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/apps/server/src/startup-config.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/startup-config.test.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/apps/server/src/startup-config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/startup-config.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/docs/deployment-runbook.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/docs/deployment-runbook.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/client/src/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/src/main.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/client/src/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/src/styles.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/docs/client-animation-roadmap.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/docs/client-animation-roadmap.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/docs/developer-setup.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/docs/developer-setup.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/scripts/check-server-env-template.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/modern/scripts/check-server-env-template.mjs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -520,7 +515,15 @@
       <option name="project" value="LOCAL" />
       <updated>1772218462143</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="feat(server): add WebSocket command guardrails for rate-limiting and in-flight restriction&#10;&#10;- Added rate-limit settings (`POKER_TABLE_WS_COMMAND_RATE_LIMIT_WINDOW_MS`, `POKER_TABLE_WS_COMMAND_RATE_LIMIT_MAX`) and in-flight processing cap (`POKER_TABLE_WS_COMMAND_MAX_IN_FLIGHT`) for WebSocket command channels.&#10;- Updated runtime configuration, server tests, and deployment documents to include these guardrails.&#10;- Enhanced `/health` endpoint to report WebSocket guardrail settings.&#10;- Added tests for rate-limiting and in-flight rejection scenarios to ensure compliance and robustness.">
+      <option name="closed" value="true" />
+      <created>1772219869968</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1772219869968</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -539,8 +542,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Add `package-lock.json` for the modern Poker workspace with updated dependencies and configurations" />
-    <MESSAGE value="Add auth and wallet API to Poker Server MVP with session handling, user profiles, wallet adjustments, and ledger tracking. Extend tests, docs, and CLI scripts to ensure parity and coverage." />
     <MESSAGE value="Add Poker Server MVP with hand lifecycle, deterministic replay, and lifecycle/replay tests." />
     <MESSAGE value="chore: update `.idea/workspace.xml` with extended legacy file references and default changelist adjustments" />
     <MESSAGE value="feat: add auth bootstrap and demo user controls&#10;&#10;Add `POKER_AUTH_BOOTSTRAP_USERS_FILE` for JSON-based seed user initialization and `POKER_AUTH_ALLOW_DEMO_USERS` to control demo user access. Update docs, tests, and examples for auth bootstrap and production guardrails." />
@@ -564,7 +565,9 @@
     <MESSAGE value="feat(server, client): add WebSocket-based table command channels and snapshot streaming&#10;&#10;- Introduced WebSocket command channel (`POKER_ENABLE_TABLE_WS_COMMANDS`) with `APPLY_COMMAND` frame support and idempotency.&#10;- Added table-scoped snapshot streaming via `/api/table/ws` for low-latency client/server sync.&#10;- Implemented fallback poll mechanism for disconnected WebSocket streams.&#10;- Updated server runtime and docs with WebSocket feature support details.&#10;- Added extensive tests for WebSocket stream behaviors, integrations, and command flow validations." />
     <MESSAGE value="feat(client): add WebSocket-based command handling with HTTP fallback&#10;&#10;- Introduced WebSocket command channel (`VITE_TABLE_WS_COMMANDS_ENABLED`) for low-latency command execution.&#10;- Added automatic fallback to HTTP command route in case of WebSocket channel unavailability.&#10;- Extended server table controller with new WebSocket-based `APPLY_COMMAND` message handling and idempotency.&#10;- Updated deployment-runbook and developer-setup for WebSocket feature configuration.&#10;- Implemented comprehensive tests for WebSocket command flow, error handling, and fallback scenarios." />
     <MESSAGE value="feat(client): implement WebSocket command channel with HTTP fallback, telemetry, and updated docs&#10;&#10;- Added `VITE_TABLE_WS_COMMANDS_ENABLED` to enable WebSocket-based `APPLY_COMMAND` handling with automatic HTTP fallback.&#10;- Introduced `VITE_TABLE_WS_COMMAND_TELEMETRY_ENABLED` for detailed telemetry on WebSocket command flow.&#10;- Updated `server-table-controller` to support command streaming with fallback, idempotency, and error handling.&#10;- Enhanced developer setup and deployment docs with WebSocket configuration details.&#10;- Added comprehensive tests for WebSocket command functionality and fallback scenarios." />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(client): implement WebSocket command channel with HTTP fallback, telemetry, and updated docs&#10;&#10;- Added `VITE_TABLE_WS_COMMANDS_ENABLED` to enable WebSocket-based `APPLY_COMMAND` handling with automatic HTTP fallback.&#10;- Introduced `VITE_TABLE_WS_COMMAND_TELEMETRY_ENABLED` for detailed telemetry on WebSocket command flow.&#10;- Updated `server-table-controller` to support command streaming with fallback, idempotency, and error handling.&#10;- Enhanced developer setup and deployment docs with WebSocket configuration details.&#10;- Added comprehensive tests for WebSocket command functionality and fallback scenarios." />
+    <MESSAGE value="feat(server): add WebSocket command guardrails for rate-limiting and in-flight restriction&#10;&#10;- Added rate-limit settings (`POKER_TABLE_WS_COMMAND_RATE_LIMIT_WINDOW_MS`, `POKER_TABLE_WS_COMMAND_RATE_LIMIT_MAX`) and in-flight processing cap (`POKER_TABLE_WS_COMMAND_MAX_IN_FLIGHT`) for WebSocket command channels.&#10;- Updated runtime configuration, server tests, and deployment documents to include these guardrails.&#10;- Enhanced `/health` endpoint to report WebSocket" />
+    <MESSAGE value="feat(client): enhance play view keyboard shortcuts and refine control dock layout&#10;&#10;- Added keyboard shortcuts for play actions (e.g., `F` for Fold, `K` for Check).&#10;- Adjusted control docks to ensure fixed bottom placement across breakpoints for consistent user reach.&#10;- Updated styles for compact spacing and better visual hierarchy.&#10;- Refined action button labels with shortcuts and betting range metadata.&#10;- Improved `multi-table` action dock layout with grid-based scaling." />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(client): enhance play view keyboard shortcuts and refine control dock layout&#10;&#10;- Added keyboard shortcuts for play actions (e.g., `F` for Fold, `K` for Check).&#10;- Adjusted control docks to ensure fixed bottom placement across breakpoints for consistent user reach.&#10;- Updated styles for compact spacing and better visual hierarchy.&#10;- Refined action button labels with shortcuts and betting range metadata.&#10;- Improved `multi-table` action dock layout with grid-based scaling." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

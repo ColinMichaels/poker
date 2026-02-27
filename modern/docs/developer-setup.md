@@ -130,12 +130,13 @@ Authoritative table runtime in client:
    - `POKER_TABLE_WS_COMMAND_RATE_LIMIT_MAX` (default `30`)
    - `POKER_TABLE_WS_COMMAND_MAX_IN_FLIGHT` (default `4`)
 8. Client/server sync also uses table-scoped WebSocket streams (`/api/table/ws?tableId=<id>`) with polling fallback/reconnect.
-9. When a server session is available, the client auto-claims the selected seat through `POST /api/table/seat`.
-10. Player sessions can only submit `PLAYER_ACTION` for their claimed seat; logout releases the current claim.
-11. Multi-table runtime in server mode uses table-scoped routes with `?tableId=<id>` so each table card tracks isolated authoritative state.
-12. Player sessions cannot submit non-player lifecycle commands (`START_HAND`, deal/showdown controls); those are reserved for system/operator flows.
-13. Client lobby/multi-table table cards are now sourced from server catalog route `GET /api/table/list` in server runtime mode.
-14. When telemetry is enabled, observe browser events with:
+9. Play and multi-table gameplay controls are rendered in fixed bottom docks so betting and hand-advance actions stay in one controller zone.
+10. When a server session is available, the client auto-claims the selected seat through `POST /api/table/seat`.
+11. Player sessions can only submit `PLAYER_ACTION` for their claimed seat; logout releases the current claim.
+12. Multi-table runtime in server mode uses table-scoped routes with `?tableId=<id>` so each table card tracks isolated authoritative state.
+13. Player sessions cannot submit non-player lifecycle commands (`START_HAND`, deal/showdown controls); those are reserved for system/operator flows.
+14. Client lobby/multi-table table cards are now sourced from server catalog route `GET /api/table/list` in server runtime mode.
+15. When telemetry is enabled, observe browser events with:
     - `window.addEventListener('poker:ws-command-telemetry', (event) => console.log((event as CustomEvent).detail));`
 
 Firebase hosting starter config:

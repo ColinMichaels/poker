@@ -171,12 +171,20 @@ const MULTI_TABLE_SEATS: readonly MultiTableSeat[] = [
 ];
 
 const MULTI_TABLE_ACTIONS: readonly MultiTableActionOption[] = [
-  { id: 'FOLD', label: 'Fold', shortcut: 'F', tone: 'caution' },
-  { id: 'CHECK', label: 'Check', shortcut: 'K', tone: 'neutral' },
+  { id: 'FOLD', label: 'Fold', shortcut: 'F|X', tone: 'caution' },
+  { id: 'CHECK', label: 'Check', shortcut: 'X', tone: 'neutral' },
   { id: 'CALL', label: 'Call', shortcut: 'C', tone: 'neutral' },
   { id: 'RAISE', label: 'Raise', shortcut: 'R', tone: 'aggressive' },
   { id: 'ALL_IN', label: 'All In', shortcut: 'A', tone: 'danger' },
 ];
+const PLAY_SHORTCUT_BY_ACTION: Readonly<Record<PokerAction, string>> = {
+  FOLD: 'F|X',
+  CHECK: 'X',
+  CALL: 'C',
+  BET: 'B',
+  RAISE: 'R',
+  ALL_IN: 'A',
+};
 
 const MULTI_TABLE_DESKTOP_MEDIA_QUERY = '(min-width: 1024px)';
 const runtimeConfig = loadClientRuntimeConfig();
@@ -186,7 +194,7 @@ let multiTableState: MultiTableUiState = {
   selectedTableId: multiTableCards[0]?.id ?? '',
   selectedActionId: 'CALL',
   targetBetAmount: multiTableCards[0]?.minRaise ?? 0,
-  activityNote: 'Seat 1 to act. Use action shortcuts on desktop (F/K/C/R/A + Enter).',
+  activityNote: 'Seat 1 to act. Desktop keys: X checks (or folds if check is unavailable), F folds, C calls, B bets, R raises, A all in.',
   lastSubmittedActionId: null,
   lastSubmittedAtMs: null,
 };
@@ -492,7 +500,7 @@ window.addEventListener('resize', () => {
   });
 });
 window.addEventListener('keydown', (event) => {
-  if (!lastRenderedModel || activeView !== 'multitable' || !isMultiTableDesktopViewport()) {
+  if (!lastRenderedModel) {
     return;
   }
   if (event.metaKey || event.ctrlKey || event.altKey) {
@@ -506,6 +514,30 @@ window.addEventListener('keydown', (event) => {
     target instanceof HTMLSelectElement ||
     (target instanceof HTMLElement && target.isContentEditable)
   ) {
+    return;
+  }
+
+  if (activeView === 'play') {
+    const key = event.key.toLowerCase();
+    if (key === 'enter') {
+      event.preventDefault();
+      controller?.startNextHand();
+      return;
+    }
+
+    const targetAction = resolvePlayShortcutAction(lastRenderedModel, key);
+    if (!targetAction) {
+      return;
+    }
+
+    const amountInput = appRoot.querySelector<HTMLInputElement>('[data-role="action-amount"]');
+    if (submitPlayAction(lastRenderedModel, targetAction, amountInput ?? null)) {
+      event.preventDefault();
+    }
+    return;
+  }
+
+  if (activeView !== 'multitable' || !isMultiTableDesktopViewport()) {
     return;
   }
 
@@ -529,18 +561,18 @@ window.addEventListener('keydown', (event) => {
     return;
   }
 
-  const action = MULTI_TABLE_ACTIONS.find((candidate) => candidate.shortcut.toLowerCase() === key);
-  if (!action) {
+  const actionId = resolveMultiTableShortcutAction(multiTableState.selectedTableId, key);
+  if (!actionId) {
     return;
   }
 
-  const actionOption = resolveMultiTableActionOption(multiTableState.selectedTableId, action.id);
+  const actionOption = resolveMultiTableActionOption(multiTableState.selectedTableId, actionId);
   if (!actionOption?.allowed) {
     return;
   }
 
   event.preventDefault();
-  multiTableState.selectedActionId = action.id;
+  multiTableState.selectedActionId = actionId;
   render(appRoot, lastRenderedModel);
 });
 
@@ -856,34 +888,10 @@ function render(container: HTMLElement, model: TableViewModel): void {
     actionButtons.forEach((button) => {
       button.addEventListener('click', () => {
         const action = button.dataset.action as PokerAction | undefined;
-        if (!action || !userSeatAction) {
+        if (!action) {
           return;
         }
-
-        const option = userSeatAction.actions.find((candidate) => candidate.action === action && candidate.allowed);
-        if (!option) {
-          return;
-        }
-
-        let amount: number | undefined;
-        if (option.amountSemantics === 'TARGET_BET') {
-          const parsedAmount = Number(amountInput?.value ?? targetBetInputAmount);
-          const min = option.minAmount ?? parsedAmount;
-          const max = option.maxAmount ?? parsedAmount;
-          const clampedAmount = clampWholeNumberAmount(parsedAmount, min, max);
-
-          if (!Number.isFinite(clampedAmount)) {
-            return;
-          }
-
-          amount = clampedAmount;
-          draftTargetBetAmount = clampedAmount;
-          if (amountInput) {
-            amountInput.value = String(clampedAmount);
-          }
-        }
-
-        controller?.performUserAction({ action, amount });
+        submitPlayAction(model, action, amountInput ?? null);
       });
     });
   }
@@ -891,6 +899,10 @@ function render(container: HTMLElement, model: TableViewModel): void {
 
 function chips(amount: number): string {
   return `${amount.toLocaleString()} chips`;
+}
+
+function chipsCompact(amount: number): string {
+  return amount.toLocaleString();
 }
 
 function formatClientAuthStatus(state: ExternalAuthSessionState): string {
@@ -1030,31 +1042,46 @@ function renderPlayView(
 function renderLobbyView(model: TableViewModel): string {
   const lobbyTables = getLobbyTables();
   const selectedTable = lobbyTables.find((table) => table.id === selectedLobbyTableId) ?? lobbyTables[0];
+  const selectedPaceLabel = selectedTable?.paceLabel ?? 'Standard';
+  const selectedStakesLabel = selectedTable?.stakesLabel ?? '-';
 
   return [
     '  <section class="lobby-shell">',
     '    <section class="lobby-tables-panel">',
     '      <div class="lobby-head">',
-    '        <p class="eyebrow">Mobile Lobby</p>',
-    '        <h2>Pick a Table</h2>',
-    '        <p>Choose your table pace, then lock in a seat before entering the action.</p>',
+    '        <p class="eyebrow">Table Lobby</p>',
+    '        <h2>Choose Your Table</h2>',
+    '        <p>Pick a pace, lock your seat, and jump directly into the next hand.</p>',
+    '        <div class="lobby-head-badges">',
+    `          <span>${escapeHtml(`${lobbyTables.length} tables live`)}</span>`,
+    `          <span>${escapeHtml(`${selectedPaceLabel} pace selected`)}</span>`,
+    '        </div>',
     '      </div>',
     '      <div class="lobby-tables">',
     ...lobbyTables.map((table) => {
       const classes = table.id === selectedTable?.id ? 'lobby-table-card is-selected' : 'lobby-table-card';
       return [
         `        <button class="${classes}" data-table-id="${table.id}" type="button" aria-pressed="${table.id === selectedTable?.id ? 'true' : 'false'}">`,
-        `          <strong>${escapeHtml(table.name)}</strong>`,
-        `          <p>Blinds ${escapeHtml(table.stakesLabel)} · ${escapeHtml(table.paceLabel)}</p>`,
-        `          <span>${escapeHtml(table.occupancyLabel)}</span>`,
+        '          <div class="lobby-table-top">',
+        `            <strong>${escapeHtml(table.name)}</strong>`,
+        `            <small class="lobby-table-pace">${escapeHtml(table.paceLabel)}</small>`,
+        '          </div>',
+        `          <p class="lobby-table-stakes">Blinds ${escapeHtml(table.stakesLabel)}</p>`,
+        '          <div class="lobby-table-meta">',
+        `            <span>${escapeHtml(table.occupancyLabel)}</span>`,
+        `            <span>${escapeHtml(`${table.stakesLabel} stakes`)}</span>`,
+        '          </div>',
         '        </button>',
       ].join('\n');
     }),
     '      </div>',
     '    </section>',
     '    <section class="lobby-seat-panel">',
-    `      <h2>${escapeHtml(selectedTable?.name ?? 'Table')}</h2>`,
-    `      <p class="lobby-meta">Blinds ${escapeHtml(selectedTable?.stakesLabel ?? '-')} · ${escapeHtml(selectedTable?.paceLabel ?? '-')}</p>`,
+    '      <div class="lobby-seat-head">',
+    '        <p class="eyebrow">Seat Selection</p>',
+    `        <h2>${escapeHtml(selectedTable?.name ?? 'Table')}</h2>`,
+    '      </div>',
+    `      <p class="lobby-meta"><span>Blinds ${escapeHtml(selectedStakesLabel)}</span><span>${escapeHtml(selectedPaceLabel)} pace</span></p>`,
     '      <div class="lobby-seat-grid">',
     ...model.state.seats.map((seat) => {
       const classes = seat.seatId === selectedLobbySeatId ? 'lobby-seat is-selected' : 'lobby-seat';
@@ -1062,14 +1089,14 @@ function renderLobbyView(model: TableViewModel): string {
 
       return [
         `        <button class="${classes}" data-seat-id="${seat.seatId}" type="button" aria-pressed="${seat.seatId === selectedLobbySeatId ? 'true' : 'false'}">`,
-        `          <span>${escapeHtml(seatLabel)}</span>`,
-        `          <strong>${escapeHtml(chips(seat.stack))}</strong>`,
-        `          <small>${escapeHtml(seat.playerId)}</small>`,
+        `          <span class="lobby-seat-label">${escapeHtml(seatLabel)}</span>`,
+        `          <strong class="lobby-seat-stack">${escapeHtml(chips(seat.stack))}</strong>`,
+        `          <small class="lobby-seat-player">${escapeHtml(seat.playerId)}</small>`,
         '        </button>',
       ].join('\n');
     }),
     '      </div>',
-    `      <button class="cta lobby-enter" data-role="enter-table" type="button">Enter As Seat ${selectedLobbySeatId}</button>`,
+    `      <button class="cta lobby-enter" data-role="enter-table" type="button">Enter Table as Seat ${selectedLobbySeatId}</button>`,
     '    </section>',
     '  </section>',
   ].join('\n');
@@ -1222,7 +1249,7 @@ function renderMultiTableView(motionClasses: MotionClassSet, chipFlowPlan: ChipF
     '        </article>',
     '      </section>',
     '    </div>',
-    // Desktop keeps this dock in a sticky side rail while mobile keeps it fixed near thumb reach.
+    // Keep gameplay controls in a fixed bottom dock across breakpoints for consistent controller reach.
     `    <aside class="${actionBarClasses.filter((value) => value.length > 0).join(' ')}" aria-label="Table action bar">`,
     '      <div class="multi-action-head">',
     '        <h2>Action Bar</h2>',
@@ -1271,7 +1298,7 @@ function renderMultiTableView(motionClasses: MotionClassSet, chipFlowPlan: ChipF
         ].join('\n')
       : '',
     `      <button class="${primaryActionClasses.join(' ')}" data-role="multi-action-submit" ${canSubmitSelectedAction ? '' : 'disabled'}>${escapeHtml(primaryLabel)}</button>`,
-    '      <p class="multi-action-help">Desktop: Arrow keys switch actions, Enter confirms.</p>',
+    '      <p class="multi-action-help">Desktop: X checks (or folds when checking is unavailable), F folds, C calls, B/R bets or raises, A goes all in, Enter confirms.</p>',
     '    </aside>',
     '  </section>',
   ].join('\n');
@@ -1653,29 +1680,39 @@ function renderSeatCard(
   const winMeterWidth = seatWinOdds?.isContender ? Math.max(0, Math.min(100, seatWinOdds.percentage)) : 0;
   const winMeterBarStyle = ` style="width:${winMeterWidth.toFixed(2)}%"`;
   const outcomePill = renderSeatOutcomePill(model, seatWinOdds);
+  const primarySeatLabel = seatState.seatId === model.userSeatId ? `Seat ${seatState.seatId} (You)` : `Seat ${seatState.seatId}`;
 
   return [
     `<article class="${seatClasses.join(' ')}">`,
-    '  <header>',
+    '  <header class="seat-card-head">',
     `    <div class="seat-avatar"><img src="/assets/avatars/${avatarId}.svg" alt="Seat ${seatState.seatId} avatar" loading="lazy" /></div>`,
-    '    <div>',
-    `      <h3>${escapeHtml(seatState.playerId)}</h3>`,
-    `      <p>Seat ${seatState.seatId}</p>`,
+    '    <div class="seat-primary">',
+    `      <p class="seat-primary-label">${escapeHtml(primarySeatLabel)}</p>`,
+    badges.length > 0 ? `      <p class="seat-primary-meta">${escapeHtml(badges)}</p>` : '',
     '    </div>',
-    `    <p class="seat-badges">${escapeHtml(badges)}</p>`,
+    '    <p class="seat-chip-badge">',
+    '      <span>Total Chips</span>',
+    `      <strong>${escapeHtml(chipsCompact(seatState.stack))}</strong>`,
+    '    </p>',
     '  </header>',
-    `  <div class="hole-cards">${holeCards}</div>`,
-    outcomePill.length > 0 ? `  ${outcomePill}` : '',
-    '  <div class="seat-win-meter">',
-    `    <p><span>Win Chance</span><strong>${escapeHtml(winLabel)}</strong></p>`,
-    `    <div class="seat-win-track" aria-hidden="true"><span${winMeterBarStyle}></span></div>`,
-    '  </div>',
-    seatWinOdds?.handLabel ? `  <p class="seat-showdown-label">${escapeHtml(seatWinOdds.handLabel)}</p>` : '',
-    '  <dl>',
-    `    <div><dt>Stack</dt><dd>${chips(seatState.stack)}</dd></div>`,
-    `    <div><dt>Street Bet</dt><dd>${chips(seatState.currentBet)}</dd></div>`,
-    `    <div><dt>To Call</dt><dd>${chips(actionState.toCall)}</dd></div>`,
-    '  </dl>',
+    '  <details class="seat-details">',
+    '    <summary>Extended Stats</summary>',
+    '    <div class="seat-details-body">',
+    `      <p class="seat-player-id">${escapeHtml(seatState.playerId)}</p>`,
+    `      <div class="hole-cards">${holeCards}</div>`,
+    outcomePill.length > 0 ? `      ${outcomePill}` : '',
+    '      <div class="seat-win-meter">',
+    `        <p><span>Win Chance</span><strong>${escapeHtml(winLabel)}</strong></p>`,
+    `        <div class="seat-win-track" aria-hidden="true"><span${winMeterBarStyle}></span></div>`,
+    '      </div>',
+    seatWinOdds?.handLabel ? `      <p class="seat-showdown-label">${escapeHtml(seatWinOdds.handLabel)}</p>` : '',
+    '      <dl>',
+    `        <div><dt>Stack</dt><dd>${chips(seatState.stack)}</dd></div>`,
+    `        <div><dt>Street Bet</dt><dd>${chips(seatState.currentBet)}</dd></div>`,
+    `        <div><dt>To Call</dt><dd>${chips(actionState.toCall)}</dd></div>`,
+    '      </dl>',
+    '    </div>',
+    '  </details>',
     '</article>',
   ].join('\n');
 }
@@ -1727,15 +1764,18 @@ function renderActionButtons(options: readonly ActionOptionDTO[], isUserTurn: bo
       option.allowed && option.amountSemantics === 'TARGET_BET'
         ? `${option.minAmount ?? 0}-${option.maxAmount ?? option.minAmount ?? 0}`
         : '';
-    const buttonLabel = option.allowed ? formatActionButtonLabel(action, option) : formatActionLabel(action);
-    const actionAriaLabel = bettingRange.length > 0 ? `${buttonLabel} (${bettingRange})` : buttonLabel;
+    const shortcut = PLAY_SHORTCUT_BY_ACTION[action];
+    const buttonLabel = formatActionCompactLabel(action);
+    const actionAriaLabel = bettingRange.length > 0
+      ? `${formatActionButtonLabel(action, option)} (${shortcut}; ${bettingRange})`
+      : `${buttonLabel} (${shortcut})`;
     const buttonDisabled = !isUserTurn || !option.allowed;
 
     buttons.push(
       [
         `<button class="action-btn action-${actionTone(action)}" data-action="${action}" aria-label="${escapeHtml(actionAriaLabel)}" ${buttonDisabled ? 'disabled' : ''}>`,
-        `  <span>${buttonLabel}</span>`,
-        bettingRange.length > 0 ? `  <small>${bettingRange}</small>` : '',
+        `  <span class="action-icon">${formatActionIcon(action)}</span>`,
+        `  <small class="action-text">${buttonLabel}</small>`,
         '</button>',
       ].join(''),
     );
@@ -1746,6 +1786,74 @@ function renderActionButtons(options: readonly ActionOptionDTO[], isUserTurn: bo
   }
 
   return buttons.join('');
+}
+
+function resolvePlayActionOption(
+  userSeatAction: SeatActionStateDTO,
+  requestedAction: PokerAction,
+): ActionOptionDTO | null {
+  const directMatch = userSeatAction.actions.find((candidate) => candidate.action === requestedAction && candidate.allowed);
+  if (directMatch) {
+    return directMatch;
+  }
+
+  if (requestedAction === 'RAISE') {
+    return userSeatAction.actions.find((candidate) => candidate.action === 'BET' && candidate.allowed) ?? null;
+  }
+
+  return null;
+}
+
+function resolvePlayActionAmount(
+  option: ActionOptionDTO,
+  amountInput: HTMLInputElement | null,
+  fallbackAmount: number,
+): number | null | undefined {
+  if (option.amountSemantics !== 'TARGET_BET') {
+    return undefined;
+  }
+
+  const parsedAmount = Number(amountInput?.value ?? fallbackAmount);
+  const min = option.minAmount ?? parsedAmount;
+  const max = option.maxAmount ?? parsedAmount;
+  const clampedAmount = clampWholeNumberAmount(parsedAmount, min, max);
+  if (!Number.isFinite(clampedAmount)) {
+    return null;
+  }
+
+  draftTargetBetAmount = clampedAmount;
+  if (amountInput) {
+    amountInput.value = String(clampedAmount);
+  }
+  return clampedAmount;
+}
+
+function submitPlayAction(
+  model: TableViewModel,
+  requestedAction: PokerAction,
+  amountInput: HTMLInputElement | null,
+): boolean {
+  const userSeatAction = model.actionState.seats.find((seat) => seat.seatId === model.userSeatId);
+  if (!userSeatAction) {
+    return false;
+  }
+
+  const option = resolvePlayActionOption(userSeatAction, requestedAction);
+  if (!option) {
+    return false;
+  }
+
+  const fallbackAmount = resolveTargetBetInputAmount(option, draftTargetBetAmount ?? option.minAmount ?? 0);
+  const amount = resolvePlayActionAmount(option, amountInput, fallbackAmount);
+  if (amount === null) {
+    return false;
+  }
+
+  controller?.performUserAction({
+    action: option.action,
+    amount: typeof amount === 'number' ? amount : undefined,
+  });
+  return true;
 }
 
 function renderQuickAmountButtons(amounts: readonly number[]): string {
@@ -2772,6 +2880,32 @@ function formatActionButtonLabel(action: PokerAction, option: ActionOptionDTO): 
   return formatActionLabel(action);
 }
 
+function formatActionCompactLabel(action: PokerAction): string {
+  if (action === 'ALL_IN') {
+    return 'All In';
+  }
+  return formatActionLabel(action);
+}
+
+function formatActionIcon(action: PokerAction): string {
+  if (action === 'FOLD') {
+    return 'X';
+  }
+  if (action === 'CHECK') {
+    return 'CH';
+  }
+  if (action === 'CALL') {
+    return 'C';
+  }
+  if (action === 'BET') {
+    return 'B';
+  }
+  if (action === 'RAISE') {
+    return 'R';
+  }
+  return 'AI';
+}
+
 function formatRadarName(playerId: string, seatId: number, userSeatId: number): string {
   if (seatId === userSeatId) {
     return 'You';
@@ -2792,6 +2926,54 @@ function actionTone(action: PokerAction): 'neutral' | 'aggressive' | 'caution' |
     return 'aggressive';
   }
   return 'neutral';
+}
+
+function resolvePlayShortcutAction(model: TableViewModel, key: string): PokerAction | null {
+  const normalizedKey = key.toLowerCase();
+  if (normalizedKey === 'x') {
+    const userSeatAction = model.actionState.seats.find((seat) => seat.seatId === model.userSeatId);
+    if (!userSeatAction) {
+      return null;
+    }
+    if (resolvePlayActionOption(userSeatAction, 'CHECK')) {
+      return 'CHECK';
+    }
+    if (resolvePlayActionOption(userSeatAction, 'FOLD')) {
+      return 'FOLD';
+    }
+    return null;
+  }
+
+  const actionByKey: Partial<Record<string, PokerAction>> = {
+    f: 'FOLD',
+    c: 'CALL',
+    b: 'BET',
+    r: 'RAISE',
+    a: 'ALL_IN',
+  };
+  return actionByKey[normalizedKey] ?? null;
+}
+
+function resolveMultiTableShortcutAction(tableId: string, key: string): MultiTableActionId | null {
+  const normalizedKey = key.toLowerCase();
+  if (normalizedKey === 'x') {
+    if (resolveMultiTableActionOption(tableId, 'CHECK')?.allowed) {
+      return 'CHECK';
+    }
+    if (resolveMultiTableActionOption(tableId, 'FOLD')?.allowed) {
+      return 'FOLD';
+    }
+    return null;
+  }
+
+  const actionByKey: Partial<Record<string, MultiTableActionId>> = {
+    f: 'FOLD',
+    c: 'CALL',
+    b: 'RAISE',
+    r: 'RAISE',
+    a: 'ALL_IN',
+  };
+  return actionByKey[normalizedKey] ?? null;
 }
 
 function isBettingPhase(phase: TablePhase): boolean {

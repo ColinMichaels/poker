@@ -14,8 +14,9 @@ Purpose: improve gameplay clarity with motion that communicates game state, not 
 ## Current Baseline
 
 - Existing phase/board/acting-seat transitions are class-based in `apps/client/src/main.ts` + `styles.css`.
-- Action dock has state transitions and swipe affordances.
-- Multi-table screen now has a thumb-reach action bar but minimal motion orchestration.
+- Play + multi-table action docks are fixed-bottom controller surfaces with compact action grids.
+- Action dock has state transitions and confirmation cues.
+- Multi-table screen has thumb-reach action control with pending-turn emphasis, with additional motion orchestration still pending.
 
 ## Current Status (Implemented)
 
