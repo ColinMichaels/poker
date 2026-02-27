@@ -27,6 +27,7 @@ const ALLOWED_USER_ROLES: readonly UserRole[] = ['PLAYER', 'OPERATOR', 'ADMIN'];
 const WEBSOCKET_GUID = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
 const TABLE_STREAM_COMMAND_IDEMPOTENCY_TTL_MS = 5 * 60_000;
 const TABLE_STREAM_COMMAND_IDEMPOTENCY_MAX_PER_TABLE = 2_000;
+const TABLE_STREAM_MAX_PENDING_FRAME_BYTES = 1_048_576;
 
 class HttpError extends Error {
   public readonly statusCode: number;
@@ -66,7 +67,7 @@ function resolveSingleHeaderValue(value: string | string[] | undefined): string 
   return value;
 }
 
-function readWebSocketFramePayload(buffer: Buffer): { opcode: number; payload: Buffer } | null {
+function readWebSocketFramePayload(buffer: Buffer): { opcode: number; payload: Buffer; bytesConsumed: number } | null {
   if (buffer.length < 2) {
     return null;
   }
@@ -113,6 +114,7 @@ function readWebSocketFramePayload(buffer: Buffer): { opcode: number; payload: B
     return {
       opcode,
       payload,
+      bytesConsumed: end,
     };
   }
 
@@ -124,6 +126,7 @@ function readWebSocketFramePayload(buffer: Buffer): { opcode: number; payload: B
   return {
     opcode,
     payload,
+    bytesConsumed: end,
   };
 }
 
@@ -600,23 +603,18 @@ function handleTableStreamApplyCommand(
   }
 }
 
-function handleTableStreamSocketData(
+function handleTableStreamSocketFrame(
   socket: Duplex,
-  chunk: Buffer,
+  frame: { opcode: number; payload: Buffer },
   commandChannel: TableStreamCommandChannelOptions | undefined,
-): void {
-  const frame = readWebSocketFramePayload(chunk);
-  if (!frame) {
-    return;
-  }
-
+): boolean {
   if (frame.opcode === 0x8) {
     try {
       socket.end(encodeWebSocketControlFrame(0x8, frame.payload));
     } catch {
       socket.destroy();
     }
-    return;
+    return false;
   }
 
   if (frame.opcode === 0x9) {
@@ -625,11 +623,11 @@ function handleTableStreamSocketData(
     } catch {
       socket.destroy();
     }
-    return;
+    return true;
   }
 
   if (frame.opcode !== 0x1 || !commandChannel) {
-    return;
+    return true;
   }
 
   let payload: unknown;
@@ -637,17 +635,51 @@ function handleTableStreamSocketData(
     payload = JSON.parse(frame.payload.toString('utf8')) as unknown;
   } catch {
     sendStreamCommandError(socket, 'unknown', 'BAD_REQUEST', 'Stream message payload must be valid JSON.');
-    return;
+    return true;
   }
 
   if (typeof payload !== 'object' || payload === null || Array.isArray(payload)) {
     sendStreamCommandError(socket, 'unknown', 'BAD_REQUEST', 'Stream message payload must be an object.');
-    return;
+    return true;
   }
 
   const record = payload as Record<string, unknown>;
   if (record.type === 'APPLY_COMMAND') {
     handleTableStreamApplyCommand(socket, payload, commandChannel);
+  }
+  return true;
+}
+
+function handleTableStreamSocketData(
+  socket: Duplex,
+  chunk: Buffer,
+  pendingBuffer: { bytes: Buffer },
+  commandChannel: TableStreamCommandChannelOptions | undefined,
+): void {
+  if (chunk.length === 0) {
+    return;
+  }
+
+  pendingBuffer.bytes = pendingBuffer.bytes.length === 0
+    ? chunk
+    : Buffer.concat([pendingBuffer.bytes, chunk]);
+  while (pendingBuffer.bytes.length > 0) {
+    const frame = readWebSocketFramePayload(pendingBuffer.bytes);
+    if (!frame) {
+      if (pendingBuffer.bytes.length > TABLE_STREAM_MAX_PENDING_FRAME_BYTES) {
+        socket.destroy();
+      }
+      return;
+    }
+
+    pendingBuffer.bytes = frame.bytesConsumed >= pendingBuffer.bytes.length
+      ? Buffer.alloc(0)
+      : Buffer.from(pendingBuffer.bytes.subarray(frame.bytesConsumed));
+
+    const shouldContinue = handleTableStreamSocketFrame(socket, frame, commandChannel);
+    if (!shouldContinue) {
+      return;
+    }
   }
 }
 
@@ -732,9 +764,12 @@ export function handleTableStreamUpgrade(
     ].join('\r\n'),
   );
 
+  const socketReadBuffer = {
+    bytes: Buffer.alloc(0),
+  };
   socket.on('data', (chunk: Buffer | string) => {
     const buffer = typeof chunk === 'string' ? Buffer.from(chunk, 'utf8') : chunk;
-    handleTableStreamSocketData(socket, buffer, commandChannel);
+    handleTableStreamSocketData(socket, buffer, socketReadBuffer, commandChannel);
   });
   socket.on('close', () => {
     options.tableStreamHub.removeConnection(socket);

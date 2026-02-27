@@ -17,6 +17,7 @@ const STARTABLE_PHASES: readonly TablePhase[] = ['SEATED', 'HAND_COMPLETE'];
 const STREAM_RECONNECT_BASE_MS = 350;
 const STREAM_RECONNECT_MAX_MS = 6_000;
 const STREAM_STALE_MIN_TIMEOUT_MS = 4_000;
+const STREAM_COMMAND_TIMEOUT_MS = 4_500;
 
 interface ServerTableSnapshot {
   tableId: string;
@@ -54,14 +55,67 @@ interface ServerTableStreamHeartbeatMessage {
   sentAt: string;
 }
 
+interface ServerTableStreamApplyCommandMessage {
+  type: 'APPLY_COMMAND';
+  commandId: string;
+  command: TableCommand;
+  authToken?: string;
+}
+
+interface ServerTableStreamCommandAckMessage {
+  type: 'COMMAND_ACK';
+  commandId: string;
+  acceptedAt: string;
+  tableId: string;
+  result: ServerApplyCommandResult;
+}
+
+interface ServerTableStreamCommandErrorMessage {
+  type: 'COMMAND_ERROR';
+  commandId: string;
+  code: string;
+  message: string;
+}
+
+export type StreamCommandTelemetryKind =
+  | 'WS_COMMAND_SENT'
+  | 'WS_COMMAND_ACK'
+  | 'WS_COMMAND_ERROR'
+  | 'WS_COMMAND_TIMEOUT'
+  | 'WS_COMMAND_ABORTED'
+  | 'WS_COMMAND_FALLBACK_HTTP';
+
+export interface StreamCommandTelemetryEvent {
+  kind: StreamCommandTelemetryKind;
+  timestamp: string;
+  commandId?: string;
+  commandType?: TableCommand['type'];
+  action?: PokerAction;
+  latencyMs?: number;
+  code?: string;
+  reason?: string;
+  inFlightCommands: number;
+}
+
 interface ServerTableControllerOptions {
   userSeatId: number;
   snapshotUrl: string;
   commandUrl: string;
   seatClaimUrl?: string;
   streamUrl?: string;
+  streamCommandChannelEnabled?: boolean;
+  streamCommandTelemetryReporter?: (event: StreamCommandTelemetryEvent) => void;
+  streamCommandTimeoutMs?: number;
   pollIntervalMs?: number;
   fetchImpl?: typeof fetch;
+}
+
+interface PendingStreamCommand {
+  timeoutId: number;
+  startedAtMs: number;
+  command: TableCommand;
+  resolve: (result: ServerApplyCommandResult) => void;
+  reject: (error: Error) => void;
 }
 
 type Listener = (model: TableViewModel) => void;
@@ -141,6 +195,52 @@ function isStreamHeartbeatMessage(value: unknown): value is ServerTableStreamHea
 
   const record = value as Record<string, unknown>;
   return record.type === 'TABLE_HEARTBEAT' && typeof record.sentAt === 'string';
+}
+
+function parseStreamCommandAckMessage(value: unknown): ServerTableStreamCommandAckMessage | null {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+    return null;
+  }
+
+  const record = value as Record<string, unknown>;
+  if (record.type !== 'COMMAND_ACK' || typeof record.commandId !== 'string') {
+    return null;
+  }
+
+  try {
+    return {
+      type: 'COMMAND_ACK',
+      commandId: record.commandId,
+      acceptedAt: typeof record.acceptedAt === 'string' ? record.acceptedAt : '',
+      tableId: typeof record.tableId === 'string' ? record.tableId : '',
+      result: parseApplyCommandResult(record.result),
+    };
+  } catch {
+    return null;
+  }
+}
+
+function parseStreamCommandErrorMessage(value: unknown): ServerTableStreamCommandErrorMessage | null {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+    return null;
+  }
+
+  const record = value as Record<string, unknown>;
+  if (
+    record.type !== 'COMMAND_ERROR'
+    || typeof record.commandId !== 'string'
+    || typeof record.code !== 'string'
+    || typeof record.message !== 'string'
+  ) {
+    return null;
+  }
+
+  return {
+    type: 'COMMAND_ERROR',
+    commandId: record.commandId,
+    code: record.code,
+    message: record.message,
+  };
 }
 
 function truncate(value: string, max = 140): string {
@@ -242,6 +342,9 @@ export class ServerTableController implements TableController {
   private readonly commandUrl: string;
   private readonly seatClaimUrl: string | null;
   private readonly streamUrl: string | null;
+  private readonly streamCommandChannelEnabled: boolean;
+  private readonly streamCommandTelemetryReporter: ((event: StreamCommandTelemetryEvent) => void) | null;
+  private readonly streamCommandTimeoutMs: number;
   private readonly pollIntervalMs: number;
   private readonly fetchImpl: typeof fetch;
 
@@ -256,6 +359,9 @@ export class ServerTableController implements TableController {
   private streamHealthTimerId: number | null = null;
   private reconnectAttempt = 0;
   private lastStreamMessageAtMs = 0;
+  private lastStreamFallbackReason: string | null = null;
+  private nextStreamCommandId = 1;
+  private readonly pendingStreamCommands = new Map<string, PendingStreamCommand>();
   private operationChain: Promise<void> = Promise.resolve();
   private logs: TableLogEntry[] = [];
   private nextLogId = 1;
@@ -267,6 +373,9 @@ export class ServerTableController implements TableController {
     this.commandUrl = options.commandUrl;
     this.seatClaimUrl = options.seatClaimUrl ?? null;
     this.streamUrl = options.streamUrl ?? null;
+    this.streamCommandChannelEnabled = options.streamCommandChannelEnabled ?? false;
+    this.streamCommandTelemetryReporter = options.streamCommandTelemetryReporter ?? null;
+    this.streamCommandTimeoutMs = options.streamCommandTimeoutMs ?? STREAM_COMMAND_TIMEOUT_MS;
     this.pollIntervalMs = options.pollIntervalMs ?? 900;
     this.fetchImpl = options.fetchImpl ?? fetch;
   }
@@ -457,6 +566,39 @@ export class ServerTableController implements TableController {
         return;
       }
 
+      const streamCommandAck = parseStreamCommandAckMessage(payload);
+      if (streamCommandAck) {
+        this.lastStreamMessageAtMs = Date.now();
+        const acknowledgedCommand = streamCommandAck.result.command.command;
+        const pending = this.pendingStreamCommands.get(streamCommandAck.commandId);
+        const latencyMs = pending ? Math.max(0, Date.now() - pending.startedAtMs) : undefined;
+        this.reportStreamCommandTelemetry({
+          kind: 'WS_COMMAND_ACK',
+          commandId: streamCommandAck.commandId,
+          command: acknowledgedCommand,
+          latencyMs,
+        });
+        this.resolvePendingStreamCommand(streamCommandAck.commandId, streamCommandAck.result);
+        return;
+      }
+
+      const streamCommandError = parseStreamCommandErrorMessage(payload);
+      if (streamCommandError) {
+        this.lastStreamMessageAtMs = Date.now();
+        const pending = this.pendingStreamCommands.get(streamCommandError.commandId);
+        const latencyMs = pending ? Math.max(0, Date.now() - pending.startedAtMs) : undefined;
+        this.reportStreamCommandTelemetry({
+          kind: 'WS_COMMAND_ERROR',
+          commandId: streamCommandError.commandId,
+          command: pending?.command,
+          latencyMs,
+          code: streamCommandError.code,
+          reason: streamCommandError.message,
+        });
+        this.rejectPendingStreamCommand(streamCommandError.commandId, `${streamCommandError.code}: ${streamCommandError.message}`);
+        return;
+      }
+
       const streamSnapshot = parseStreamSnapshotMessage(payload);
       if (!streamSnapshot) {
         return;
@@ -476,6 +618,16 @@ export class ServerTableController implements TableController {
 
       this.streamConnected = false;
       this.streamSocket = null;
+      for (const [commandId, pending] of this.pendingStreamCommands.entries()) {
+        this.reportStreamCommandTelemetry({
+          kind: 'WS_COMMAND_ABORTED',
+          commandId,
+          command: pending.command,
+          latencyMs: Math.max(0, Date.now() - pending.startedAtMs),
+          reason: 'stream_disconnected',
+        });
+      }
+      this.rejectAllPendingStreamCommands('Live table stream disconnected before command acknowledgement.');
       this.scheduleReconnect();
     });
 
@@ -485,6 +637,16 @@ export class ServerTableController implements TableController {
       }
 
       this.streamConnected = false;
+      for (const [commandId, pending] of this.pendingStreamCommands.entries()) {
+        this.reportStreamCommandTelemetry({
+          kind: 'WS_COMMAND_ABORTED',
+          commandId,
+          command: pending.command,
+          latencyMs: Math.max(0, Date.now() - pending.startedAtMs),
+          reason: 'stream_error',
+        });
+      }
+      this.rejectAllPendingStreamCommands('Live table stream error interrupted command acknowledgement.');
       try {
         nextSocket.close();
       } catch {
@@ -497,6 +659,16 @@ export class ServerTableController implements TableController {
     this.streamConnected = false;
     this.lastStreamMessageAtMs = 0;
     this.reconnectAttempt = 0;
+    for (const [commandId, pending] of this.pendingStreamCommands.entries()) {
+      this.reportStreamCommandTelemetry({
+        kind: 'WS_COMMAND_ABORTED',
+        commandId,
+        command: pending.command,
+        latencyMs: Math.max(0, Date.now() - pending.startedAtMs),
+        reason: 'stream_stopped',
+      });
+    }
+    this.rejectAllPendingStreamCommands('Live table stream stopped before command acknowledgement.');
     if (this.reconnectTimerId !== null) {
       window.clearTimeout(this.reconnectTimerId);
       this.reconnectTimerId = null;
@@ -645,6 +817,35 @@ export class ServerTableController implements TableController {
 
   private async applyCommand(command: TableCommand): Promise<ServerTableSnapshot> {
     await this.ensureSeatClaimed();
+    let result: ServerApplyCommandResult | null = null;
+    this.lastStreamFallbackReason = null;
+    if (this.streamCommandChannelEnabled) {
+      result = await this.tryApplyCommandOverStream(command);
+    }
+
+    if (!result) {
+      if (this.streamCommandChannelEnabled) {
+        this.pushLog('SYSTEM', 'Live command channel unavailable; falling back to HTTP command route.');
+        this.reportStreamCommandTelemetry({
+          kind: 'WS_COMMAND_FALLBACK_HTTP',
+          command,
+          reason: this.lastStreamFallbackReason ?? 'stream_unavailable',
+        });
+      }
+      result = await this.applyCommandOverHttp(command);
+    }
+
+    this.pushLog('COMMAND', this.describeCommand(command));
+    for (const eventRecord of result.events) {
+      this.pushLog('EVENT', this.describeEvent(eventRecord.event));
+    }
+
+    this.storeSnapshot(result.snapshot);
+    this.emitSnapshot(result.snapshot);
+    return result.snapshot;
+  }
+
+  private async applyCommandOverHttp(command: TableCommand): Promise<ServerApplyCommandResult> {
     const response = await this.fetchImpl(this.commandUrl, {
       method: 'POST',
       headers: {
@@ -659,15 +860,156 @@ export class ServerTableController implements TableController {
       throw new Error(this.extractHttpError(response.status, payload));
     }
 
-    const result = parseApplyCommandResult(payload);
-    this.pushLog('COMMAND', this.describeCommand(command));
-    for (const eventRecord of result.events) {
-      this.pushLog('EVENT', this.describeEvent(eventRecord.event));
+    return parseApplyCommandResult(payload);
+  }
+
+  private async tryApplyCommandOverStream(command: TableCommand): Promise<ServerApplyCommandResult | null> {
+    if (!this.streamSocket || !this.streamConnected) {
+      this.lastStreamFallbackReason = 'stream_not_connected';
+      return null;
     }
 
-    this.storeSnapshot(result.snapshot);
-    this.emitSnapshot(result.snapshot);
-    return result.snapshot;
+    const socket = this.streamSocket;
+    const readyState = (socket as unknown as { readyState?: number }).readyState;
+    if (typeof readyState === 'number' && readyState !== 1) {
+      this.lastStreamFallbackReason = 'stream_not_open';
+      return null;
+    }
+
+    const commandId = this.createNextStreamCommandId();
+    const authToken = this.resolveStreamCommandAuthToken(command);
+    const message: ServerTableStreamApplyCommandMessage = {
+      type: 'APPLY_COMMAND',
+      commandId,
+      command,
+      authToken,
+    };
+
+    return new Promise<ServerApplyCommandResult>((resolve, reject) => {
+      const startedAtMs = Date.now();
+      const timeoutId = window.setTimeout(() => {
+        this.pendingStreamCommands.delete(commandId);
+        this.reportStreamCommandTelemetry({
+          kind: 'WS_COMMAND_TIMEOUT',
+          commandId,
+          command,
+          latencyMs: Math.max(0, Date.now() - startedAtMs),
+          reason: 'ack_timeout',
+        });
+        reject(new Error('Timed out waiting for stream command acknowledgement.'));
+      }, this.streamCommandTimeoutMs);
+
+      this.pendingStreamCommands.set(commandId, {
+        timeoutId,
+        startedAtMs,
+        command,
+        resolve,
+        reject,
+      });
+      this.reportStreamCommandTelemetry({
+        kind: 'WS_COMMAND_SENT',
+        commandId,
+        command,
+      });
+
+      try {
+        socket.send(JSON.stringify(message));
+      } catch {
+        this.clearPendingStreamCommand(commandId);
+        this.lastStreamFallbackReason = 'stream_send_failed';
+        reject(new Error('Stream command send failed.'));
+      }
+    }).catch((error) => {
+      if (error instanceof Error) {
+        if (error.message === 'Timed out waiting for stream command acknowledgement.') {
+          throw error;
+        }
+
+        if (error.message === 'Stream command send failed.') {
+          return null;
+        }
+      }
+
+      throw error;
+    });
+  }
+
+  private resolveStreamCommandAuthToken(command: TableCommand): string | undefined {
+    if (command.type !== 'PLAYER_ACTION') {
+      return undefined;
+    }
+
+    return this.readSessionToken() ?? undefined;
+  }
+
+  private createNextStreamCommandId(): string {
+    const id = this.nextStreamCommandId;
+    this.nextStreamCommandId += 1;
+    return `ws-command-${Date.now()}-${id}`;
+  }
+
+  private resolvePendingStreamCommand(commandId: string, result: ServerApplyCommandResult): void {
+    const pending = this.pendingStreamCommands.get(commandId);
+    if (!pending) {
+      return;
+    }
+
+    window.clearTimeout(pending.timeoutId);
+    this.pendingStreamCommands.delete(commandId);
+    pending.resolve(result);
+  }
+
+  private rejectPendingStreamCommand(commandId: string, reason: string): void {
+    const pending = this.pendingStreamCommands.get(commandId);
+    if (!pending) {
+      return;
+    }
+
+    window.clearTimeout(pending.timeoutId);
+    this.pendingStreamCommands.delete(commandId);
+    pending.reject(new Error(reason));
+  }
+
+  private clearPendingStreamCommand(commandId: string): void {
+    const pending = this.pendingStreamCommands.get(commandId);
+    if (!pending) {
+      return;
+    }
+
+    window.clearTimeout(pending.timeoutId);
+    this.pendingStreamCommands.delete(commandId);
+  }
+
+  private rejectAllPendingStreamCommands(reason: string): void {
+    for (const commandId of this.pendingStreamCommands.keys()) {
+      this.rejectPendingStreamCommand(commandId, reason);
+    }
+  }
+
+  private reportStreamCommandTelemetry(input: {
+    kind: StreamCommandTelemetryKind;
+    commandId?: string;
+    command?: TableCommand;
+    latencyMs?: number;
+    code?: string;
+    reason?: string;
+  }): void {
+    if (!this.streamCommandTelemetryReporter) {
+      return;
+    }
+
+    const event: StreamCommandTelemetryEvent = {
+      kind: input.kind,
+      timestamp: new Date().toISOString(),
+      commandId: input.commandId,
+      commandType: input.command?.type,
+      action: input.command?.type === 'PLAYER_ACTION' ? input.command.action : undefined,
+      latencyMs: input.latencyMs,
+      code: input.code,
+      reason: input.reason,
+      inFlightCommands: this.pendingStreamCommands.size,
+    };
+    this.streamCommandTelemetryReporter(event);
   }
 
   private extractHttpError(statusCode: number, payload: unknown): string {

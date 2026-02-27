@@ -1,11 +1,13 @@
 import { loadClientRuntimeConfig } from './client-runtime-config.ts';
-import { ServerTableController } from './server-table-controller.ts';
+import { ServerTableController, type StreamCommandTelemetryEvent } from './server-table-controller.ts';
 import { LocalTableController, type TableController } from './table-controller.ts';
 
 interface RuntimeTableControllerOptions {
   userSeatId: number;
   tableId?: string;
 }
+
+export const TABLE_WS_COMMAND_TELEMETRY_EVENT = 'poker:ws-command-telemetry';
 
 function joinBaseUrlAndPath(baseUrl: string, path: string): string {
   const normalizedBase = baseUrl.trim();
@@ -63,8 +65,27 @@ export function buildTableScopedWebSocketUrl(baseUrl: string, path: string, tabl
   return toWebSocketUrl(scopedRouteUrl);
 }
 
+function createStreamCommandTelemetryReporter(
+  enabled: boolean,
+): ((event: StreamCommandTelemetryEvent) => void) | undefined {
+  if (!enabled) {
+    return undefined;
+  }
+
+  return (event: StreamCommandTelemetryEvent): void => {
+    if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function' && typeof CustomEvent === 'function') {
+      window.dispatchEvent(new CustomEvent(TABLE_WS_COMMAND_TELEMETRY_EVENT, { detail: event }));
+    }
+
+    if (typeof console !== 'undefined' && typeof console.debug === 'function') {
+      console.debug('[poker][ws-command]', event);
+    }
+  };
+}
+
 export function createRuntimeTableController(options: RuntimeTableControllerOptions): TableController {
   const config = loadClientRuntimeConfig();
+  const streamCommandTelemetryReporter = createStreamCommandTelemetryReporter(config.tableWsCommandTelemetryEnabled);
   if (config.tableRuntimeMode === 'server') {
     return new ServerTableController({
       userSeatId: options.userSeatId,
@@ -73,6 +94,8 @@ export function createRuntimeTableController(options: RuntimeTableControllerOpti
       seatClaimUrl: buildTableScopedRouteUrl(config.apiBaseUrl, '/api/table/seat', options.tableId),
       streamUrl: buildTableScopedWebSocketUrl(config.apiBaseUrl, '/api/table/ws', options.tableId) ?? undefined,
       pollIntervalMs: config.tablePollIntervalMs,
+      streamCommandChannelEnabled: config.tableWsCommandChannelEnabled,
+      streamCommandTelemetryReporter,
     });
   }
 

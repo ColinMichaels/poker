@@ -18,6 +18,8 @@ describe('client runtime config', () => {
     expect(config.externalAuthMode).toBe('disabled');
     expect(config.tableRuntimeMode).toBe('local');
     expect(config.tablePollIntervalMs).toBe(900);
+    expect(config.tableWsCommandChannelEnabled).toBe(false);
+    expect(config.tableWsCommandTelemetryEnabled).toBe(false);
     expect(config.firebase).toBeNull();
   });
 
@@ -67,10 +69,26 @@ describe('client runtime config', () => {
       createEnv({
         VITE_TABLE_RUNTIME_MODE: 'server',
         VITE_TABLE_POLL_INTERVAL_MS: '1400',
+        VITE_TABLE_WS_COMMANDS_ENABLED: '1',
+        VITE_TABLE_WS_COMMAND_TELEMETRY_ENABLED: '1',
       }),
     );
 
     expect(config.tableRuntimeMode).toBe('server');
     expect(config.tablePollIntervalMs).toBe(1400);
+    expect(config.tableWsCommandChannelEnabled).toBe(true);
+    expect(config.tableWsCommandTelemetryEnabled).toBe(true);
+  });
+
+  it('falls back to false for invalid table ws command env values', () => {
+    const config = loadClientRuntimeConfig(
+      createEnv({
+        VITE_TABLE_WS_COMMANDS_ENABLED: 'maybe',
+        VITE_TABLE_WS_COMMAND_TELEMETRY_ENABLED: 'maybe',
+      }),
+    );
+
+    expect(config.tableWsCommandChannelEnabled).toBe(false);
+    expect(config.tableWsCommandTelemetryEnabled).toBe(false);
   });
 });

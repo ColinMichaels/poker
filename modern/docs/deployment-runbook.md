@@ -61,6 +61,8 @@ Client runtime variables (for Firebase-authenticated web client):
 - `VITE_API_BASE_URL` (optional absolute API origin for non-rewrite deployments)
 - `VITE_TABLE_RUNTIME_MODE` (`local` or `server`; default: `local`)
 - `VITE_TABLE_POLL_INTERVAL_MS` (optional positive integer poll interval in ms for server table snapshots; default: `900`)
+- `VITE_TABLE_WS_COMMANDS_ENABLED` (`1`/`0`, default: `0`; enables client WebSocket `APPLY_COMMAND` usage with HTTP fallback)
+- `VITE_TABLE_WS_COMMAND_TELEMETRY_ENABLED` (`1`/`0`, default: `0`; emits `poker:ws-command-telemetry` browser events and debug logs)
 - `VITE_FIREBASE_API_KEY`
 - `VITE_FIREBASE_AUTH_DOMAIN`
 - `VITE_FIREBASE_PROJECT_ID`

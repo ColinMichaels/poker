@@ -118,17 +118,21 @@ Authoritative table runtime in client:
 
 1. Set `VITE_TABLE_RUNTIME_MODE=server` in `apps/client/.env.local` (default is `local`).
 2. Optional polling interval override: `VITE_TABLE_POLL_INTERVAL_MS=900`.
-3. Start both services:
+3. Optional WebSocket command channel in client: `VITE_TABLE_WS_COMMANDS_ENABLED=1` (requires server `POKER_ENABLE_TABLE_WS_COMMANDS=1`).
+4. Optional telemetry stream for WS command reliability: `VITE_TABLE_WS_COMMAND_TELEMETRY_ENABLED=1`.
+5. Start both services:
    - `npm run dev:server`
    - `npm run dev:client`
-4. In server mode, play actions and hand progression are submitted through `/api/table/command` and snapshots are read from `/api/table/state`.
-5. Optional: enable WebSocket command channel with `POKER_ENABLE_TABLE_WS_COMMANDS=1` to accept `APPLY_COMMAND` frames on `/api/table/ws`.
-6. Client/server sync also uses table-scoped WebSocket streams (`/api/table/ws?tableId=<id>`) with polling fallback/reconnect.
-7. When a server session is available, the client auto-claims the selected seat through `POST /api/table/seat`.
-8. Player sessions can only submit `PLAYER_ACTION` for their claimed seat; logout releases the current claim.
-9. Multi-table runtime in server mode uses table-scoped routes with `?tableId=<id>` so each table card tracks isolated authoritative state.
-10. Player sessions cannot submit non-player lifecycle commands (`START_HAND`, deal/showdown controls); those are reserved for system/operator flows.
-11. Client lobby/multi-table table cards are now sourced from server catalog route `GET /api/table/list` in server runtime mode.
+6. In server mode, play actions and hand progression are submitted through `/api/table/command` and snapshots are read from `/api/table/state`.
+7. Optional: enable server WebSocket command channel with `POKER_ENABLE_TABLE_WS_COMMANDS=1` to accept `APPLY_COMMAND` frames on `/api/table/ws`.
+8. Client/server sync also uses table-scoped WebSocket streams (`/api/table/ws?tableId=<id>`) with polling fallback/reconnect.
+9. When a server session is available, the client auto-claims the selected seat through `POST /api/table/seat`.
+10. Player sessions can only submit `PLAYER_ACTION` for their claimed seat; logout releases the current claim.
+11. Multi-table runtime in server mode uses table-scoped routes with `?tableId=<id>` so each table card tracks isolated authoritative state.
+12. Player sessions cannot submit non-player lifecycle commands (`START_HAND`, deal/showdown controls); those are reserved for system/operator flows.
+13. Client lobby/multi-table table cards are now sourced from server catalog route `GET /api/table/list` in server runtime mode.
+14. When telemetry is enabled, observe browser events with:
+    - `window.addEventListener('poker:ws-command-telemetry', (event) => console.log((event as CustomEvent).detail));`
 
 Firebase hosting starter config:
 

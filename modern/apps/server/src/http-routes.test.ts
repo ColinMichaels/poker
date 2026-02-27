@@ -1424,6 +1424,144 @@ async function testTableStreamHubEmitsHeartbeats(): Promise<void> {
   }
 }
 
+async function testTableStreamApplyCommandProcessesCoalescedFrames(): Promise<void> {
+  const tableService = new TableService({
+    tableId: 'http-test-table',
+    initialState: createDefaultTableState({
+      handId: 'boot-http-test',
+      seed: 412,
+    }),
+  });
+  const tableStreamHub = new TableStreamHub({ heartbeatIntervalMs: 60_000 });
+  const idempotencyStore = new TableStreamCommandIdempotencyStore();
+  const authWalletService = new AuthWalletService();
+  const socket = new MockUpgradeSocket();
+
+  try {
+    handleTableStreamUpgrade(
+      createUpgradeRequest({
+        url: '/api/table/ws',
+        headers: createUpgradeHeaders(),
+      }),
+      socket as unknown as Duplex,
+      {
+        defaultTableId: tableService.getSnapshot().tableId,
+        resolveTableService: () => tableService,
+        tableStreamHub,
+        host: '127.0.0.1',
+        port: 8787,
+        commandChannel: {
+          enabled: true,
+          authWalletService,
+          persistRuntimeState: () => {},
+          emitTableSnapshot: () => {},
+          idempotencyStore,
+        },
+      },
+    );
+
+    socket.writes = [];
+    const firstCommandFrame = encodeClientTextFrame(JSON.stringify({
+      type: 'APPLY_COMMAND',
+      commandId: 'cmd-coalesced-1',
+      command: {
+        type: 'START_HAND',
+        handId: 'ws-coalesced-hand',
+        seed: 333,
+      },
+    }));
+    const secondCommandFrame = encodeClientTextFrame(JSON.stringify({
+      type: 'APPLY_COMMAND',
+      commandId: 'cmd-coalesced-2',
+      command: {
+        type: 'POST_BLINDS',
+      },
+    }));
+    socket.emit('data', Buffer.concat([firstCommandFrame, secondCommandFrame]));
+
+    const messages = extractSocketJsonMessages(socket)
+      .filter((message) =>
+        typeof message === 'object'
+        && message !== null
+        && !Array.isArray(message)
+        && (message as Record<string, unknown>).type === 'COMMAND_ACK');
+    assertEqual(messages.length, 2, 'Expected coalesced websocket frames to apply both commands.');
+    assertEqual(tableService.getSnapshot().commandSequence, 2, 'Expected coalesced websocket command frames to advance command sequence twice.');
+  } finally {
+    tableStreamHub.closeAll();
+  }
+}
+
+async function testTableStreamApplyCommandBuffersFragmentedFrames(): Promise<void> {
+  const tableService = new TableService({
+    tableId: 'http-test-table',
+    initialState: createDefaultTableState({
+      handId: 'boot-http-test',
+      seed: 413,
+    }),
+  });
+  const tableStreamHub = new TableStreamHub({ heartbeatIntervalMs: 60_000 });
+  const idempotencyStore = new TableStreamCommandIdempotencyStore();
+  const authWalletService = new AuthWalletService();
+  const socket = new MockUpgradeSocket();
+
+  try {
+    handleTableStreamUpgrade(
+      createUpgradeRequest({
+        url: '/api/table/ws',
+        headers: createUpgradeHeaders(),
+      }),
+      socket as unknown as Duplex,
+      {
+        defaultTableId: tableService.getSnapshot().tableId,
+        resolveTableService: () => tableService,
+        tableStreamHub,
+        host: '127.0.0.1',
+        port: 8787,
+        commandChannel: {
+          enabled: true,
+          authWalletService,
+          persistRuntimeState: () => {},
+          emitTableSnapshot: () => {},
+          idempotencyStore,
+        },
+      },
+    );
+
+    socket.writes = [];
+    const commandFrame = encodeClientTextFrame(JSON.stringify({
+      type: 'APPLY_COMMAND',
+      commandId: 'cmd-fragmented-1',
+      command: {
+        type: 'START_HAND',
+        handId: 'ws-fragmented-hand',
+        seed: 444,
+      },
+    }));
+    const splitAt = Math.floor(commandFrame.length / 2);
+    socket.emit('data', commandFrame.subarray(0, splitAt));
+    assertEqual(
+      extractSocketJsonMessages(socket).length,
+      0,
+      'Expected partial websocket frame to buffer until payload is complete.',
+    );
+
+    socket.emit('data', commandFrame.subarray(splitAt));
+    const ackMessages = extractSocketJsonMessages(socket)
+      .filter((message) =>
+        typeof message === 'object'
+        && message !== null
+        && !Array.isArray(message)
+        && (message as Record<string, unknown>).type === 'COMMAND_ACK');
+    assertEqual(ackMessages.length, 1, 'Expected fragmented websocket command frame to emit a single ACK after completion.');
+    const ackPayload = ackMessages[0] as Record<string, unknown>;
+    assertEqual(ackPayload.commandId, 'cmd-fragmented-1', 'Expected fragmented websocket frame ACK to preserve command id.');
+    assertEqual(tableService.getSnapshot().commandSequence, 1, 'Expected fragmented websocket command frame to apply once.');
+  } finally {
+    tableStreamHub.closeAll();
+  }
+}
+
 async function testTableStreamApplyCommandDisabledReturnsError(): Promise<void> {
   const tableService = new TableService({
     tableId: 'http-test-table',
@@ -1659,6 +1797,8 @@ async function runAll(): Promise<void> {
   await testTableStreamPublishSnapshotIsTableScoped();
   await testTableStreamSocketCloseRemovesConnection();
   await testTableStreamHubEmitsHeartbeats();
+  await testTableStreamApplyCommandProcessesCoalescedFrames();
+  await testTableStreamApplyCommandBuffersFragmentedFrames();
   await testTableStreamApplyCommandDisabledReturnsError();
   await testTableStreamApplyCommandAuthChecksMatchHttpRouteRules();
   await testTableStreamApplyCommandIdempotencyReplaysAckWithoutReapplying();

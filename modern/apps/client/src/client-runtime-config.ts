@@ -19,6 +19,8 @@ export interface ClientRuntimeConfig {
   externalAuthLoginPath: string;
   tableRuntimeMode: TableRuntimeMode;
   tablePollIntervalMs: number;
+  tableWsCommandChannelEnabled: boolean;
+  tableWsCommandTelemetryEnabled: boolean;
   firebase: FirebaseClientRuntimeConfig | null;
 }
 
@@ -60,6 +62,23 @@ function parsePositiveInteger(rawValue: string | undefined, fallback: number): n
   }
 
   return parsed;
+}
+
+function parseBoolean(rawValue: string | undefined, fallback: boolean): boolean {
+  if (!rawValue || rawValue.trim().length === 0) {
+    return fallback;
+  }
+
+  const normalized = rawValue.trim().toLowerCase();
+  if (['1', 'true', 'yes', 'on'].includes(normalized)) {
+    return true;
+  }
+
+  if (['0', 'false', 'no', 'off'].includes(normalized)) {
+    return false;
+  }
+
+  return fallback;
 }
 
 function resolveExternalAuthMode(env: ImportMetaEnv, firebaseConfig: FirebaseClientRuntimeConfig | null): ExternalAuthMode {
@@ -111,6 +130,8 @@ export function loadClientRuntimeConfig(env: ImportMetaEnv = import.meta.env): C
     externalAuthLoginPath: normalizePath(env.VITE_EXTERNAL_AUTH_LOGIN_PATH, '/api/auth/external/login'),
     tableRuntimeMode: resolveTableRuntimeMode(env),
     tablePollIntervalMs: parsePositiveInteger(env.VITE_TABLE_POLL_INTERVAL_MS, 900),
+    tableWsCommandChannelEnabled: parseBoolean(env.VITE_TABLE_WS_COMMANDS_ENABLED, false),
+    tableWsCommandTelemetryEnabled: parseBoolean(env.VITE_TABLE_WS_COMMAND_TELEMETRY_ENABLED, false),
     firebase: firebaseConfig,
   };
 }
