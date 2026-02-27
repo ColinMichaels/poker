@@ -212,6 +212,7 @@ export interface StartupConfig {
   authBootstrapUsersFile: string | undefined;
   authBootstrapUsers: AuthUserSeedRecord[] | undefined;
   allowLegacyWalletRoutes: boolean;
+  tableWsCommandChannelEnabled: boolean;
   externalAuthEnabled: boolean;
   externalAuthMode: ExternalAuthMode;
   externalAuthIssuer: string;
@@ -318,6 +319,9 @@ export function loadStartupConfig(env: Record<string, string | undefined>): Star
     authBootstrapUsersFile,
     authBootstrapUsers: loadBootstrapUsersFromFile(authBootstrapUsersFile),
     allowLegacyWalletRoutes: parseAllowLegacyWalletRoutes(env.POKER_ENABLE_LEGACY_WALLET_ROUTES, env.NODE_ENV),
+    tableWsCommandChannelEnabled: env.POKER_ENABLE_TABLE_WS_COMMANDS === undefined
+      ? false
+      : parseBooleanEnv(env.POKER_ENABLE_TABLE_WS_COMMANDS, 'POKER_ENABLE_TABLE_WS_COMMANDS'),
     externalAuthEnabled,
     externalAuthMode,
     externalAuthIssuer,

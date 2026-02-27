@@ -1,8 +1,9 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
+import type { Duplex } from 'node:stream';
 import { AuthWalletService } from './auth-wallet-service.ts';
 import { createExternalAuthAssertion } from './external-auth.ts';
 import type { FirebaseExternalIdentity, FirebaseIdTokenVerificationOptions } from './firebase-id-token.ts';
-import { handleRequest } from './index.ts';
+import { TableStreamCommandIdempotencyStore, TableStreamHub, handleRequest, handleTableStreamUpgrade } from './index.ts';
 import type { ExternalAuthMode, FirebaseVerifierMode } from './startup-config.ts';
 import { TableService, createDefaultTableState } from './table-service.ts';
 
@@ -16,6 +17,142 @@ function assertEqual<T>(actual: T, expected: T, message: string): void {
   if (actual !== expected) {
     throw new Error(`${message} (actual=${String(actual)} expected=${String(expected)})`);
   }
+}
+
+type SocketListener = (...args: unknown[]) => void;
+
+class MockUpgradeSocket {
+  public writes: Array<string | Buffer> = [];
+  public destroyed = false;
+  private readonly listeners = new Map<string, SocketListener[]>();
+
+  public write(chunk: string | Buffer): boolean {
+    this.writes.push(typeof chunk === 'string' ? chunk : Buffer.from(chunk));
+    return true;
+  }
+
+  public end(chunk?: string | Buffer): void {
+    if (chunk !== undefined) {
+      this.write(chunk);
+    }
+    this.destroy();
+  }
+
+  public destroy(): void {
+    if (this.destroyed) {
+      return;
+    }
+
+    this.destroyed = true;
+    this.emit('close');
+  }
+
+  public on(event: string, listener: SocketListener): this {
+    const existing = this.listeners.get(event) ?? [];
+    existing.push(listener);
+    this.listeners.set(event, existing);
+    return this;
+  }
+
+  public emit(event: string, ...args: unknown[]): void {
+    const listeners = this.listeners.get(event) ?? [];
+    for (const listener of listeners) {
+      listener(...args);
+    }
+  }
+}
+
+function createUpgradeRequest(options: {
+  method?: string;
+  url: string;
+  headers?: Record<string, string>;
+}): IncomingMessage {
+  return {
+    method: options.method ?? 'GET',
+    url: options.url,
+    headers: options.headers ?? {},
+  } as IncomingMessage;
+}
+
+function createUpgradeHeaders(overrides: Record<string, string> = {}): Record<string, string> {
+  return {
+    host: '127.0.0.1:8787',
+    connection: 'Upgrade',
+    upgrade: 'websocket',
+    'sec-websocket-version': '13',
+    'sec-websocket-key': 'dGhlIHNhbXBsZSBub25jZQ==',
+    ...overrides,
+  };
+}
+
+function decodeServerTextFrame(frame: Buffer): string {
+  assert(frame.length >= 2, 'Expected WebSocket frame to include header bytes.');
+  const opcode = frame[0] & 0x0f;
+  assertEqual(opcode, 0x1, 'Expected server frame opcode to be text.');
+  const masked = (frame[1] & 0x80) !== 0;
+  assertEqual(masked, false, 'Expected server WebSocket frame payload to be unmasked.');
+
+  let payloadLength = frame[1] & 0x7f;
+  let offset = 2;
+  if (payloadLength === 126) {
+    assert(frame.length >= 4, 'Expected frame to include extended 16-bit payload length.');
+    payloadLength = frame.readUInt16BE(2);
+    offset = 4;
+  } else if (payloadLength === 127) {
+    assert(frame.length >= 10, 'Expected frame to include extended 64-bit payload length.');
+    payloadLength = Number(frame.readBigUInt64BE(2));
+    offset = 10;
+  }
+
+  const end = offset + payloadLength;
+  assert(frame.length >= end, 'Expected frame payload bytes to be present.');
+  return frame.subarray(offset, end).toString('utf8');
+}
+
+function extractSocketJsonMessages(socket: MockUpgradeSocket): unknown[] {
+  const messages: unknown[] = [];
+  for (const chunk of socket.writes) {
+    if (!Buffer.isBuffer(chunk)) {
+      continue;
+    }
+
+    messages.push(JSON.parse(decodeServerTextFrame(chunk)) as unknown);
+  }
+  return messages;
+}
+
+function encodeClientTextFrame(payload: string): Buffer {
+  const payloadBuffer = Buffer.from(payload, 'utf8');
+  const mask = Buffer.from([0x11, 0x22, 0x33, 0x44]);
+  let headerLength = 2 + 4;
+  let payloadLengthField = payloadBuffer.length;
+  if (payloadBuffer.length >= 126 && payloadBuffer.length < 65_536) {
+    headerLength += 2;
+    payloadLengthField = 126;
+  } else if (payloadBuffer.length >= 65_536) {
+    headerLength += 8;
+    payloadLengthField = 127;
+  }
+
+  const frame = Buffer.alloc(headerLength + payloadBuffer.length);
+  frame[0] = 0x81;
+  frame[1] = 0x80 | payloadLengthField;
+  let offset = 2;
+  if (payloadLengthField === 126) {
+    frame.writeUInt16BE(payloadBuffer.length, offset);
+    offset += 2;
+  } else if (payloadLengthField === 127) {
+    frame.writeBigUInt64BE(BigInt(payloadBuffer.length), offset);
+    offset += 8;
+  }
+
+  mask.copy(frame, offset);
+  offset += 4;
+  for (let index = 0; index < payloadBuffer.length; index += 1) {
+    frame[offset + index] = payloadBuffer[index] ^ mask[index % 4];
+  }
+
+  return frame;
 }
 
 class MockIncomingMessage {
@@ -109,6 +246,7 @@ type RouteRuntimeInfo = {
   externalAuthFirebaseCertsUrl: string;
   externalAuthFirebaseVerifier: FirebaseVerifierMode;
   externalAuthVerificationSecrets: readonly string[];
+  tableWsCommandChannelEnabled?: boolean;
   verifyFirebaseIdTokenFn: (
     idToken: string,
     options: FirebaseIdTokenVerificationOptions,
@@ -130,6 +268,7 @@ function createRuntimeInfo(overrides: Partial<RouteRuntimeInfo> = {}): RouteRunt
     externalAuthFirebaseCertsUrl: 'https://example.test/certs',
     externalAuthFirebaseVerifier: 'jwt',
     externalAuthVerificationSecrets: [],
+    tableWsCommandChannelEnabled: false,
     verifyFirebaseIdTokenFn: async () => {
       throw new Error('firebase verifier should not be called in default runtime mode');
     },
@@ -192,6 +331,7 @@ async function testHealthRouteIncludesExternalAuthRotationFlag(): Promise<void> 
       externalAuthFirebaseCertsUrl: 'https://example.test/certs',
       externalAuthFirebaseVerifier: 'jwt',
       externalAuthVerificationSecrets: ['current-secret-1234567890', 'previous-secret-1234567890'],
+      tableWsCommandChannelEnabled: true,
       verifyFirebaseIdTokenFn: async () => {
         throw new Error('firebase verifier should not be called in signed_assertion mode');
       },
@@ -207,6 +347,7 @@ async function testHealthRouteIncludesExternalAuthRotationFlag(): Promise<void> 
       externalAuthIssuer: string;
       externalAuthFirebaseVerifier: string;
       externalAuthSecretRotationEnabled: boolean;
+      tableWsCommandChannelEnabled: boolean;
     };
   };
   assertEqual(payload.runtime.externalAuthEnabled, true, 'Expected runtime to report external auth enabled.');
@@ -221,6 +362,11 @@ async function testHealthRouteIncludesExternalAuthRotationFlag(): Promise<void> 
     payload.runtime.externalAuthSecretRotationEnabled,
     true,
     'Expected health runtime to report rotation enabled when two verification secrets are configured.',
+  );
+  assertEqual(
+    payload.runtime.tableWsCommandChannelEnabled,
+    true,
+    'Expected health runtime to report websocket command channel enablement.',
   );
 }
 
@@ -1007,6 +1153,491 @@ async function testLogoutReleasesClaimsAcrossScopedTables(): Promise<void> {
   assertEqual(secondaryTable.getSeatClaimForUser(session.user.id), null, 'Expected scoped table claim to clear on logout.');
 }
 
+async function testTableStreamUpgradeReturnsScopedSnapshot(): Promise<void> {
+  const primaryTable = new TableService({
+    tableId: 'http-test-table',
+    initialState: createDefaultTableState({
+      handId: 'boot-http-test',
+      seed: 401,
+    }),
+  });
+  const scopedTable = new TableService({
+    tableId: 'blaze-04',
+    initialState: createDefaultTableState({
+      handId: 'boot-blaze',
+      seed: 402,
+    }),
+  });
+  const tableServiceById = new Map<string, TableService>([
+    [primaryTable.getSnapshot().tableId, primaryTable],
+    [scopedTable.getSnapshot().tableId, scopedTable],
+  ]);
+  const tableStreamHub = new TableStreamHub({ heartbeatIntervalMs: 60_000 });
+  const socket = new MockUpgradeSocket();
+
+  try {
+    handleTableStreamUpgrade(
+      createUpgradeRequest({
+        url: '/api/table/ws?tableId=blaze-04',
+        headers: createUpgradeHeaders(),
+      }),
+      socket as unknown as Duplex,
+      {
+        defaultTableId: primaryTable.getSnapshot().tableId,
+        resolveTableService: (tableId: string) => tableServiceById.get(tableId) ?? primaryTable,
+        tableStreamHub,
+        host: '127.0.0.1',
+        port: 8787,
+      },
+    );
+
+    assert(socket.writes.length >= 2, 'Expected successful upgrade to write handshake and initial snapshot frame.');
+    const handshake = socket.writes[0];
+    assert(typeof handshake === 'string', 'Expected first websocket write to be HTTP upgrade handshake text.');
+    assert(
+      handshake.includes('HTTP/1.1 101 Switching Protocols'),
+      'Expected websocket upgrade handshake to return HTTP 101.',
+    );
+
+    const messages = extractSocketJsonMessages(socket);
+    const snapshotMessage = messages.find((message) =>
+      typeof message === 'object'
+        && message !== null
+        && !Array.isArray(message)
+        && (message as Record<string, unknown>).type === 'TABLE_SNAPSHOT');
+    assert(snapshotMessage, 'Expected websocket upgrade to emit initial TABLE_SNAPSHOT message.');
+    const snapshotRecord = snapshotMessage as Record<string, unknown>;
+    assertEqual(snapshotRecord.tableId, 'blaze-04', 'Expected initial stream snapshot to match scoped table id.');
+    assert(
+      typeof snapshotRecord.snapshot === 'object'
+      && snapshotRecord.snapshot !== null
+      && (snapshotRecord.snapshot as Record<string, unknown>).tableId === 'blaze-04',
+      'Expected initial stream payload snapshot to be scoped to requested table.',
+    );
+  } finally {
+    tableStreamHub.closeAll();
+  }
+}
+
+async function testTableStreamUpgradeRejectsInvalidVersion(): Promise<void> {
+  const primaryTable = new TableService({
+    tableId: 'http-test-table',
+    initialState: createDefaultTableState({
+      handId: 'boot-http-test',
+      seed: 403,
+    }),
+  });
+  const tableStreamHub = new TableStreamHub({ heartbeatIntervalMs: 60_000 });
+  const socket = new MockUpgradeSocket();
+
+  try {
+    handleTableStreamUpgrade(
+      createUpgradeRequest({
+        url: '/api/table/ws',
+        headers: createUpgradeHeaders({
+          'sec-websocket-version': '12',
+        }),
+      }),
+      socket as unknown as Duplex,
+      {
+        defaultTableId: primaryTable.getSnapshot().tableId,
+        resolveTableService: () => primaryTable,
+        tableStreamHub,
+        host: '127.0.0.1',
+        port: 8787,
+      },
+    );
+
+    assert(socket.writes.length >= 1, 'Expected invalid websocket version request to receive an HTTP rejection response.');
+    const responseText = socket.writes[0];
+    assert(typeof responseText === 'string', 'Expected upgrade rejection response to be plain HTTP text.');
+    assert(
+      responseText.startsWith('HTTP/1.1 426 Upgrade Required'),
+      'Expected unsupported websocket version to return HTTP 426.',
+    );
+    assertEqual(socket.destroyed, true, 'Expected upgrade rejection to destroy the socket.');
+  } finally {
+    tableStreamHub.closeAll();
+  }
+}
+
+async function testTableStreamPublishSnapshotIsTableScoped(): Promise<void> {
+  const primaryTable = new TableService({
+    tableId: 'http-test-table',
+    initialState: createDefaultTableState({
+      handId: 'boot-http-test',
+      seed: 404,
+    }),
+  });
+  const scopedTable = new TableService({
+    tableId: 'drift-09',
+    initialState: createDefaultTableState({
+      handId: 'boot-drift',
+      seed: 405,
+    }),
+  });
+  const tableServiceById = new Map<string, TableService>([
+    [primaryTable.getSnapshot().tableId, primaryTable],
+    [scopedTable.getSnapshot().tableId, scopedTable],
+  ]);
+  const tableStreamHub = new TableStreamHub({ heartbeatIntervalMs: 60_000 });
+  const primarySocket = new MockUpgradeSocket();
+  const scopedSocket = new MockUpgradeSocket();
+
+  try {
+    handleTableStreamUpgrade(
+      createUpgradeRequest({
+        url: '/api/table/ws',
+        headers: createUpgradeHeaders(),
+      }),
+      primarySocket as unknown as Duplex,
+      {
+        defaultTableId: primaryTable.getSnapshot().tableId,
+        resolveTableService: (tableId: string) => tableServiceById.get(tableId) ?? primaryTable,
+        tableStreamHub,
+        host: '127.0.0.1',
+        port: 8787,
+      },
+    );
+
+    handleTableStreamUpgrade(
+      createUpgradeRequest({
+        url: '/api/table/ws?tableId=drift-09',
+        headers: createUpgradeHeaders(),
+      }),
+      scopedSocket as unknown as Duplex,
+      {
+        defaultTableId: primaryTable.getSnapshot().tableId,
+        resolveTableService: (tableId: string) => tableServiceById.get(tableId) ?? primaryTable,
+        tableStreamHub,
+        host: '127.0.0.1',
+        port: 8787,
+      },
+    );
+
+    primarySocket.writes = [];
+    scopedSocket.writes = [];
+
+    scopedTable.applyCommand({
+      type: 'START_HAND',
+      handId: 'drift-hand-2',
+      seed: 406,
+    });
+    tableStreamHub.publishSnapshot(scopedTable.getSnapshot());
+
+    assertEqual(
+      extractSocketJsonMessages(primarySocket).length,
+      0,
+      'Expected default table stream to ignore snapshots from other tables.',
+    );
+    const scopedMessages = extractSocketJsonMessages(scopedSocket);
+    assertEqual(scopedMessages.length, 1, 'Expected scoped table stream to receive published snapshot.');
+    const scopedSnapshotMessage = scopedMessages[0] as Record<string, unknown>;
+    assertEqual(scopedSnapshotMessage.type, 'TABLE_SNAPSHOT', 'Expected published stream message type to be TABLE_SNAPSHOT.');
+    assertEqual(scopedSnapshotMessage.tableId, 'drift-09', 'Expected published snapshot message to preserve scoped table id.');
+  } finally {
+    tableStreamHub.closeAll();
+  }
+}
+
+async function testTableStreamSocketCloseRemovesConnection(): Promise<void> {
+  const primaryTable = new TableService({
+    tableId: 'http-test-table',
+    initialState: createDefaultTableState({
+      handId: 'boot-http-test',
+      seed: 407,
+    }),
+  });
+  const tableStreamHub = new TableStreamHub({ heartbeatIntervalMs: 60_000 });
+  const socket = new MockUpgradeSocket();
+
+  try {
+    handleTableStreamUpgrade(
+      createUpgradeRequest({
+        url: '/api/table/ws',
+        headers: createUpgradeHeaders(),
+      }),
+      socket as unknown as Duplex,
+      {
+        defaultTableId: primaryTable.getSnapshot().tableId,
+        resolveTableService: () => primaryTable,
+        tableStreamHub,
+        host: '127.0.0.1',
+        port: 8787,
+      },
+    );
+
+    socket.writes = [];
+    socket.emit('close');
+    tableStreamHub.publishSnapshot(primaryTable.getSnapshot());
+
+    assertEqual(
+      extractSocketJsonMessages(socket).length,
+      0,
+      'Expected closed websocket stream to stop receiving table snapshot broadcasts.',
+    );
+  } finally {
+    tableStreamHub.closeAll();
+  }
+}
+
+async function testTableStreamHubEmitsHeartbeats(): Promise<void> {
+  const primaryTable = new TableService({
+    tableId: 'http-test-table',
+    initialState: createDefaultTableState({
+      handId: 'boot-http-test',
+      seed: 408,
+    }),
+  });
+  const tableStreamHub = new TableStreamHub({ heartbeatIntervalMs: 15 });
+  const socket = new MockUpgradeSocket();
+
+  try {
+    handleTableStreamUpgrade(
+      createUpgradeRequest({
+        url: '/api/table/ws',
+        headers: createUpgradeHeaders(),
+      }),
+      socket as unknown as Duplex,
+      {
+        defaultTableId: primaryTable.getSnapshot().tableId,
+        resolveTableService: () => primaryTable,
+        tableStreamHub,
+        host: '127.0.0.1',
+        port: 8787,
+      },
+    );
+
+    socket.writes = [];
+    await new Promise((resolve) => {
+      setTimeout(resolve, 35);
+    });
+
+    const hasHeartbeat = extractSocketJsonMessages(socket).some((message) =>
+      typeof message === 'object'
+      && message !== null
+      && !Array.isArray(message)
+      && (message as Record<string, unknown>).type === 'TABLE_HEARTBEAT');
+    assertEqual(hasHeartbeat, true, 'Expected active websocket streams to receive heartbeat frames.');
+  } finally {
+    tableStreamHub.closeAll();
+  }
+}
+
+async function testTableStreamApplyCommandDisabledReturnsError(): Promise<void> {
+  const tableService = new TableService({
+    tableId: 'http-test-table',
+    initialState: createDefaultTableState({
+      handId: 'boot-http-test',
+      seed: 409,
+    }),
+  });
+  const tableStreamHub = new TableStreamHub({ heartbeatIntervalMs: 60_000 });
+  const idempotencyStore = new TableStreamCommandIdempotencyStore();
+  const authWalletService = new AuthWalletService();
+  const socket = new MockUpgradeSocket();
+
+  try {
+    handleTableStreamUpgrade(
+      createUpgradeRequest({
+        url: '/api/table/ws',
+        headers: createUpgradeHeaders(),
+      }),
+      socket as unknown as Duplex,
+      {
+        defaultTableId: tableService.getSnapshot().tableId,
+        resolveTableService: () => tableService,
+        tableStreamHub,
+        host: '127.0.0.1',
+        port: 8787,
+        commandChannel: {
+          enabled: false,
+          authWalletService,
+          persistRuntimeState: () => {},
+          emitTableSnapshot: () => {},
+          idempotencyStore,
+        },
+      },
+    );
+
+    socket.writes = [];
+    socket.emit(
+      'data',
+      encodeClientTextFrame(JSON.stringify({
+        type: 'APPLY_COMMAND',
+        commandId: 'cmd-disabled-1',
+        command: {
+          type: 'START_HAND',
+          handId: 'ws-disabled-hand',
+          seed: 999,
+        },
+      })),
+    );
+
+    const messages = extractSocketJsonMessages(socket);
+    assertEqual(messages.length, 1, 'Expected disabled command channel request to emit exactly one response message.');
+    const errorPayload = messages[0] as Record<string, unknown>;
+    assertEqual(errorPayload.type, 'COMMAND_ERROR', 'Expected disabled channel to emit COMMAND_ERROR.');
+    assertEqual(
+      errorPayload.code,
+      'COMMAND_CHANNEL_DISABLED',
+      'Expected disabled command channel error code.',
+    );
+  } finally {
+    tableStreamHub.closeAll();
+  }
+}
+
+async function testTableStreamApplyCommandAuthChecksMatchHttpRouteRules(): Promise<void> {
+  const tableService = new TableService({
+    tableId: 'http-test-table',
+    initialState: createDefaultTableState({
+      handId: 'boot-http-test',
+      seed: 410,
+    }),
+  });
+  tableService.claimSeat(999, 1);
+
+  const tableStreamHub = new TableStreamHub({ heartbeatIntervalMs: 60_000 });
+  const idempotencyStore = new TableStreamCommandIdempotencyStore();
+  const authWalletService = new AuthWalletService();
+  const playerSession = authWalletService.login({ email: 'luna@example.com', password: 'demo' }).session;
+  const socket = new MockUpgradeSocket();
+
+  try {
+    handleTableStreamUpgrade(
+      createUpgradeRequest({
+        url: '/api/table/ws',
+        headers: createUpgradeHeaders(),
+      }),
+      socket as unknown as Duplex,
+      {
+        defaultTableId: tableService.getSnapshot().tableId,
+        resolveTableService: () => tableService,
+        tableStreamHub,
+        host: '127.0.0.1',
+        port: 8787,
+        commandChannel: {
+          enabled: true,
+          authWalletService,
+          persistRuntimeState: () => {},
+          emitTableSnapshot: () => {},
+          idempotencyStore,
+        },
+      },
+    );
+
+    socket.writes = [];
+    socket.emit(
+      'data',
+      encodeClientTextFrame(JSON.stringify({
+        type: 'APPLY_COMMAND',
+        commandId: 'cmd-auth-1',
+        command: {
+          type: 'PLAYER_ACTION',
+          seatId: 1,
+          action: 'FOLD',
+        },
+      })),
+    );
+
+    socket.emit(
+      'data',
+      encodeClientTextFrame(JSON.stringify({
+        type: 'APPLY_COMMAND',
+        commandId: 'cmd-auth-2',
+        authToken: playerSession.token,
+        command: {
+          type: 'START_HAND',
+          handId: 'player-forbidden',
+          seed: 111,
+        },
+      })),
+    );
+
+    const messages = extractSocketJsonMessages(socket);
+    const firstError = messages[0] as Record<string, unknown>;
+    const secondError = messages[1] as Record<string, unknown>;
+    assertEqual(firstError.type, 'COMMAND_ERROR', 'Expected claimed-seat unauthenticated action to return COMMAND_ERROR.');
+    assertEqual(firstError.code, 'UNAUTHORIZED', 'Expected claimed-seat unauthenticated action to be unauthorized.');
+    assertEqual(secondError.type, 'COMMAND_ERROR', 'Expected player non-player command to return COMMAND_ERROR.');
+    assertEqual(secondError.code, 'COMMAND_FORBIDDEN', 'Expected player non-player command to be forbidden.');
+  } finally {
+    tableStreamHub.closeAll();
+  }
+}
+
+async function testTableStreamApplyCommandIdempotencyReplaysAckWithoutReapplying(): Promise<void> {
+  const tableService = new TableService({
+    tableId: 'http-test-table',
+    initialState: createDefaultTableState({
+      handId: 'boot-http-test',
+      seed: 411,
+    }),
+  });
+  const tableStreamHub = new TableStreamHub({ heartbeatIntervalMs: 60_000 });
+  const idempotencyStore = new TableStreamCommandIdempotencyStore();
+  const authWalletService = new AuthWalletService();
+  const socket = new MockUpgradeSocket();
+
+  try {
+    handleTableStreamUpgrade(
+      createUpgradeRequest({
+        url: '/api/table/ws',
+        headers: createUpgradeHeaders(),
+      }),
+      socket as unknown as Duplex,
+      {
+        defaultTableId: tableService.getSnapshot().tableId,
+        resolveTableService: () => tableService,
+        tableStreamHub,
+        host: '127.0.0.1',
+        port: 8787,
+        commandChannel: {
+          enabled: true,
+          authWalletService,
+          persistRuntimeState: () => {},
+          emitTableSnapshot: () => {},
+          idempotencyStore,
+        },
+      },
+    );
+
+    socket.writes = [];
+    const commandPayload = JSON.stringify({
+      type: 'APPLY_COMMAND',
+      commandId: 'cmd-idempotent-1',
+      command: {
+        type: 'START_HAND',
+        handId: 'ws-hand-1',
+        seed: 222,
+      },
+    });
+    socket.emit('data', encodeClientTextFrame(commandPayload));
+    socket.emit('data', encodeClientTextFrame(commandPayload));
+
+    const messages = extractSocketJsonMessages(socket)
+      .filter((message) =>
+        typeof message === 'object'
+        && message !== null
+        && !Array.isArray(message)
+        && (message as Record<string, unknown>).type === 'COMMAND_ACK');
+    assertEqual(messages.length, 2, 'Expected duplicate commandId submissions to return replayed COMMAND_ACK responses.');
+    const firstAck = messages[0] as Record<string, unknown>;
+    const secondAck = messages[1] as Record<string, unknown>;
+    assertEqual(firstAck.commandId, 'cmd-idempotent-1', 'Expected first ACK to include command id.');
+    assertEqual(secondAck.commandId, 'cmd-idempotent-1', 'Expected duplicate ACK to include command id.');
+    assertEqual(
+      JSON.stringify(firstAck.result),
+      JSON.stringify(secondAck.result),
+      'Expected duplicate commandId to replay the original result payload.',
+    );
+    assertEqual(tableService.getSnapshot().commandSequence, 1, 'Expected duplicate commandId to apply only once.');
+  } finally {
+    tableStreamHub.closeAll();
+  }
+}
+
 async function runAll(): Promise<void> {
   await testHealthRouteIncludesExternalAuthRotationFlag();
   await testExternalLoginAcceptsPreviousRotationSecret();
@@ -1023,7 +1654,15 @@ async function runAll(): Promise<void> {
   await testInvalidTableIdQueryRejected();
   await testTableListRouteReturnsServerFedMetadata();
   await testLogoutReleasesClaimsAcrossScopedTables();
-  console.info('HTTP route tests passed (external auth login + health diagnostics + seat auth + table routing).');
+  await testTableStreamUpgradeReturnsScopedSnapshot();
+  await testTableStreamUpgradeRejectsInvalidVersion();
+  await testTableStreamPublishSnapshotIsTableScoped();
+  await testTableStreamSocketCloseRemovesConnection();
+  await testTableStreamHubEmitsHeartbeats();
+  await testTableStreamApplyCommandDisabledReturnsError();
+  await testTableStreamApplyCommandAuthChecksMatchHttpRouteRules();
+  await testTableStreamApplyCommandIdempotencyReplaysAckWithoutReapplying();
+  console.info('HTTP route tests passed (external auth login + health diagnostics + seat auth + table routing + stream upgrade + stream commands).');
 }
 
 await runAll();

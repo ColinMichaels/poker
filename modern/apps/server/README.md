@@ -9,6 +9,7 @@ This service is the PR B/PR C runtime for `modern/` (authoritative table + minim
 - Records command/event logs with sequence numbers
 - Stores per-hand snapshots and replay history
 - Replays a hand from start snapshot + command stream for deterministic verification
+- Streams table snapshot updates over WebSocket for low-latency client sync
 
 ## Run
 
@@ -48,6 +49,7 @@ Environment overrides:
 - `POKER_AUTH_ALLOW_DEMO_USERS` (`1`/`0`, default `1` unless `NODE_ENV=production`)
 - `POKER_AUTH_BOOTSTRAP_USERS_FILE` (path to JSON file with bootstrap auth users)
 - `POKER_ENABLE_LEGACY_WALLET_ROUTES` (`1`/`0`, default `1` unless `NODE_ENV=production`)
+- `POKER_ENABLE_TABLE_WS_COMMANDS` (`1`/`0`, default `0`; enables WebSocket `APPLY_COMMAND` channel)
 
 Environment template:
 
@@ -68,7 +70,8 @@ Runtime persistence:
 - `runtime.externalAuthFirebaseProjectId`
 - `runtime.externalAuthFirebaseIssuer`
 - `runtime.externalAuthFirebaseVerifier`
-  - `runtime.externalAuthSecretRotationEnabled`
+- `runtime.externalAuthSecretRotationEnabled`
+- `runtime.tableWsCommandChannelEnabled`
 
 Auth/session behavior:
 
@@ -92,6 +95,7 @@ Auth/session behavior:
 - `GET /health`
 - `GET /api/table/list`
 - `GET /api/table/state`
+- `GET /api/table/ws` (WebSocket upgrade endpoint)
 - `GET /api/table/seat`
 - `POST /api/table/seat`
 - `DELETE /api/table/seat`
@@ -105,9 +109,24 @@ Auth/session behavior:
 Table routing:
 
 - `/health` and all `/api/table/*` routes support optional `?tableId=<id>` query.
+- `/api/table/ws` also supports optional `?tableId=<id>` query for table-scoped streams.
 - When omitted, routes target configured default table (`TABLE_ID`).
 - Server keeps isolated runtime state per table id and lazily initializes unknown table ids.
 - Seat claims are scoped per table id.
+
+WebSocket command channel (`POKER_ENABLE_TABLE_WS_COMMANDS=1`):
+
+- Incoming frame:
+  - `{ "type": "APPLY_COMMAND", "commandId": "client-id", "command": { ...TableCommand }, "authToken"?: "<bearer>" }`
+- Success response:
+  - `{ "type": "COMMAND_ACK", "commandId": "client-id", "tableId": "<id>", "acceptedAt": "<iso>", "result": <applyCommandResult> }`
+- Failure response:
+  - `{ "type": "COMMAND_ERROR", "commandId": "client-id", "code": "<ERROR_CODE>", "message": "<details>" }`
+- Idempotency:
+  - repeated `commandId` for the same table/auth context replays the original `COMMAND_ACK`/`COMMAND_ERROR` without reapplying.
+- Auth checks:
+  - uses the same seat ownership / role rules as `POST /api/table/command`.
+  - include `authToken` for player-seat actions; omit for system automation commands.
 
 Legacy compatibility wallet routes:
 

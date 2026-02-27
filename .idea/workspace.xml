@@ -8,21 +8,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1eee6476-c5d8-4dc1-b068-da2be4a7c407" name="Default Changelist" comment="feat(server): add seat ownership enforcement and session-gated table actions&#10;&#10;- Introduced APIs for seat claims (`GET`, `POST`, `DELETE /api/table/seat`) with snapshot persistence.&#10;- Enforced seat ownership for `PLAYER_ACTION` commands.&#10;- Updated logout to release seat claims for the authenticated user.&#10;- Extended client integration with server runtime table controller for auto seat claiming.&#10;- Added extensive tests for seat claim lifecycle, conflicts, and restore behavior.">
-      <change afterPath="$PROJECT_DIR$/modern/apps/client/tests/table-controller-factory.test.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/modern/apps/client/tests/server-table-controller-stream.test.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/apps/client/src/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/src/main.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/apps/client/src/server-table-controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/src/server-table-controller.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/client/src/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/src/styles.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/apps/client/src/table-controller-factory.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/src/table-controller-factory.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/client/tests/table-controller-factory.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/tests/table-controller-factory.test.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/client/vite.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/client/vite.config.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/server/.env.example" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/.env.example" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/apps/server/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/apps/server/src/http-routes.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/http-routes.test.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/apps/server/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/apps/server/src/runtime-state-store.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/runtime-state-store.test.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/apps/server/src/runtime-state-store.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/runtime-state-store.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/server/src/startup-config.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/startup-config.test.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modern/apps/server/src/startup-config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/modern/apps/server/src/startup-config.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/docs/deployment-runbook.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/docs/deployment-runbook.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modern/docs/developer-setup.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/docs/developer-setup.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/docs/legacy-decommission-plan.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/docs/legacy-decommission-plan.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modern/docs/phase-2-engine-progress.md" beforeDir="false" afterPath="$PROJECT_DIR$/modern/docs/phase-2-engine-progress.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -87,22 +88,22 @@
     &quot;assignee&quot;: &quot;ColinMichaels&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/ColinMichaels/poker.git",
-    "accountId": "766fa723-3ebb-47d4-b69b-294d9a253afa"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/ColinMichaels/poker.git&quot;,
+    &quot;accountId&quot;: &quot;766fa723-3ebb-47d4-b69b-294d9a253afa&quot;
   },
-  "recentNewPullRequestHead": {
-    "server": {
-      "useHttp": false,
-      "host": "github.com",
-      "port": null,
-      "suffix": null
+  &quot;recentNewPullRequestHead&quot;: {
+    &quot;server&quot;: {
+      &quot;useHttp&quot;: false,
+      &quot;host&quot;: &quot;github.com&quot;,
+      &quot;port&quot;: null,
+      &quot;suffix&quot;: null
     },
-    "owner": "ColinMichaels",
-    "repository": "poker"
+    &quot;owner&quot;: &quot;ColinMichaels&quot;,
+    &quot;repository&quot;: &quot;poker&quot;
   }
-}]]></component>
+}</component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/app/Poker/Game.php" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" />
   </component>
@@ -203,29 +204,29 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "feature/modernizing",
-    "javascript.preferred.runtime.type.id": "node",
-    "junie.onboarding.icon.badge.shown": "true",
-    "last_opened_file_path": "/Users/colin/Projects/poker",
-    "node.js.detected.package.eslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "npm.build.executor": "Run",
-    "npm.dev.executor": "Run",
-    "settings.editor.selected.configurable": "ml.llm.AIAssistantPromptsLibrary",
-    "to.speed.mode.migration.done": "true",
-    "ts.external.directory.path": "/Users/colin/Projects/poker/modern/node_modules/typescript/lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;feature/modernizing&quot;,
+    &quot;javascript.preferred.runtime.type.id&quot;: &quot;node&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/colin/Projects/poker&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;npm.build.executor&quot;: &quot;Run&quot;,
+    &quot;npm.dev.executor&quot;: &quot;Run&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;ml.llm.AIAssistantPromptsLibrary&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/Users/colin/Projects/poker/modern/node_modules/typescript/lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecapSpentCounter">
     <option name="endsOfQuotaMs" value="1773266417423" />
     <option name="spentUsd" value="0.08793066" />

@@ -952,6 +952,7 @@ function renderPlayView(
     .join(' ');
   const controlsPanelClasses = [
     'controls-panel',
+    'controls-panel-gamepad',
     isUserTurn ? 'is-live' : 'is-waiting',
     motionClasses.playControlsClass,
   ]

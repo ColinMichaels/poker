@@ -52,6 +52,7 @@ Environment variables:
 - `POKER_AUTH_ALLOW_DEMO_USERS` (`1`/`0`, default: `0` when `NODE_ENV=production`)
 - `POKER_AUTH_BOOTSTRAP_USERS_FILE` (JSON seed file used when no persisted auth state exists)
 - `POKER_ENABLE_LEGACY_WALLET_ROUTES` (`1`/`0`, default: `0` when `NODE_ENV=production`)
+- `POKER_ENABLE_TABLE_WS_COMMANDS` (`1`/`0`, default: `0`; enables WebSocket `APPLY_COMMAND` channel)
 
 Client runtime variables (for Firebase-authenticated web client):
 
@@ -78,10 +79,13 @@ Template reference:
 ## Health + Readiness Checks
 
 - `GET /health` (liveness)
-  - includes runtime flags for persistence/demo-users/legacy-wallet-route/external-auth, including mode and rotation fallback status
+  - includes runtime flags for persistence/demo-users/legacy-wallet-route/external-auth, including mode/rotation fallback and WebSocket command-channel status
 - `GET /api/table/list` (server-fed table catalog for lobby + multi-table cards)
 - `GET /api/table/state` (authoritative table snapshot)
   - optional `?tableId=<id>` targets non-default table session
+- `GET /api/table/ws` (WebSocket stream for table snapshots)
+  - optional `?tableId=<id>` targets non-default table session
+  - when `POKER_ENABLE_TABLE_WS_COMMANDS=1`, also accepts `APPLY_COMMAND` frames and returns `COMMAND_ACK` / `COMMAND_ERROR`
 
 Auth/wallet sanity checks:
 

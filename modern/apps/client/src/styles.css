@@ -23,6 +23,7 @@
   --mono: 'IBM Plex Mono', Menlo, Monaco, Consolas, 'Courier New', monospace;
   --display: 'Bodoni Moda SC', 'Bodoni 72', Didot, 'Times New Roman', serif;
   --body: 'Avenir Next', 'Trebuchet MS', 'Segoe UI', sans-serif;
+  --app-frame-pad: 0.75rem;
 }
 
 *,
@@ -45,7 +46,7 @@ body {
   color: var(--ink);
   font-family: var(--body);
   line-height: 1.35;
-  padding: 0.75rem;
+  padding: var(--app-frame-pad);
 }
 
 #app {
@@ -436,6 +437,7 @@ body {
   flex-direction: column;
   gap: 0.72rem;
   min-height: clamp(560px, 74dvh, 920px);
+  padding-bottom: calc(clamp(230px, 31dvh, 288px) + env(safe-area-inset-bottom));
 }
 
 .play-main {
@@ -448,6 +450,7 @@ body {
   display: grid;
   gap: 0.72rem;
   margin-top: auto;
+  min-height: 0;
 }
 
 .play-players {
@@ -1198,35 +1201,63 @@ body {
 }
 
 .controls-panel {
-  backdrop-filter: blur(2px);
-  bottom: calc(0.45rem + env(safe-area-inset-bottom));
-  box-shadow: 0 12px 28px rgb(0 0 0 / 16%);
-  padding: 0.44rem 0.55rem calc(0.55rem + env(safe-area-inset-bottom));
-  position: sticky;
   transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
-  z-index: 5;
 }
 
-.controls-panel.is-live {
+.controls-panel.controls-panel-gamepad {
+  backdrop-filter: blur(8px);
+  background: linear-gradient(180deg, rgb(255 252 247 / 97%) 0%, rgb(247 236 219 / 97%) 100%);
+  border-color: #cfa67a;
+  border-radius: 16px;
+  bottom: calc(0.3rem + env(safe-area-inset-bottom));
+  box-shadow:
+    0 14px 34px rgb(0 0 0 / 18%),
+    0 0 0 1px rgb(186 142 87 / 15%);
+  left: 50%;
+  max-height: calc(100dvh - 1.2rem - env(safe-area-inset-bottom));
+  overflow: auto;
+  padding: 0.46rem 0.52rem calc(0.52rem + env(safe-area-inset-bottom));
+  position: fixed;
+  transform: translateX(-50%);
+  width: min(calc(100vw - (var(--app-frame-pad) * 2)), 1200px);
+  z-index: 26;
+}
+
+.controls-panel.controls-panel-gamepad.is-live {
   border-color: #cc8840;
-  box-shadow: 0 16px 30px rgb(116 62 17 / 20%);
+  box-shadow:
+    0 18px 36px rgb(116 62 17 / 24%),
+    0 0 0 1px rgb(204 136 64 / 24%);
 }
 
-.controls-panel.is-waiting {
+.controls-panel.controls-panel-gamepad.is-waiting {
   opacity: 0.96;
 }
 
-.controls-panel.is-flash {
+.controls-panel.controls-panel-gamepad.is-flash {
   animation: dock-flash var(--motion-fast) var(--easing-emphasis);
 }
 
-.controls-panel.is-live .action-btn:not(:disabled) {
-  border-color: #dfb983;
+.controls-panel.controls-panel-gamepad.is-live .action-btn:not(:disabled) {
+  border-color: #d6ad75;
+}
+
+.controls-panel.controls-panel-gamepad h2 {
+  font-size: 0.86rem;
+  letter-spacing: 0.05em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.controls-panel.controls-panel-gamepad .cta-compact {
+  border-radius: 10px;
+  min-height: 44px;
+  padding: 0.34rem 0.62rem;
 }
 
 .controls-body {
   display: grid;
-  gap: 0.1rem;
+  gap: 0.35rem;
 }
 
 .controls-head {
@@ -1237,7 +1268,7 @@ body {
 .controls-head-row {
   align-items: center;
   display: flex;
-  gap: 0.5rem;
+  gap: 0.44rem;
   justify-content: space-between;
 }
 
@@ -1246,16 +1277,20 @@ body {
 }
 
 .amount-control {
+  align-items: center;
   display: grid;
-  gap: 0.46rem;
-  margin-top: 0.72rem;
+  gap: 0.3rem 0.42rem;
+  grid-template-columns: auto minmax(0, 1fr);
+  margin-top: 0.34rem;
 }
 
 .amount-control label {
   color: var(--muted);
   font-family: var(--mono);
-  font-size: 0.76rem;
+  font-size: 0.67rem;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .amount-input-wrap {
@@ -1265,29 +1300,32 @@ body {
 .amount-input-wrap input {
   background: #fff;
   border: 1px solid var(--line-soft);
-  border-radius: 12px;
+  border-radius: 10px;
   color: var(--ink);
   font-family: var(--mono);
-  font-size: 0.88rem;
-  padding: 0.5rem 0.6rem;
+  font-size: 0.85rem;
+  min-height: 44px;
+  padding: 0.4rem 0.52rem;
   width: 100%;
 }
 
 .quick-amounts {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.35rem;
+  gap: 0.3rem;
+  grid-column: 1 / -1;
 }
 
 .quick-amounts button {
   background: #fff;
   border: 1px solid var(--line-soft);
-  border-radius: 999px;
+  border-radius: 10px;
   color: var(--muted);
   cursor: pointer;
   font-family: var(--mono);
-  font-size: 0.72rem;
-  padding: 0.27rem 0.64rem;
+  font-size: 0.68rem;
+  min-height: 34px;
+  padding: 0.2rem 0.55rem;
 }
 
 .quick-amounts button:hover,
@@ -1299,22 +1337,23 @@ body {
 
 .actions-row {
   display: grid;
-  gap: 0.42rem;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  margin-top: 0.68rem;
+  gap: 0.32rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 0.38rem;
 }
 
 .action-btn {
-  align-items: flex-start;
+  align-items: center;
   background: #fff;
   border: 1px solid var(--line-soft);
-  border-radius: 14px;
+  border-radius: 10px;
   cursor: pointer;
   display: grid;
-  gap: 0.08rem;
-  min-height: 50px;
-  padding: 0.42rem 0.48rem;
-  text-align: left;
+  gap: 0.06rem;
+  justify-items: center;
+  min-height: 44px;
+  padding: 0.3rem 0.36rem;
+  text-align: center;
   transition: transform 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
 }
 
@@ -1394,6 +1433,15 @@ body {
   font-size: 0.83rem;
   margin: 0.72rem 0 0;
   padding-top: 0.58rem;
+}
+
+.controls-panel.controls-panel-gamepad .payouts {
+  font-size: 0.71rem;
+  margin-top: 0.34rem;
+  overflow: hidden;
+  padding-top: 0.34rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .audit-log {
@@ -2394,8 +2442,8 @@ body {
 }
 
 @media (min-width: 720px) {
-  body {
-    padding: 1rem;
+  :root {
+    --app-frame-pad: 1rem;
   }
 
   .table-shell {
@@ -2484,7 +2532,7 @@ body {
   }
 
   .actions-row {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .audit-log-body ul {
@@ -2536,8 +2584,8 @@ body {
 }
 
 @media (min-width: 1080px) {
-  body {
-    padding: 1.25rem;
+  :root {
+    --app-frame-pad: 1.25rem;
   }
 
   .table-shell {
@@ -2605,12 +2653,8 @@ body {
   }
 
   .actions-row {
-    display: flex;
-    flex-wrap: wrap;
-  }
-
-  .action-btn {
-    flex: 1 1 160px;
+    gap: 0.34rem;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
   }
 
   .audit-log-body ul {

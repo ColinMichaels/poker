@@ -39,6 +39,7 @@ function testLoadsDevelopmentDefaults(): void {
   assert(config.stateFilePath.includes('/.data/runtime-state.json'), 'Expected default state file path suffix.');
   assertEqual(config.authAllowDemoUsers, true, 'Expected demo users enabled by default outside production.');
   assertEqual(config.allowLegacyWalletRoutes, true, 'Expected legacy routes enabled by default outside production.');
+  assertEqual(config.tableWsCommandChannelEnabled, false, 'Expected WS command channel disabled by default.');
   assertEqual(config.externalAuthEnabled, false, 'Expected external auth disabled by default.');
   assertEqual(config.externalAuthMode, 'signed_assertion', 'Expected default external auth mode.');
   assertEqual(config.externalAuthIssuer, 'external-idp', 'Expected default external auth issuer.');
@@ -94,6 +95,7 @@ function testLoadsExplicitOverrides(): void {
     POKER_SESSION_TTL_MS: '60000',
     POKER_AUTH_ALLOW_DEMO_USERS: '1',
     POKER_ENABLE_LEGACY_WALLET_ROUTES: '0',
+    POKER_ENABLE_TABLE_WS_COMMANDS: '1',
     POKER_EXTERNAL_AUTH_ENABLED: '1',
     POKER_EXTERNAL_AUTH_ISSUER: 'oidc-demo',
     POKER_EXTERNAL_AUTH_SHARED_SECRET: 'external-secret-123456',
@@ -109,6 +111,7 @@ function testLoadsExplicitOverrides(): void {
   assertEqual(config.authSessionTtlMs, 60000, 'Expected session ttl override.');
   assertEqual(config.authAllowDemoUsers, true, 'Expected explicit demo users override.');
   assertEqual(config.allowLegacyWalletRoutes, false, 'Expected explicit legacy route override.');
+  assertEqual(config.tableWsCommandChannelEnabled, true, 'Expected explicit WS command channel override.');
   assertEqual(config.externalAuthEnabled, true, 'Expected explicit external auth enablement.');
   assertEqual(config.externalAuthMode, 'signed_assertion', 'Expected signed assertion mode when unspecified.');
   assertEqual(config.externalAuthIssuer, 'oidc-demo', 'Expected external auth issuer override.');
@@ -297,6 +300,12 @@ function testRejectsInvalidBootstrapUsersAndEnvValues(): void {
       () => loadStartupConfig({ POKER_ENABLE_LEGACY_WALLET_ROUTES: 'maybe' }),
       /Invalid POKER_ENABLE_LEGACY_WALLET_ROUTES value/,
       'Expected invalid boolean env values to fail.',
+    );
+
+    assertThrows(
+      () => loadStartupConfig({ POKER_ENABLE_TABLE_WS_COMMANDS: 'maybe' }),
+      /Invalid POKER_ENABLE_TABLE_WS_COMMANDS value/,
+      'Expected invalid WS command channel toggle values to fail.',
     );
 
     assertThrows(

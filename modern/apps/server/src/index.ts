@@ -1,4 +1,6 @@
+import { createHash } from 'node:crypto';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
+import type { Duplex } from 'node:stream';
 import type { LoginRequestDTO, UpdateProfileRequestDTO, UserRole, WalletAdjustmentRequestDTO } from '@poker/game-contracts';
 import type { TableCommand } from '@poker/poker-engine';
 import { AuthWalletService } from './auth-wallet-service.ts';
@@ -11,12 +13,20 @@ import {
 import { createFirebaseIdTokenVerifier } from './firebase-id-token-verifier.ts';
 import { RuntimeStateStore, type RuntimeStateSnapshot } from './runtime-state-store.ts';
 import { loadStartupConfig, type ExternalAuthMode, type FirebaseVerifierMode } from './startup-config.ts';
-import { TableService, createDefaultTableState, type TableServiceStateSnapshot } from './table-service.ts';
+import {
+  TableService,
+  createDefaultTableState,
+  type TableServiceStateSnapshot,
+  type TableSnapshot,
+} from './table-service.ts';
 
 const DEFAULT_HOST = '127.0.0.1';
 const DEFAULT_PORT = 8787;
 const MAX_LOG_LIMIT = 500;
 const ALLOWED_USER_ROLES: readonly UserRole[] = ['PLAYER', 'OPERATOR', 'ADMIN'];
+const WEBSOCKET_GUID = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
+const TABLE_STREAM_COMMAND_IDEMPOTENCY_TTL_MS = 5 * 60_000;
+const TABLE_STREAM_COMMAND_IDEMPOTENCY_MAX_PER_TABLE = 2_000;
 
 class HttpError extends Error {
   public readonly statusCode: number;
@@ -46,6 +56,694 @@ function sendJson(response: ServerResponse, statusCode: number, payload: unknown
 function sendNoContent(response: ServerResponse): void {
   response.writeHead(204, jsonHeaders());
   response.end();
+}
+
+function resolveSingleHeaderValue(value: string | string[] | undefined): string | undefined {
+  if (Array.isArray(value)) {
+    return value[0];
+  }
+
+  return value;
+}
+
+function readWebSocketFramePayload(buffer: Buffer): { opcode: number; payload: Buffer } | null {
+  if (buffer.length < 2) {
+    return null;
+  }
+
+  const opcode = buffer[0] & 0x0f;
+  const secondByte = buffer[1];
+  const masked = (secondByte & 0x80) !== 0;
+  let payloadLength = secondByte & 0x7f;
+  let offset = 2;
+
+  if (payloadLength === 126) {
+    if (buffer.length < 4) {
+      return null;
+    }
+    payloadLength = buffer.readUInt16BE(2);
+    offset = 4;
+  } else if (payloadLength === 127) {
+    if (buffer.length < 10) {
+      return null;
+    }
+    const payloadLengthBigInt = buffer.readBigUInt64BE(2);
+    if (payloadLengthBigInt > BigInt(Number.MAX_SAFE_INTEGER)) {
+      return null;
+    }
+    payloadLength = Number(payloadLengthBigInt);
+    offset = 10;
+  }
+
+  let maskOffset = offset;
+  if (masked) {
+    if (buffer.length < maskOffset + 4) {
+      return null;
+    }
+    offset += 4;
+  }
+
+  const end = offset + payloadLength;
+  if (buffer.length < end) {
+    return null;
+  }
+
+  const payload = Buffer.from(buffer.subarray(offset, end));
+  if (!masked) {
+    return {
+      opcode,
+      payload,
+    };
+  }
+
+  const mask = buffer.subarray(maskOffset, maskOffset + 4);
+  for (let index = 0; index < payload.length; index += 1) {
+    payload[index] ^= mask[index % 4];
+  }
+
+  return {
+    opcode,
+    payload,
+  };
+}
+
+function encodeWebSocketFrame(opcode: number, payload: Buffer): Buffer {
+  if (payload.length < 126) {
+    const frame = Buffer.alloc(2 + payload.length);
+    frame[0] = 0x80 | (opcode & 0x0f);
+    frame[1] = payload.length;
+    payload.copy(frame, 2);
+    return frame;
+  }
+
+  if (payload.length < 65_536) {
+    const frame = Buffer.alloc(4 + payload.length);
+    frame[0] = 0x80 | (opcode & 0x0f);
+    frame[1] = 126;
+    frame.writeUInt16BE(payload.length, 2);
+    payload.copy(frame, 4);
+    return frame;
+  }
+
+  const frame = Buffer.alloc(10 + payload.length);
+  frame[0] = 0x80 | (opcode & 0x0f);
+  frame[1] = 127;
+  frame.writeBigUInt64BE(BigInt(payload.length), 2);
+  payload.copy(frame, 10);
+  return frame;
+}
+
+function encodeWebSocketTextFrame(payload: string): Buffer {
+  return encodeWebSocketFrame(0x1, Buffer.from(payload, 'utf8'));
+}
+
+function encodeWebSocketControlFrame(opcode: number, payload?: Buffer): Buffer {
+  return encodeWebSocketFrame(opcode, payload ?? Buffer.alloc(0));
+}
+
+function buildWebSocketAcceptValue(key: string): string {
+  return createHash('sha1')
+    .update(`${key}${WEBSOCKET_GUID}`)
+    .digest('base64');
+}
+
+function writeUpgradeResponse(socket: Duplex, statusCode: number, statusText: string): void {
+  socket.write(
+    [
+      `HTTP/1.1 ${statusCode} ${statusText}`,
+      'Connection: close',
+      '',
+      '',
+    ].join('\r\n'),
+  );
+  socket.destroy();
+}
+
+interface TableStreamSnapshotMessage {
+  type: 'TABLE_SNAPSHOT';
+  tableId: string;
+  generatedAt: string;
+  commandSequence: number;
+  eventSequence: number;
+  snapshot: TableSnapshot;
+}
+
+interface TableStreamHeartbeatMessage {
+  type: 'TABLE_HEARTBEAT';
+  sentAt: string;
+}
+
+interface TableStreamApplyCommandMessage {
+  type: 'APPLY_COMMAND';
+  commandId: string;
+  command: TableCommand;
+  authToken?: string;
+}
+
+interface TableStreamCommandAckMessage {
+  type: 'COMMAND_ACK';
+  commandId: string;
+  acceptedAt: string;
+  tableId: string;
+  result: {
+    command: {
+      command: TableCommand;
+    };
+    events: Array<{
+      event: unknown;
+    }>;
+    snapshot: TableSnapshot;
+  };
+}
+
+interface TableStreamCommandErrorMessage {
+  type: 'COMMAND_ERROR';
+  commandId: string;
+  code: string;
+  message: string;
+}
+
+interface TableStreamHubOptions {
+  heartbeatIntervalMs?: number;
+}
+
+export class TableStreamHub {
+  private readonly socketsByTableId = new Map<string, Set<Duplex>>();
+  private readonly tableIdBySocket = new Map<Duplex, string>();
+  private readonly heartbeatTimer: ReturnType<typeof setInterval>;
+
+  public constructor(options: TableStreamHubOptions = {}) {
+    const heartbeatIntervalMs = options.heartbeatIntervalMs ?? 2_500;
+    this.heartbeatTimer = setInterval(() => {
+      this.broadcastHeartbeat();
+    }, heartbeatIntervalMs);
+    this.heartbeatTimer.unref?.();
+  }
+
+  public addConnection(tableId: string, socket: Duplex, snapshot: TableSnapshot): void {
+    const existingSockets = this.socketsByTableId.get(tableId) ?? new Set<Duplex>();
+    existingSockets.add(socket);
+    this.socketsByTableId.set(tableId, existingSockets);
+    this.tableIdBySocket.set(socket, tableId);
+    this.sendSnapshot(socket, snapshot);
+  }
+
+  public removeConnection(socket: Duplex): void {
+    const tableId = this.tableIdBySocket.get(socket);
+    if (!tableId) {
+      return;
+    }
+
+    this.tableIdBySocket.delete(socket);
+    const sockets = this.socketsByTableId.get(tableId);
+    if (!sockets) {
+      return;
+    }
+
+    sockets.delete(socket);
+    if (sockets.size === 0) {
+      this.socketsByTableId.delete(tableId);
+    }
+  }
+
+  public publishSnapshot(snapshot: TableSnapshot): void {
+    const sockets = this.socketsByTableId.get(snapshot.tableId);
+    if (!sockets || sockets.size === 0) {
+      return;
+    }
+
+    for (const socket of sockets) {
+      this.sendSnapshot(socket, snapshot);
+    }
+  }
+
+  public closeAll(): void {
+    clearInterval(this.heartbeatTimer);
+    for (const socket of this.tableIdBySocket.keys()) {
+      try {
+        socket.end(encodeWebSocketControlFrame(0x8));
+      } catch {
+        // Ignore close errors.
+      }
+      socket.destroy();
+    }
+
+    this.tableIdBySocket.clear();
+    this.socketsByTableId.clear();
+  }
+
+  private broadcastHeartbeat(): void {
+    if (this.tableIdBySocket.size === 0) {
+      return;
+    }
+
+    const message: TableStreamHeartbeatMessage = {
+      type: 'TABLE_HEARTBEAT',
+      sentAt: new Date().toISOString(),
+    };
+
+    for (const socket of this.tableIdBySocket.keys()) {
+      this.sendMessage(socket, message);
+    }
+  }
+
+  private sendMessage(socket: Duplex, payload: unknown): void {
+    if (socket.destroyed) {
+      this.removeConnection(socket);
+      return;
+    }
+
+    try {
+      socket.write(encodeWebSocketTextFrame(JSON.stringify(payload)));
+    } catch {
+      this.removeConnection(socket);
+      socket.destroy();
+    }
+  }
+
+  private sendSnapshot(socket: Duplex, snapshot: TableSnapshot): void {
+    const message: TableStreamSnapshotMessage = {
+      type: 'TABLE_SNAPSHOT',
+      tableId: snapshot.tableId,
+      generatedAt: snapshot.generatedAt,
+      commandSequence: snapshot.commandSequence,
+      eventSequence: snapshot.eventSequence,
+      snapshot,
+    };
+    this.sendMessage(socket, message);
+  }
+}
+
+function sendWebSocketJson(socket: Duplex, payload: unknown): void {
+  socket.write(encodeWebSocketTextFrame(JSON.stringify(payload)));
+}
+
+interface StoredTableStreamCommandResult {
+  expiresAtMs: number;
+  response: TableStreamCommandAckMessage | TableStreamCommandErrorMessage;
+}
+
+export class TableStreamCommandIdempotencyStore {
+  private readonly ttlMs: number;
+  private readonly maxEntriesPerTable: number;
+  private readonly responsesByTableId = new Map<string, Map<string, StoredTableStreamCommandResult>>();
+
+  public constructor(options: { ttlMs?: number; maxEntriesPerTable?: number } = {}) {
+    this.ttlMs = options.ttlMs ?? TABLE_STREAM_COMMAND_IDEMPOTENCY_TTL_MS;
+    this.maxEntriesPerTable = options.maxEntriesPerTable ?? TABLE_STREAM_COMMAND_IDEMPOTENCY_MAX_PER_TABLE;
+  }
+
+  public get(
+    tableId: string,
+    idempotencyKey: string,
+  ): TableStreamCommandAckMessage | TableStreamCommandErrorMessage | null {
+    const tableEntries = this.responsesByTableId.get(tableId);
+    if (!tableEntries) {
+      return null;
+    }
+
+    this.pruneExpiredEntries(tableEntries);
+    const existing = tableEntries.get(idempotencyKey);
+    return existing ? existing.response : null;
+  }
+
+  public set(
+    tableId: string,
+    idempotencyKey: string,
+    response: TableStreamCommandAckMessage | TableStreamCommandErrorMessage,
+  ): void {
+    const tableEntries = this.responsesByTableId.get(tableId) ?? new Map<string, StoredTableStreamCommandResult>();
+    this.pruneExpiredEntries(tableEntries);
+    tableEntries.set(idempotencyKey, {
+      expiresAtMs: Date.now() + this.ttlMs,
+      response,
+    });
+    while (tableEntries.size > this.maxEntriesPerTable) {
+      const firstKey = tableEntries.keys().next().value;
+      if (typeof firstKey !== 'string') {
+        break;
+      }
+      tableEntries.delete(firstKey);
+    }
+    this.responsesByTableId.set(tableId, tableEntries);
+  }
+
+  private pruneExpiredEntries(entries: Map<string, StoredTableStreamCommandResult>): void {
+    const nowMs = Date.now();
+    for (const [key, value] of entries.entries()) {
+      if (value.expiresAtMs <= nowMs) {
+        entries.delete(key);
+      }
+    }
+  }
+}
+
+interface TableStreamCommandChannelOptions {
+  enabled: boolean;
+  tableService: TableService;
+  authWalletService: AuthWalletService;
+  persistRuntimeState: () => void;
+  emitTableSnapshot: (tableService: TableService) => void;
+  idempotencyStore: TableStreamCommandIdempotencyStore;
+  tableId: string;
+}
+
+interface TableStreamUpgradeOptions {
+  defaultTableId: string;
+  resolveTableService: (tableId: string) => TableService;
+  tableStreamHub: TableStreamHub;
+  host: string;
+  port: number;
+  commandChannel?: {
+    enabled: boolean;
+    authWalletService: AuthWalletService;
+    persistRuntimeState: () => void;
+    emitTableSnapshot: (tableService: TableService) => void;
+    idempotencyStore: TableStreamCommandIdempotencyStore;
+  };
+}
+
+function parseOptionalAuthToken(value: unknown): string | undefined {
+  if (value === undefined || value === null) {
+    return undefined;
+  }
+
+  if (typeof value !== 'string') {
+    throw new HttpError(400, 'BAD_REQUEST', 'APPLY_COMMAND authToken must be a string when provided.');
+  }
+
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : undefined;
+}
+
+function parseTableStreamApplyCommandMessage(payload: unknown): TableStreamApplyCommandMessage {
+  const record = requireObject(payload, 'stream message');
+  if (record.type !== 'APPLY_COMMAND') {
+    throw new HttpError(400, 'BAD_REQUEST', 'Unsupported stream message type.');
+  }
+
+  if (typeof record.commandId !== 'string' || record.commandId.trim().length === 0) {
+    throw new HttpError(400, 'BAD_REQUEST', 'APPLY_COMMAND requires a non-empty commandId.');
+  }
+
+  const commandId = record.commandId.trim();
+  if (commandId.length > 96) {
+    throw new HttpError(400, 'BAD_REQUEST', 'APPLY_COMMAND commandId must not exceed 96 characters.');
+  }
+
+  if (!record.command || typeof record.command !== 'object' || Array.isArray(record.command)) {
+    throw new HttpError(400, 'BAD_REQUEST', 'APPLY_COMMAND requires a command object.');
+  }
+
+  const command = record.command as unknown;
+  assertCommand(command);
+
+  return {
+    type: 'APPLY_COMMAND',
+    commandId,
+    command,
+    authToken: parseOptionalAuthToken(record.authToken),
+  };
+}
+
+function resolveStreamCommandId(payload: unknown): string {
+  if (typeof payload !== 'object' || payload === null || Array.isArray(payload)) {
+    return 'unknown';
+  }
+  const record = payload as Record<string, unknown>;
+  if (typeof record.commandId !== 'string') {
+    return 'unknown';
+  }
+  const commandId = record.commandId.trim();
+  return commandId.length > 0 ? commandId.slice(0, 96) : 'unknown';
+}
+
+function buildStreamIdempotencyKey(commandId: string, authToken: string | undefined): string {
+  const authKey = authToken ? createHash('sha1').update(authToken).digest('hex') : 'anonymous';
+  return `${authKey}:${commandId}`;
+}
+
+function sendStreamCommandError(
+  socket: Duplex,
+  commandId: string,
+  code: string,
+  message: string,
+): TableStreamCommandErrorMessage | null {
+  const payload: TableStreamCommandErrorMessage = {
+    type: 'COMMAND_ERROR',
+    commandId,
+    code,
+    message,
+  };
+
+  try {
+    sendWebSocketJson(socket, payload);
+    return payload;
+  } catch {
+    socket.destroy();
+    return null;
+  }
+}
+
+function sendStreamCommandAck(
+  socket: Duplex,
+  commandId: string,
+  tableId: string,
+  result: {
+    command: {
+      command: TableCommand;
+    };
+    events: Array<{
+      event: unknown;
+    }>;
+    snapshot: TableSnapshot;
+  },
+): TableStreamCommandAckMessage | null {
+  const payload: TableStreamCommandAckMessage = {
+    type: 'COMMAND_ACK',
+    commandId,
+    tableId,
+    acceptedAt: new Date().toISOString(),
+    result,
+  };
+  try {
+    sendWebSocketJson(socket, payload);
+    return payload;
+  } catch {
+    socket.destroy();
+    return null;
+  }
+}
+
+function handleTableStreamApplyCommand(
+  socket: Duplex,
+  payload: unknown,
+  commandChannel: TableStreamCommandChannelOptions,
+): void {
+  const fallbackCommandId = resolveStreamCommandId(payload);
+  let commandId = fallbackCommandId;
+  let idempotencyKey: string | null = null;
+
+  try {
+    const parsedMessage = parseTableStreamApplyCommandMessage(payload);
+    commandId = parsedMessage.commandId;
+    idempotencyKey = buildStreamIdempotencyKey(parsedMessage.commandId, parsedMessage.authToken);
+
+    const cachedResponse = commandChannel.idempotencyStore.get(commandChannel.tableId, idempotencyKey);
+    if (cachedResponse) {
+      sendWebSocketJson(socket, cachedResponse);
+      return;
+    }
+
+    if (!commandChannel.enabled) {
+      const disabledResponse = sendStreamCommandError(
+        socket,
+        parsedMessage.commandId,
+        'COMMAND_CHANNEL_DISABLED',
+        'WebSocket command channel is disabled on this server.',
+      );
+      if (disabledResponse) {
+        commandChannel.idempotencyStore.set(commandChannel.tableId, idempotencyKey, disabledResponse);
+      }
+      return;
+    }
+
+    authorizeTableCommand(
+      parsedMessage.authToken,
+      parsedMessage.command,
+      commandChannel.tableService,
+      commandChannel.authWalletService,
+    );
+
+    const result = commandChannel.tableService.applyCommand(parsedMessage.command) as {
+      command: {
+        command: TableCommand;
+      };
+      events: Array<{
+        event: unknown;
+      }>;
+      snapshot: TableSnapshot;
+    };
+    commandChannel.persistRuntimeState();
+    commandChannel.emitTableSnapshot(commandChannel.tableService);
+
+    const ackResponse = sendStreamCommandAck(socket, parsedMessage.commandId, commandChannel.tableId, result);
+    if (ackResponse) {
+      commandChannel.idempotencyStore.set(commandChannel.tableId, idempotencyKey, ackResponse);
+    }
+  } catch (error) {
+    const httpError = mapToHttpError(error);
+    const errorResponse = sendStreamCommandError(socket, commandId, httpError.code, httpError.message);
+    if (idempotencyKey && errorResponse) {
+      commandChannel.idempotencyStore.set(commandChannel.tableId, idempotencyKey, errorResponse);
+    }
+  }
+}
+
+function handleTableStreamSocketData(
+  socket: Duplex,
+  chunk: Buffer,
+  commandChannel: TableStreamCommandChannelOptions | undefined,
+): void {
+  const frame = readWebSocketFramePayload(chunk);
+  if (!frame) {
+    return;
+  }
+
+  if (frame.opcode === 0x8) {
+    try {
+      socket.end(encodeWebSocketControlFrame(0x8, frame.payload));
+    } catch {
+      socket.destroy();
+    }
+    return;
+  }
+
+  if (frame.opcode === 0x9) {
+    try {
+      socket.write(encodeWebSocketControlFrame(0xA, frame.payload));
+    } catch {
+      socket.destroy();
+    }
+    return;
+  }
+
+  if (frame.opcode !== 0x1 || !commandChannel) {
+    return;
+  }
+
+  let payload: unknown;
+  try {
+    payload = JSON.parse(frame.payload.toString('utf8')) as unknown;
+  } catch {
+    sendStreamCommandError(socket, 'unknown', 'BAD_REQUEST', 'Stream message payload must be valid JSON.');
+    return;
+  }
+
+  if (typeof payload !== 'object' || payload === null || Array.isArray(payload)) {
+    sendStreamCommandError(socket, 'unknown', 'BAD_REQUEST', 'Stream message payload must be an object.');
+    return;
+  }
+
+  const record = payload as Record<string, unknown>;
+  if (record.type === 'APPLY_COMMAND') {
+    handleTableStreamApplyCommand(socket, payload, commandChannel);
+  }
+}
+
+export function handleTableStreamUpgrade(
+  request: IncomingMessage,
+  socket: Duplex,
+  options: TableStreamUpgradeOptions,
+): void {
+  const method = request.method ?? 'GET';
+  if (method !== 'GET') {
+    writeUpgradeResponse(socket, 405, 'Method Not Allowed');
+    return;
+  }
+
+  const upgradeHeader = resolveSingleHeaderValue(request.headers.upgrade)?.toLowerCase() ?? '';
+  if (upgradeHeader !== 'websocket') {
+    writeUpgradeResponse(socket, 400, 'Bad Request');
+    return;
+  }
+
+  const connectionHeader = resolveSingleHeaderValue(request.headers.connection)?.toLowerCase() ?? '';
+  if (!connectionHeader.split(',').some((token) => token.trim() === 'upgrade')) {
+    writeUpgradeResponse(socket, 400, 'Bad Request');
+    return;
+  }
+
+  const websocketVersion = resolveSingleHeaderValue(request.headers['sec-websocket-version']);
+  if (websocketVersion !== '13') {
+    writeUpgradeResponse(socket, 426, 'Upgrade Required');
+    return;
+  }
+
+  const websocketKey = resolveSingleHeaderValue(request.headers['sec-websocket-key']);
+  if (!websocketKey || websocketKey.trim().length === 0) {
+    writeUpgradeResponse(socket, 400, 'Bad Request');
+    return;
+  }
+
+  const hostHeader = resolveSingleHeaderValue(request.headers.host) ?? `${options.host}:${options.port}`;
+  let requestUrl: URL;
+  try {
+    requestUrl = new URL(request.url ?? '/', `http://${hostHeader}`);
+  } catch {
+    writeUpgradeResponse(socket, 400, 'Bad Request');
+    return;
+  }
+
+  if (requestUrl.pathname !== '/api/table/ws') {
+    writeUpgradeResponse(socket, 404, 'Not Found');
+    return;
+  }
+
+  let requestedTableId: string;
+  try {
+    requestedTableId = parseRequestedTableId(requestUrl.searchParams.get('tableId'), options.defaultTableId);
+  } catch {
+    writeUpgradeResponse(socket, 400, 'Bad Request');
+    return;
+  }
+
+  const scopedTableService = options.resolveTableService(requestedTableId);
+  const commandChannel: TableStreamCommandChannelOptions | undefined = options.commandChannel
+    ? {
+      enabled: options.commandChannel.enabled,
+      tableService: scopedTableService,
+      authWalletService: options.commandChannel.authWalletService,
+      persistRuntimeState: options.commandChannel.persistRuntimeState,
+      emitTableSnapshot: options.commandChannel.emitTableSnapshot,
+      idempotencyStore: options.commandChannel.idempotencyStore,
+      tableId: requestedTableId,
+    }
+    : undefined;
+  const acceptValue = buildWebSocketAcceptValue(websocketKey.trim());
+  socket.write(
+    [
+      'HTTP/1.1 101 Switching Protocols',
+      'Upgrade: websocket',
+      'Connection: Upgrade',
+      `Sec-WebSocket-Accept: ${acceptValue}`,
+      '',
+      '',
+    ].join('\r\n'),
+  );
+
+  socket.on('data', (chunk: Buffer | string) => {
+    const buffer = typeof chunk === 'string' ? Buffer.from(chunk, 'utf8') : chunk;
+    handleTableStreamSocketData(socket, buffer, commandChannel);
+  });
+  socket.on('close', () => {
+    options.tableStreamHub.removeConnection(socket);
+  });
+  socket.on('error', () => {
+    options.tableStreamHub.removeConnection(socket);
+  });
+
+  options.tableStreamHub.addConnection(requestedTableId, socket, scopedTableService.getSnapshot());
 }
 
 function sendRouteNotFound(response: ServerResponse, method: string, pathname: string): void {
@@ -493,13 +1191,12 @@ function requireAuthenticatedContext(request: IncomingMessage, authWalletService
   };
 }
 
-function authorizeTableCommandRequest(
-  request: IncomingMessage,
+function authorizeTableCommand(
+  token: string | undefined,
   command: TableCommand,
   tableService: TableService,
   authWalletService: AuthWalletService,
 ): void {
-  const token = getBearerToken(request);
   const authContext = token ? authWalletService.requireAuth(token) : null;
 
   if (command.type !== 'PLAYER_ACTION') {
@@ -558,6 +1255,7 @@ export async function handleRequest(
     externalAuthFirebaseCertsUrl: string;
     externalAuthFirebaseVerifier: FirebaseVerifierMode;
     externalAuthVerificationSecrets: readonly string[];
+    tableWsCommandChannelEnabled?: boolean;
     verifyFirebaseIdTokenFn: (
       idToken: string,
       options: FirebaseIdTokenVerificationOptions,
@@ -571,6 +1269,7 @@ export async function handleRequest(
     releaseSeatClaimsForUser?: (userId: number) => void;
     listTableServices?: () => TableService[];
   },
+  notifyTableSnapshot?: (tableService: TableService) => void,
 ): Promise<void> {
   const method = request.method ?? 'GET';
   const host = getHeaderValue(request, 'host') ?? `${DEFAULT_HOST}:${DEFAULT_PORT}`;
@@ -586,6 +1285,7 @@ export async function handleRequest(
     tableService.releaseSeatForUser(userId);
   });
   const listTableServices = tableRouting?.listTableServices ?? (() => [tableService]);
+  const emitTableSnapshot = notifyTableSnapshot ?? (() => {});
   let resolvedTableService: TableService | null = null;
   function getScopedTableService(): TableService {
     if (resolvedTableService) {
@@ -623,6 +1323,7 @@ export async function handleRequest(
           externalAuthFirebaseIssuer: runtimeInfo.externalAuthFirebaseIssuer,
           externalAuthFirebaseVerifier: runtimeInfo.externalAuthFirebaseVerifier,
           externalAuthSecretRotationEnabled: runtimeInfo.externalAuthVerificationSecrets.length > 1,
+          tableWsCommandChannelEnabled: runtimeInfo.tableWsCommandChannelEnabled ?? false,
         },
       });
       return;
@@ -717,6 +1418,9 @@ export async function handleRequest(
       releaseSeatClaimsForUser(userId);
       authWalletService.logout(token);
       persistRuntimeState();
+      for (const scopedTableService of listTableServices()) {
+        emitTableSnapshot(scopedTableService);
+      }
       sendNoContent(response);
       return;
     }
@@ -842,8 +1546,10 @@ export async function handleRequest(
       const { userId } = requireAuthenticatedContext(request, authWalletService);
       const body = await readJsonBody(request);
       const { seatId } = parseSeatClaimRequest(body);
-      const claim = getScopedTableService().claimSeat(userId, seatId);
+      const scopedTableService = getScopedTableService();
+      const claim = scopedTableService.claimSeat(userId, seatId);
       persistRuntimeState();
+      emitTableSnapshot(scopedTableService);
       sendJson(response, 200, {
         claim,
       });
@@ -852,9 +1558,11 @@ export async function handleRequest(
 
     if (method === 'DELETE' && pathname === '/api/table/seat') {
       const { userId } = requireAuthenticatedContext(request, authWalletService);
-      const released = getScopedTableService().releaseSeatForUser(userId);
+      const scopedTableService = getScopedTableService();
+      const released = scopedTableService.releaseSeatForUser(userId);
       if (released) {
         persistRuntimeState();
+        emitTableSnapshot(scopedTableService);
       }
       sendJson(response, 200, {
         released,
@@ -906,9 +1614,10 @@ export async function handleRequest(
       const body = await readJsonBody(request);
       const command = extractCommand(body);
       const scopedTableService = getScopedTableService();
-      authorizeTableCommandRequest(request, command, scopedTableService, authWalletService);
+      authorizeTableCommand(getBearerToken(request), command, scopedTableService, authWalletService);
       const result = scopedTableService.applyCommand(command);
       persistRuntimeState();
+      emitTableSnapshot(scopedTableService);
       sendJson(response, 200, result);
       return;
     }
@@ -936,6 +1645,7 @@ const {
   authBootstrapUsersFile,
   authBootstrapUsers,
   allowLegacyWalletRoutes,
+  tableWsCommandChannelEnabled,
   externalAuthEnabled,
   externalAuthMode,
   externalAuthIssuer,
@@ -1040,6 +1750,13 @@ function exportAllTableStates(): TableServiceStateSnapshot[] {
     .map(([, scopedTableService]) => scopedTableService.exportState());
 }
 
+const tableStreamHub = new TableStreamHub();
+const tableStreamCommandIdempotencyStore = new TableStreamCommandIdempotencyStore();
+
+function emitTableSnapshot(scopedTableService: TableService): void {
+  tableStreamHub.publishSnapshot(scopedTableService.getSnapshot());
+}
+
 const authWalletService = persistedRuntimeState
   ? new AuthWalletService({
     users: persistedRuntimeState.auth.users,
@@ -1100,6 +1817,7 @@ const server = createServer((request, response) => {
       externalAuthFirebaseCertsUrl,
       externalAuthFirebaseVerifier,
       externalAuthVerificationSecrets,
+      tableWsCommandChannelEnabled,
       verifyFirebaseIdTokenFn: firebaseIdTokenVerifier,
     },
     allowLegacyWalletRoutes,
@@ -1110,7 +1828,25 @@ const server = createServer((request, response) => {
       releaseSeatClaimsForUser,
       listTableServices,
     },
+    emitTableSnapshot,
   );
+});
+
+server.on('upgrade', (request, socket) => {
+  handleTableStreamUpgrade(request, socket, {
+    defaultTableId: tableId,
+    resolveTableService,
+    tableStreamHub,
+    host,
+    port,
+    commandChannel: {
+      enabled: tableWsCommandChannelEnabled,
+      authWalletService,
+      persistRuntimeState,
+      emitTableSnapshot,
+      idempotencyStore: tableStreamCommandIdempotencyStore,
+    },
+  });
 });
 
 if (process.env.POKER_SERVER_NO_LISTEN !== '1') {
@@ -1123,6 +1859,7 @@ if (process.env.POKER_SERVER_NO_LISTEN !== '1') {
     shuttingDown = true;
     console.info(`Received ${signal}; persisting runtime state and shutting down.`);
     persistRuntimeState();
+    tableStreamHub.closeAll();
 
     const forceExitTimer = setTimeout(() => {
       console.error('Shutdown timeout reached; forcing process exit.');
@@ -1160,6 +1897,7 @@ if (process.env.POKER_SERVER_NO_LISTEN !== '1') {
     }
     console.info(`Auth demo users: ${authAllowDemoUsers ? 'enabled' : 'disabled'}`);
     console.info(`Legacy wallet routes: ${allowLegacyWalletRoutes ? 'enabled' : 'disabled'}`);
+    console.info(`Table WS command channel: ${tableWsCommandChannelEnabled ? 'enabled' : 'disabled'}`);
     console.info(
       `External auth: ${externalAuthEnabled ? `enabled (${externalAuthMode}, issuer: ${externalAuthIssuer})` : 'disabled'}`,
     );

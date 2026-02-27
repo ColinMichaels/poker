@@ -28,6 +28,41 @@ export function buildTableScopedRouteUrl(baseUrl: string, path: string, tableId?
   return appendTableIdQuery(joinBaseUrlAndPath(baseUrl, path), tableId);
 }
 
+function toWebSocketUrl(routeUrl: string): string | null {
+  const trimmed = routeUrl.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  if (trimmed.startsWith('ws://') || trimmed.startsWith('wss://')) {
+    return trimmed;
+  }
+
+  if (trimmed.startsWith('http://')) {
+    return `ws://${trimmed.slice('http://'.length)}`;
+  }
+
+  if (trimmed.startsWith('https://')) {
+    return `wss://${trimmed.slice('https://'.length)}`;
+  }
+
+  if (!trimmed.startsWith('/')) {
+    return null;
+  }
+
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  return `${protocol}//${window.location.host}${trimmed}`;
+}
+
+export function buildTableScopedWebSocketUrl(baseUrl: string, path: string, tableId?: string): string | null {
+  const scopedRouteUrl = buildTableScopedRouteUrl(baseUrl, path, tableId);
+  return toWebSocketUrl(scopedRouteUrl);
+}
+
 export function createRuntimeTableController(options: RuntimeTableControllerOptions): TableController {
   const config = loadClientRuntimeConfig();
   if (config.tableRuntimeMode === 'server') {
@@ -36,6 +71,7 @@ export function createRuntimeTableController(options: RuntimeTableControllerOpti
       snapshotUrl: buildTableScopedRouteUrl(config.apiBaseUrl, '/api/table/state', options.tableId),
       commandUrl: buildTableScopedRouteUrl(config.apiBaseUrl, '/api/table/command', options.tableId),
       seatClaimUrl: buildTableScopedRouteUrl(config.apiBaseUrl, '/api/table/seat', options.tableId),
+      streamUrl: buildTableScopedWebSocketUrl(config.apiBaseUrl, '/api/table/ws', options.tableId) ?? undefined,
       pollIntervalMs: config.tablePollIntervalMs,
     });
   }

@@ -14,6 +14,9 @@ import type { TableController, TableLogEntry, TableLogKind, TableViewModel, User
 const MAX_LOGS = 120;
 const BETTING_PHASES: readonly TablePhase[] = ['BETTING_PRE_FLOP', 'BETTING_FLOP', 'BETTING_TURN', 'BETTING_RIVER'];
 const STARTABLE_PHASES: readonly TablePhase[] = ['SEATED', 'HAND_COMPLETE'];
+const STREAM_RECONNECT_BASE_MS = 350;
+const STREAM_RECONNECT_MAX_MS = 6_000;
+const STREAM_STALE_MIN_TIMEOUT_MS = 4_000;
 
 interface ServerTableSnapshot {
   tableId: string;
@@ -37,11 +40,26 @@ interface ServerApplyCommandResult {
   snapshot: ServerTableSnapshot;
 }
 
+interface ServerTableStreamSnapshotMessage {
+  type: 'TABLE_SNAPSHOT';
+  tableId: string;
+  generatedAt: string;
+  commandSequence: number;
+  eventSequence: number;
+  snapshot: ServerTableSnapshot;
+}
+
+interface ServerTableStreamHeartbeatMessage {
+  type: 'TABLE_HEARTBEAT';
+  sentAt: string;
+}
+
 interface ServerTableControllerOptions {
   userSeatId: number;
   snapshotUrl: string;
   commandUrl: string;
   seatClaimUrl?: string;
+  streamUrl?: string;
   pollIntervalMs?: number;
   fetchImpl?: typeof fetch;
 }
@@ -92,6 +110,37 @@ function parseApplyCommandResult(value: unknown): ServerApplyCommandResult {
     events: eventRecords,
     snapshot,
   };
+}
+
+function parseStreamSnapshotMessage(value: unknown): ServerTableSnapshot | null {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+    return null;
+  }
+
+  const record = value as Record<string, unknown>;
+  if (record.type !== 'TABLE_SNAPSHOT') {
+    return null;
+  }
+
+  if (!record.snapshot) {
+    return null;
+  }
+
+  try {
+    const streamMessage = record as unknown as ServerTableStreamSnapshotMessage;
+    return parseSnapshot(streamMessage.snapshot);
+  } catch {
+    return null;
+  }
+}
+
+function isStreamHeartbeatMessage(value: unknown): value is ServerTableStreamHeartbeatMessage {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+    return false;
+  }
+
+  const record = value as Record<string, unknown>;
+  return record.type === 'TABLE_HEARTBEAT' && typeof record.sentAt === 'string';
 }
 
 function truncate(value: string, max = 140): string {
@@ -192,6 +241,7 @@ export class ServerTableController implements TableController {
   private readonly snapshotUrl: string;
   private readonly commandUrl: string;
   private readonly seatClaimUrl: string | null;
+  private readonly streamUrl: string | null;
   private readonly pollIntervalMs: number;
   private readonly fetchImpl: typeof fetch;
 
@@ -200,6 +250,12 @@ export class ServerTableController implements TableController {
   private lastSnapshotVersion: string | null = null;
   private seatClaimContextKey: string | null = null;
   private pollTimerId: number | null = null;
+  private streamSocket: WebSocket | null = null;
+  private streamConnected = false;
+  private reconnectTimerId: number | null = null;
+  private streamHealthTimerId: number | null = null;
+  private reconnectAttempt = 0;
+  private lastStreamMessageAtMs = 0;
   private operationChain: Promise<void> = Promise.resolve();
   private logs: TableLogEntry[] = [];
   private nextLogId = 1;
@@ -210,6 +266,7 @@ export class ServerTableController implements TableController {
     this.snapshotUrl = options.snapshotUrl;
     this.commandUrl = options.commandUrl;
     this.seatClaimUrl = options.seatClaimUrl ?? null;
+    this.streamUrl = options.streamUrl ?? null;
     this.pollIntervalMs = options.pollIntervalMs ?? 900;
     this.fetchImpl = options.fetchImpl ?? fetch;
   }
@@ -299,13 +356,21 @@ export class ServerTableController implements TableController {
       return;
     }
 
+    this.startStream();
     void this.refreshSnapshot('initial');
     this.pollTimerId = window.setInterval(() => {
       void this.refreshSnapshot('poll');
     }, this.pollIntervalMs);
+    this.startStreamHealthCheck();
   }
 
   private stopPolling(): void {
+    this.stopStream();
+    if (this.streamHealthTimerId !== null) {
+      window.clearInterval(this.streamHealthTimerId);
+      this.streamHealthTimerId = null;
+    }
+
     if (this.pollTimerId !== null) {
       window.clearInterval(this.pollTimerId);
       this.pollTimerId = null;
@@ -313,6 +378,10 @@ export class ServerTableController implements TableController {
   }
 
   private async refreshSnapshot(source: 'initial' | 'poll'): Promise<void> {
+    if (source === 'poll' && this.streamConnected && !this.isStreamStale()) {
+      return;
+    }
+
     try {
       await this.ensureSeatClaimed();
       const snapshot = await this.fetchSnapshot();
@@ -329,6 +398,170 @@ export class ServerTableController implements TableController {
         }
       }
     }
+  }
+
+  private startStream(): void {
+    if (!this.streamUrl || this.streamSocket || this.reconnectTimerId !== null) {
+      return;
+    }
+
+    this.connectStream();
+  }
+
+  private connectStream(): void {
+    if (!this.streamUrl) {
+      return;
+    }
+
+    let nextSocket: WebSocket;
+    try {
+      nextSocket = new WebSocket(this.streamUrl);
+    } catch {
+      this.scheduleReconnect();
+      return;
+    }
+
+    this.streamSocket = nextSocket;
+    nextSocket.addEventListener('open', () => {
+      if (this.streamSocket !== nextSocket) {
+        return;
+      }
+
+      this.streamConnected = true;
+      this.reconnectAttempt = 0;
+      this.lastStreamMessageAtMs = Date.now();
+      this.pushLog('SYSTEM', 'Live table stream connected.');
+      if (this.latestSnapshot) {
+        this.emitSnapshot(this.latestSnapshot);
+      }
+    });
+
+    nextSocket.addEventListener('message', (event) => {
+      if (this.streamSocket !== nextSocket) {
+        return;
+      }
+
+      if (typeof event.data !== 'string') {
+        return;
+      }
+
+      let payload: unknown = null;
+      try {
+        payload = JSON.parse(event.data) as unknown;
+      } catch {
+        return;
+      }
+
+      if (isStreamHeartbeatMessage(payload)) {
+        this.lastStreamMessageAtMs = Date.now();
+        return;
+      }
+
+      const streamSnapshot = parseStreamSnapshotMessage(payload);
+      if (!streamSnapshot) {
+        return;
+      }
+
+      this.lastStreamMessageAtMs = Date.now();
+      const changed = this.storeSnapshot(streamSnapshot);
+      if (changed) {
+        this.emitSnapshot(streamSnapshot);
+      }
+    });
+
+    nextSocket.addEventListener('close', () => {
+      if (this.streamSocket !== nextSocket) {
+        return;
+      }
+
+      this.streamConnected = false;
+      this.streamSocket = null;
+      this.scheduleReconnect();
+    });
+
+    nextSocket.addEventListener('error', () => {
+      if (this.streamSocket !== nextSocket) {
+        return;
+      }
+
+      this.streamConnected = false;
+      try {
+        nextSocket.close();
+      } catch {
+        // Ignore close errors from errored sockets.
+      }
+    });
+  }
+
+  private stopStream(): void {
+    this.streamConnected = false;
+    this.lastStreamMessageAtMs = 0;
+    this.reconnectAttempt = 0;
+    if (this.reconnectTimerId !== null) {
+      window.clearTimeout(this.reconnectTimerId);
+      this.reconnectTimerId = null;
+    }
+
+    if (this.streamSocket) {
+      const socketToClose = this.streamSocket;
+      this.streamSocket = null;
+      try {
+        socketToClose.close();
+      } catch {
+        // Ignore close errors.
+      }
+    }
+  }
+
+  private scheduleReconnect(): void {
+    if (!this.streamUrl || this.listeners.size === 0 || this.reconnectTimerId !== null) {
+      return;
+    }
+
+    const backoffMs = Math.min(STREAM_RECONNECT_MAX_MS, STREAM_RECONNECT_BASE_MS * (2 ** this.reconnectAttempt));
+    const jitterMs = Math.floor(Math.random() * 180);
+    const delayMs = backoffMs + jitterMs;
+    this.reconnectAttempt += 1;
+    this.reconnectTimerId = window.setTimeout(() => {
+      this.reconnectTimerId = null;
+      this.connectStream();
+    }, delayMs);
+  }
+
+  private startStreamHealthCheck(): void {
+    if (this.streamHealthTimerId !== null) {
+      return;
+    }
+
+    this.streamHealthTimerId = window.setInterval(() => {
+      if (!this.streamConnected || !this.streamSocket) {
+        return;
+      }
+
+      if (!this.isStreamStale()) {
+        return;
+      }
+
+      this.pushLog('SYSTEM', 'Live table stream is stale; reconnecting.');
+      const staleSocket = this.streamSocket;
+      this.streamConnected = false;
+      this.streamSocket = null;
+      try {
+        staleSocket.close();
+      } catch {
+        // Ignore close errors.
+      }
+      this.scheduleReconnect();
+    }, Math.max(1_000, this.pollIntervalMs));
+  }
+
+  private isStreamStale(): boolean {
+    if (!this.streamConnected) {
+      return true;
+    }
+
+    const timeoutMs = Math.max(STREAM_STALE_MIN_TIMEOUT_MS, this.pollIntervalMs * 5);
+    return Date.now() - this.lastStreamMessageAtMs > timeoutMs;
   }
 
   private async ensureSnapshot(): Promise<ServerTableSnapshot> {
