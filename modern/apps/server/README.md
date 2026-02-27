@@ -50,6 +50,9 @@ Environment overrides:
 - `POKER_AUTH_BOOTSTRAP_USERS_FILE` (path to JSON file with bootstrap auth users)
 - `POKER_ENABLE_LEGACY_WALLET_ROUTES` (`1`/`0`, default `1` unless `NODE_ENV=production`)
 - `POKER_ENABLE_TABLE_WS_COMMANDS` (`1`/`0`, default `0`; enables WebSocket `APPLY_COMMAND` channel)
+- `POKER_TABLE_WS_COMMAND_RATE_LIMIT_WINDOW_MS` (positive integer, default `1000`)
+- `POKER_TABLE_WS_COMMAND_RATE_LIMIT_MAX` (positive integer, default `30`)
+- `POKER_TABLE_WS_COMMAND_MAX_IN_FLIGHT` (positive integer, default `4`)
 
 Environment template:
 
@@ -72,6 +75,9 @@ Runtime persistence:
 - `runtime.externalAuthFirebaseVerifier`
 - `runtime.externalAuthSecretRotationEnabled`
 - `runtime.tableWsCommandChannelEnabled`
+- `runtime.tableWsCommandRateLimitWindowMs`
+- `runtime.tableWsCommandRateLimitMax`
+- `runtime.tableWsCommandMaxInFlight`
 
 Auth/session behavior:
 
@@ -124,6 +130,9 @@ WebSocket command channel (`POKER_ENABLE_TABLE_WS_COMMANDS=1`):
   - `{ "type": "COMMAND_ERROR", "commandId": "client-id", "code": "<ERROR_CODE>", "message": "<details>" }`
 - Idempotency:
   - repeated `commandId` for the same table/auth context replays the original `COMMAND_ACK`/`COMMAND_ERROR` without reapplying.
+- Guardrails:
+  - per-connection command rate limit (default `30` per `1000ms`) returns `COMMAND_ERROR` with code `RATE_LIMITED`
+  - per-connection in-flight cap (default `4`) returns `COMMAND_ERROR` with code `RATE_LIMITED`
 - Auth checks:
   - uses the same seat ownership / role rules as `POST /api/table/command`.
   - include `authToken` for player-seat actions; omit for system automation commands.

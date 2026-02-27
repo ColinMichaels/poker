@@ -40,6 +40,9 @@ function testLoadsDevelopmentDefaults(): void {
   assertEqual(config.authAllowDemoUsers, true, 'Expected demo users enabled by default outside production.');
   assertEqual(config.allowLegacyWalletRoutes, true, 'Expected legacy routes enabled by default outside production.');
   assertEqual(config.tableWsCommandChannelEnabled, false, 'Expected WS command channel disabled by default.');
+  assertEqual(config.tableWsCommandRateLimitWindowMs, 1000, 'Expected WS command rate-limit window default.');
+  assertEqual(config.tableWsCommandRateLimitMax, 30, 'Expected WS command rate-limit max default.');
+  assertEqual(config.tableWsCommandMaxInFlight, 4, 'Expected WS command in-flight cap default.');
   assertEqual(config.externalAuthEnabled, false, 'Expected external auth disabled by default.');
   assertEqual(config.externalAuthMode, 'signed_assertion', 'Expected default external auth mode.');
   assertEqual(config.externalAuthIssuer, 'external-idp', 'Expected default external auth issuer.');
@@ -96,6 +99,9 @@ function testLoadsExplicitOverrides(): void {
     POKER_AUTH_ALLOW_DEMO_USERS: '1',
     POKER_ENABLE_LEGACY_WALLET_ROUTES: '0',
     POKER_ENABLE_TABLE_WS_COMMANDS: '1',
+    POKER_TABLE_WS_COMMAND_RATE_LIMIT_WINDOW_MS: '2500',
+    POKER_TABLE_WS_COMMAND_RATE_LIMIT_MAX: '75',
+    POKER_TABLE_WS_COMMAND_MAX_IN_FLIGHT: '6',
     POKER_EXTERNAL_AUTH_ENABLED: '1',
     POKER_EXTERNAL_AUTH_ISSUER: 'oidc-demo',
     POKER_EXTERNAL_AUTH_SHARED_SECRET: 'external-secret-123456',
@@ -112,6 +118,9 @@ function testLoadsExplicitOverrides(): void {
   assertEqual(config.authAllowDemoUsers, true, 'Expected explicit demo users override.');
   assertEqual(config.allowLegacyWalletRoutes, false, 'Expected explicit legacy route override.');
   assertEqual(config.tableWsCommandChannelEnabled, true, 'Expected explicit WS command channel override.');
+  assertEqual(config.tableWsCommandRateLimitWindowMs, 2500, 'Expected WS command rate-limit window override.');
+  assertEqual(config.tableWsCommandRateLimitMax, 75, 'Expected WS command rate-limit max override.');
+  assertEqual(config.tableWsCommandMaxInFlight, 6, 'Expected WS command in-flight cap override.');
   assertEqual(config.externalAuthEnabled, true, 'Expected explicit external auth enablement.');
   assertEqual(config.externalAuthMode, 'signed_assertion', 'Expected signed assertion mode when unspecified.');
   assertEqual(config.externalAuthIssuer, 'oidc-demo', 'Expected external auth issuer override.');
@@ -306,6 +315,24 @@ function testRejectsInvalidBootstrapUsersAndEnvValues(): void {
       () => loadStartupConfig({ POKER_ENABLE_TABLE_WS_COMMANDS: 'maybe' }),
       /Invalid POKER_ENABLE_TABLE_WS_COMMANDS value/,
       'Expected invalid WS command channel toggle values to fail.',
+    );
+
+    assertThrows(
+      () => loadStartupConfig({ POKER_TABLE_WS_COMMAND_RATE_LIMIT_WINDOW_MS: '0' }),
+      /Invalid POKER_TABLE_WS_COMMAND_RATE_LIMIT_WINDOW_MS value/,
+      'Expected invalid WS command rate-limit window values to fail.',
+    );
+
+    assertThrows(
+      () => loadStartupConfig({ POKER_TABLE_WS_COMMAND_RATE_LIMIT_MAX: '0' }),
+      /Invalid POKER_TABLE_WS_COMMAND_RATE_LIMIT_MAX value/,
+      'Expected invalid WS command rate-limit max values to fail.',
+    );
+
+    assertThrows(
+      () => loadStartupConfig({ POKER_TABLE_WS_COMMAND_MAX_IN_FLIGHT: '0' }),
+      /Invalid POKER_TABLE_WS_COMMAND_MAX_IN_FLIGHT value/,
+      'Expected invalid WS command in-flight cap values to fail.',
     );
 
     assertThrows(

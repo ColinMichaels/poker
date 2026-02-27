@@ -53,6 +53,9 @@ Environment variables:
 - `POKER_AUTH_BOOTSTRAP_USERS_FILE` (JSON seed file used when no persisted auth state exists)
 - `POKER_ENABLE_LEGACY_WALLET_ROUTES` (`1`/`0`, default: `0` when `NODE_ENV=production`)
 - `POKER_ENABLE_TABLE_WS_COMMANDS` (`1`/`0`, default: `0`; enables WebSocket `APPLY_COMMAND` channel)
+- `POKER_TABLE_WS_COMMAND_RATE_LIMIT_WINDOW_MS` (positive integer, default: `1000`; WS command guardrail window)
+- `POKER_TABLE_WS_COMMAND_RATE_LIMIT_MAX` (positive integer, default: `30`; max commands per WS guardrail window)
+- `POKER_TABLE_WS_COMMAND_MAX_IN_FLIGHT` (positive integer, default: `4`; max concurrent WS command processing per connection)
 
 Client runtime variables (for Firebase-authenticated web client):
 
@@ -81,13 +84,14 @@ Template reference:
 ## Health + Readiness Checks
 
 - `GET /health` (liveness)
-  - includes runtime flags for persistence/demo-users/legacy-wallet-route/external-auth, including mode/rotation fallback and WebSocket command-channel status
+  - includes runtime flags for persistence/demo-users/legacy-wallet-route/external-auth, including mode/rotation fallback, WebSocket command-channel status, and WS command guardrail settings
 - `GET /api/table/list` (server-fed table catalog for lobby + multi-table cards)
 - `GET /api/table/state` (authoritative table snapshot)
   - optional `?tableId=<id>` targets non-default table session
 - `GET /api/table/ws` (WebSocket stream for table snapshots)
   - optional `?tableId=<id>` targets non-default table session
   - when `POKER_ENABLE_TABLE_WS_COMMANDS=1`, also accepts `APPLY_COMMAND` frames and returns `COMMAND_ACK` / `COMMAND_ERROR`
+  - when WS guardrails are exceeded, command channel returns `COMMAND_ERROR` with code `RATE_LIMITED`
 
 Auth/wallet sanity checks:
 

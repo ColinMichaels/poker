@@ -247,6 +247,9 @@ type RouteRuntimeInfo = {
   externalAuthFirebaseVerifier: FirebaseVerifierMode;
   externalAuthVerificationSecrets: readonly string[];
   tableWsCommandChannelEnabled?: boolean;
+  tableWsCommandRateLimitWindowMs?: number;
+  tableWsCommandRateLimitMax?: number;
+  tableWsCommandMaxInFlight?: number;
   verifyFirebaseIdTokenFn: (
     idToken: string,
     options: FirebaseIdTokenVerificationOptions,
@@ -269,6 +272,9 @@ function createRuntimeInfo(overrides: Partial<RouteRuntimeInfo> = {}): RouteRunt
     externalAuthFirebaseVerifier: 'jwt',
     externalAuthVerificationSecrets: [],
     tableWsCommandChannelEnabled: false,
+    tableWsCommandRateLimitWindowMs: 1000,
+    tableWsCommandRateLimitMax: 30,
+    tableWsCommandMaxInFlight: 4,
     verifyFirebaseIdTokenFn: async () => {
       throw new Error('firebase verifier should not be called in default runtime mode');
     },
@@ -332,6 +338,9 @@ async function testHealthRouteIncludesExternalAuthRotationFlag(): Promise<void> 
       externalAuthFirebaseVerifier: 'jwt',
       externalAuthVerificationSecrets: ['current-secret-1234567890', 'previous-secret-1234567890'],
       tableWsCommandChannelEnabled: true,
+      tableWsCommandRateLimitWindowMs: 2000,
+      tableWsCommandRateLimitMax: 60,
+      tableWsCommandMaxInFlight: 3,
       verifyFirebaseIdTokenFn: async () => {
         throw new Error('firebase verifier should not be called in signed_assertion mode');
       },
@@ -348,6 +357,9 @@ async function testHealthRouteIncludesExternalAuthRotationFlag(): Promise<void> 
       externalAuthFirebaseVerifier: string;
       externalAuthSecretRotationEnabled: boolean;
       tableWsCommandChannelEnabled: boolean;
+      tableWsCommandRateLimitWindowMs: number;
+      tableWsCommandRateLimitMax: number;
+      tableWsCommandMaxInFlight: number;
     };
   };
   assertEqual(payload.runtime.externalAuthEnabled, true, 'Expected runtime to report external auth enabled.');
@@ -367,6 +379,21 @@ async function testHealthRouteIncludesExternalAuthRotationFlag(): Promise<void> 
     payload.runtime.tableWsCommandChannelEnabled,
     true,
     'Expected health runtime to report websocket command channel enablement.',
+  );
+  assertEqual(
+    payload.runtime.tableWsCommandRateLimitWindowMs,
+    2000,
+    'Expected health runtime to report websocket command rate-limit window.',
+  );
+  assertEqual(
+    payload.runtime.tableWsCommandRateLimitMax,
+    60,
+    'Expected health runtime to report websocket command rate-limit max.',
+  );
+  assertEqual(
+    payload.runtime.tableWsCommandMaxInFlight,
+    3,
+    'Expected health runtime to report websocket command in-flight cap.',
   );
 }
 
@@ -1562,6 +1589,180 @@ async function testTableStreamApplyCommandBuffersFragmentedFrames(): Promise<voi
   }
 }
 
+async function testTableStreamApplyCommandRateLimitRejectsExcessFrames(): Promise<void> {
+  const tableService = new TableService({
+    tableId: 'http-test-table',
+    initialState: createDefaultTableState({
+      handId: 'boot-http-test',
+      seed: 414,
+    }),
+  });
+  const tableStreamHub = new TableStreamHub({ heartbeatIntervalMs: 60_000 });
+  const idempotencyStore = new TableStreamCommandIdempotencyStore();
+  const authWalletService = new AuthWalletService();
+  const socket = new MockUpgradeSocket();
+
+  try {
+    handleTableStreamUpgrade(
+      createUpgradeRequest({
+        url: '/api/table/ws',
+        headers: createUpgradeHeaders(),
+      }),
+      socket as unknown as Duplex,
+      {
+        defaultTableId: tableService.getSnapshot().tableId,
+        resolveTableService: () => tableService,
+        tableStreamHub,
+        host: '127.0.0.1',
+        port: 8787,
+        commandChannel: {
+          enabled: true,
+          authWalletService,
+          persistRuntimeState: () => {},
+          emitTableSnapshot: () => {},
+          idempotencyStore,
+          rateLimitWindowMs: 60_000,
+          rateLimitMax: 1,
+          maxInFlight: 4,
+        },
+      },
+    );
+
+    socket.writes = [];
+    socket.emit(
+      'data',
+      encodeClientTextFrame(JSON.stringify({
+        type: 'APPLY_COMMAND',
+        commandId: 'cmd-rate-limit-1',
+        command: {
+          type: 'START_HAND',
+          handId: 'ws-rate-limit-hand',
+          seed: 555,
+        },
+      })),
+    );
+    socket.emit(
+      'data',
+      encodeClientTextFrame(JSON.stringify({
+        type: 'APPLY_COMMAND',
+        commandId: 'cmd-rate-limit-2',
+        command: {
+          type: 'POST_BLINDS',
+        },
+      })),
+    );
+
+    const messages = extractSocketJsonMessages(socket);
+    const ackMessages = messages.filter((message) =>
+      typeof message === 'object'
+      && message !== null
+      && !Array.isArray(message)
+      && (message as Record<string, unknown>).type === 'COMMAND_ACK');
+    const rateLimitedErrors = messages.filter((message) =>
+      typeof message === 'object'
+      && message !== null
+      && !Array.isArray(message)
+      && (message as Record<string, unknown>).type === 'COMMAND_ERROR'
+      && (message as Record<string, unknown>).code === 'RATE_LIMITED');
+    assertEqual(ackMessages.length, 1, 'Expected first websocket command within rate limit to be acknowledged.');
+    assertEqual(rateLimitedErrors.length, 1, 'Expected second websocket command to be rate limited.');
+    assertEqual(
+      (rateLimitedErrors[0] as Record<string, unknown>).commandId,
+      'cmd-rate-limit-2',
+      'Expected rate-limited error to report second command id.',
+    );
+    assertEqual(tableService.getSnapshot().commandSequence, 1, 'Expected rate-limited command to avoid table state mutation.');
+  } finally {
+    tableStreamHub.closeAll();
+  }
+}
+
+async function testTableStreamApplyCommandInFlightLimitRejectsReentrantFrames(): Promise<void> {
+  const tableService = new TableService({
+    tableId: 'http-test-table',
+    initialState: createDefaultTableState({
+      handId: 'boot-http-test',
+      seed: 415,
+    }),
+  });
+  const tableStreamHub = new TableStreamHub({ heartbeatIntervalMs: 60_000 });
+  const idempotencyStore = new TableStreamCommandIdempotencyStore();
+  const authWalletService = new AuthWalletService();
+  const socket = new MockUpgradeSocket();
+  let injectedReentrantCommand = false;
+  const reentrantFrame = encodeClientTextFrame(JSON.stringify({
+    type: 'APPLY_COMMAND',
+    commandId: 'cmd-inflight-2',
+    command: {
+      type: 'POST_BLINDS',
+    },
+  }));
+
+  try {
+    handleTableStreamUpgrade(
+      createUpgradeRequest({
+        url: '/api/table/ws',
+        headers: createUpgradeHeaders(),
+      }),
+      socket as unknown as Duplex,
+      {
+        defaultTableId: tableService.getSnapshot().tableId,
+        resolveTableService: () => tableService,
+        tableStreamHub,
+        host: '127.0.0.1',
+        port: 8787,
+        commandChannel: {
+          enabled: true,
+          authWalletService,
+          persistRuntimeState: () => {},
+          emitTableSnapshot: () => {
+            if (injectedReentrantCommand) {
+              return;
+            }
+            injectedReentrantCommand = true;
+            socket.emit('data', reentrantFrame);
+          },
+          idempotencyStore,
+          rateLimitWindowMs: 60_000,
+          rateLimitMax: 10,
+          maxInFlight: 1,
+        },
+      },
+    );
+
+    socket.writes = [];
+    socket.emit(
+      'data',
+      encodeClientTextFrame(JSON.stringify({
+        type: 'APPLY_COMMAND',
+        commandId: 'cmd-inflight-1',
+        command: {
+          type: 'START_HAND',
+          handId: 'ws-inflight-hand',
+          seed: 556,
+        },
+      })),
+    );
+
+    const messages = extractSocketJsonMessages(socket);
+    const rateLimitedErrors = messages.filter((message) =>
+      typeof message === 'object'
+      && message !== null
+      && !Array.isArray(message)
+      && (message as Record<string, unknown>).type === 'COMMAND_ERROR'
+      && (message as Record<string, unknown>).code === 'RATE_LIMITED');
+    assertEqual(rateLimitedErrors.length, 1, 'Expected re-entrant websocket command to be rejected by in-flight cap.');
+    assertEqual(
+      (rateLimitedErrors[0] as Record<string, unknown>).commandId,
+      'cmd-inflight-2',
+      'Expected in-flight rejection to include re-entrant command id.',
+    );
+    assertEqual(tableService.getSnapshot().commandSequence, 1, 'Expected in-flight limited command to avoid extra state mutation.');
+  } finally {
+    tableStreamHub.closeAll();
+  }
+}
+
 async function testTableStreamApplyCommandDisabledReturnsError(): Promise<void> {
   const tableService = new TableService({
     tableId: 'http-test-table',
@@ -1737,6 +1938,9 @@ async function testTableStreamApplyCommandIdempotencyReplaysAckWithoutReapplying
           persistRuntimeState: () => {},
           emitTableSnapshot: () => {},
           idempotencyStore,
+          rateLimitWindowMs: 60_000,
+          rateLimitMax: 1,
+          maxInFlight: 4,
         },
       },
     );
@@ -1799,6 +2003,8 @@ async function runAll(): Promise<void> {
   await testTableStreamHubEmitsHeartbeats();
   await testTableStreamApplyCommandProcessesCoalescedFrames();
   await testTableStreamApplyCommandBuffersFragmentedFrames();
+  await testTableStreamApplyCommandRateLimitRejectsExcessFrames();
+  await testTableStreamApplyCommandInFlightLimitRejectsReentrantFrames();
   await testTableStreamApplyCommandDisabledReturnsError();
   await testTableStreamApplyCommandAuthChecksMatchHttpRouteRules();
   await testTableStreamApplyCommandIdempotencyReplaysAckWithoutReapplying();

@@ -125,6 +125,10 @@ Authoritative table runtime in client:
    - `npm run dev:client`
 6. In server mode, play actions and hand progression are submitted through `/api/table/command` and snapshots are read from `/api/table/state`.
 7. Optional: enable server WebSocket command channel with `POKER_ENABLE_TABLE_WS_COMMANDS=1` to accept `APPLY_COMMAND` frames on `/api/table/ws`.
+   Optional guardrail tuning:
+   - `POKER_TABLE_WS_COMMAND_RATE_LIMIT_WINDOW_MS` (default `1000`)
+   - `POKER_TABLE_WS_COMMAND_RATE_LIMIT_MAX` (default `30`)
+   - `POKER_TABLE_WS_COMMAND_MAX_IN_FLIGHT` (default `4`)
 8. Client/server sync also uses table-scoped WebSocket streams (`/api/table/ws?tableId=<id>`) with polling fallback/reconnect.
 9. When a server session is available, the client auto-claims the selected seat through `POST /api/table/seat`.
 10. Player sessions can only submit `PLAYER_ACTION` for their claimed seat; logout releases the current claim.

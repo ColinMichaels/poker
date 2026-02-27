@@ -28,6 +28,9 @@ const WEBSOCKET_GUID = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
 const TABLE_STREAM_COMMAND_IDEMPOTENCY_TTL_MS = 5 * 60_000;
 const TABLE_STREAM_COMMAND_IDEMPOTENCY_MAX_PER_TABLE = 2_000;
 const TABLE_STREAM_MAX_PENDING_FRAME_BYTES = 1_048_576;
+const TABLE_STREAM_COMMAND_RATE_LIMIT_WINDOW_MS = 1_000;
+const TABLE_STREAM_COMMAND_RATE_LIMIT_MAX = 30;
+const TABLE_STREAM_COMMAND_MAX_IN_FLIGHT = 4;
 
 class HttpError extends Error {
   public readonly statusCode: number;
@@ -409,6 +412,15 @@ interface TableStreamCommandChannelOptions {
   emitTableSnapshot: (tableService: TableService) => void;
   idempotencyStore: TableStreamCommandIdempotencyStore;
   tableId: string;
+  rateLimitWindowMs: number;
+  rateLimitMax: number;
+  maxInFlight: number;
+}
+
+interface TableStreamCommandSocketState {
+  inFlightCount: number;
+  rateWindowStartedAtMs: number;
+  rateWindowCommandCount: number;
 }
 
 interface TableStreamUpgradeOptions {
@@ -423,6 +435,9 @@ interface TableStreamUpgradeOptions {
     persistRuntimeState: () => void;
     emitTableSnapshot: (tableService: TableService) => void;
     idempotencyStore: TableStreamCommandIdempotencyStore;
+    rateLimitWindowMs?: number;
+    rateLimitMax?: number;
+    maxInFlight?: number;
   };
 }
 
@@ -486,6 +501,25 @@ function buildStreamIdempotencyKey(commandId: string, authToken: string | undefi
   return `${authKey}:${commandId}`;
 }
 
+function consumeSocketCommandRateLimit(
+  socketState: TableStreamCommandSocketState,
+  nowMs: number,
+  rateLimitWindowMs: number,
+  rateLimitMax: number,
+): boolean {
+  if (nowMs - socketState.rateWindowStartedAtMs >= rateLimitWindowMs) {
+    socketState.rateWindowStartedAtMs = nowMs;
+    socketState.rateWindowCommandCount = 0;
+  }
+
+  if (socketState.rateWindowCommandCount >= rateLimitMax) {
+    return false;
+  }
+
+  socketState.rateWindowCommandCount += 1;
+  return true;
+}
+
 function sendStreamCommandError(
   socket: Duplex,
   commandId: string,
@@ -542,6 +576,7 @@ function handleTableStreamApplyCommand(
   socket: Duplex,
   payload: unknown,
   commandChannel: TableStreamCommandChannelOptions,
+  socketCommandState: TableStreamCommandSocketState,
 ): void {
   const fallbackCommandId = resolveStreamCommandId(payload);
   let commandId = fallbackCommandId;
@@ -558,41 +593,71 @@ function handleTableStreamApplyCommand(
       return;
     }
 
-    if (!commandChannel.enabled) {
-      const disabledResponse = sendStreamCommandError(
+    if (socketCommandState.inFlightCount >= commandChannel.maxInFlight) {
+      sendStreamCommandError(
         socket,
         parsedMessage.commandId,
-        'COMMAND_CHANNEL_DISABLED',
-        'WebSocket command channel is disabled on this server.',
+        'RATE_LIMITED',
+        `Too many in-flight WebSocket commands (max ${commandChannel.maxInFlight} per connection).`,
       );
-      if (disabledResponse) {
-        commandChannel.idempotencyStore.set(commandChannel.tableId, idempotencyKey, disabledResponse);
-      }
       return;
     }
 
-    authorizeTableCommand(
-      parsedMessage.authToken,
-      parsedMessage.command,
-      commandChannel.tableService,
-      commandChannel.authWalletService,
-    );
+    if (!consumeSocketCommandRateLimit(
+      socketCommandState,
+      Date.now(),
+      commandChannel.rateLimitWindowMs,
+      commandChannel.rateLimitMax,
+    )) {
+      sendStreamCommandError(
+        socket,
+        parsedMessage.commandId,
+        'RATE_LIMITED',
+        `WebSocket command rate exceeded (${commandChannel.rateLimitMax} per ${commandChannel.rateLimitWindowMs}ms).`,
+      );
+      return;
+    }
 
-    const result = commandChannel.tableService.applyCommand(parsedMessage.command) as {
-      command: {
-        command: TableCommand;
+    socketCommandState.inFlightCount += 1;
+    try {
+      if (!commandChannel.enabled) {
+        const disabledResponse = sendStreamCommandError(
+          socket,
+          parsedMessage.commandId,
+          'COMMAND_CHANNEL_DISABLED',
+          'WebSocket command channel is disabled on this server.',
+        );
+        if (disabledResponse) {
+          commandChannel.idempotencyStore.set(commandChannel.tableId, idempotencyKey, disabledResponse);
+        }
+        return;
+      }
+
+      authorizeTableCommand(
+        parsedMessage.authToken,
+        parsedMessage.command,
+        commandChannel.tableService,
+        commandChannel.authWalletService,
+      );
+
+      const result = commandChannel.tableService.applyCommand(parsedMessage.command) as {
+        command: {
+          command: TableCommand;
+        };
+        events: Array<{
+          event: unknown;
+        }>;
+        snapshot: TableSnapshot;
       };
-      events: Array<{
-        event: unknown;
-      }>;
-      snapshot: TableSnapshot;
-    };
-    commandChannel.persistRuntimeState();
-    commandChannel.emitTableSnapshot(commandChannel.tableService);
+      commandChannel.persistRuntimeState();
+      commandChannel.emitTableSnapshot(commandChannel.tableService);
 
-    const ackResponse = sendStreamCommandAck(socket, parsedMessage.commandId, commandChannel.tableId, result);
-    if (ackResponse) {
-      commandChannel.idempotencyStore.set(commandChannel.tableId, idempotencyKey, ackResponse);
+      const ackResponse = sendStreamCommandAck(socket, parsedMessage.commandId, commandChannel.tableId, result);
+      if (ackResponse) {
+        commandChannel.idempotencyStore.set(commandChannel.tableId, idempotencyKey, ackResponse);
+      }
+    } finally {
+      socketCommandState.inFlightCount = Math.max(0, socketCommandState.inFlightCount - 1);
     }
   } catch (error) {
     const httpError = mapToHttpError(error);
@@ -607,6 +672,7 @@ function handleTableStreamSocketFrame(
   socket: Duplex,
   frame: { opcode: number; payload: Buffer },
   commandChannel: TableStreamCommandChannelOptions | undefined,
+  socketCommandState: TableStreamCommandSocketState | undefined,
 ): boolean {
   if (frame.opcode === 0x8) {
     try {
@@ -645,7 +711,11 @@ function handleTableStreamSocketFrame(
 
   const record = payload as Record<string, unknown>;
   if (record.type === 'APPLY_COMMAND') {
-    handleTableStreamApplyCommand(socket, payload, commandChannel);
+    if (!socketCommandState) {
+      sendStreamCommandError(socket, 'unknown', 'SERVER_MISCONFIGURED', 'WebSocket command socket state unavailable.');
+      return true;
+    }
+    handleTableStreamApplyCommand(socket, payload, commandChannel, socketCommandState);
   }
   return true;
 }
@@ -655,6 +725,7 @@ function handleTableStreamSocketData(
   chunk: Buffer,
   pendingBuffer: { bytes: Buffer },
   commandChannel: TableStreamCommandChannelOptions | undefined,
+  socketCommandState: TableStreamCommandSocketState | undefined,
 ): void {
   if (chunk.length === 0) {
     return;
@@ -676,7 +747,7 @@ function handleTableStreamSocketData(
       ? Buffer.alloc(0)
       : Buffer.from(pendingBuffer.bytes.subarray(frame.bytesConsumed));
 
-    const shouldContinue = handleTableStreamSocketFrame(socket, frame, commandChannel);
+    const shouldContinue = handleTableStreamSocketFrame(socket, frame, commandChannel, socketCommandState);
     if (!shouldContinue) {
       return;
     }
@@ -750,6 +821,9 @@ export function handleTableStreamUpgrade(
       emitTableSnapshot: options.commandChannel.emitTableSnapshot,
       idempotencyStore: options.commandChannel.idempotencyStore,
       tableId: requestedTableId,
+      rateLimitWindowMs: options.commandChannel.rateLimitWindowMs ?? TABLE_STREAM_COMMAND_RATE_LIMIT_WINDOW_MS,
+      rateLimitMax: options.commandChannel.rateLimitMax ?? TABLE_STREAM_COMMAND_RATE_LIMIT_MAX,
+      maxInFlight: options.commandChannel.maxInFlight ?? TABLE_STREAM_COMMAND_MAX_IN_FLIGHT,
     }
     : undefined;
   const acceptValue = buildWebSocketAcceptValue(websocketKey.trim());
@@ -767,9 +841,16 @@ export function handleTableStreamUpgrade(
   const socketReadBuffer = {
     bytes: Buffer.alloc(0),
   };
+  const socketCommandState: TableStreamCommandSocketState | undefined = commandChannel
+    ? {
+      inFlightCount: 0,
+      rateWindowStartedAtMs: Date.now(),
+      rateWindowCommandCount: 0,
+    }
+    : undefined;
   socket.on('data', (chunk: Buffer | string) => {
     const buffer = typeof chunk === 'string' ? Buffer.from(chunk, 'utf8') : chunk;
-    handleTableStreamSocketData(socket, buffer, socketReadBuffer, commandChannel);
+    handleTableStreamSocketData(socket, buffer, socketReadBuffer, commandChannel, socketCommandState);
   });
   socket.on('close', () => {
     options.tableStreamHub.removeConnection(socket);
@@ -1291,6 +1372,9 @@ export async function handleRequest(
     externalAuthFirebaseVerifier: FirebaseVerifierMode;
     externalAuthVerificationSecrets: readonly string[];
     tableWsCommandChannelEnabled?: boolean;
+    tableWsCommandRateLimitWindowMs?: number;
+    tableWsCommandRateLimitMax?: number;
+    tableWsCommandMaxInFlight?: number;
     verifyFirebaseIdTokenFn: (
       idToken: string,
       options: FirebaseIdTokenVerificationOptions,
@@ -1359,6 +1443,10 @@ export async function handleRequest(
           externalAuthFirebaseVerifier: runtimeInfo.externalAuthFirebaseVerifier,
           externalAuthSecretRotationEnabled: runtimeInfo.externalAuthVerificationSecrets.length > 1,
           tableWsCommandChannelEnabled: runtimeInfo.tableWsCommandChannelEnabled ?? false,
+          tableWsCommandRateLimitWindowMs: runtimeInfo.tableWsCommandRateLimitWindowMs
+            ?? TABLE_STREAM_COMMAND_RATE_LIMIT_WINDOW_MS,
+          tableWsCommandRateLimitMax: runtimeInfo.tableWsCommandRateLimitMax ?? TABLE_STREAM_COMMAND_RATE_LIMIT_MAX,
+          tableWsCommandMaxInFlight: runtimeInfo.tableWsCommandMaxInFlight ?? TABLE_STREAM_COMMAND_MAX_IN_FLIGHT,
         },
       });
       return;
@@ -1681,6 +1769,9 @@ const {
   authBootstrapUsers,
   allowLegacyWalletRoutes,
   tableWsCommandChannelEnabled,
+  tableWsCommandRateLimitWindowMs,
+  tableWsCommandRateLimitMax,
+  tableWsCommandMaxInFlight,
   externalAuthEnabled,
   externalAuthMode,
   externalAuthIssuer,
@@ -1853,6 +1944,9 @@ const server = createServer((request, response) => {
       externalAuthFirebaseVerifier,
       externalAuthVerificationSecrets,
       tableWsCommandChannelEnabled,
+      tableWsCommandRateLimitWindowMs,
+      tableWsCommandRateLimitMax,
+      tableWsCommandMaxInFlight,
       verifyFirebaseIdTokenFn: firebaseIdTokenVerifier,
     },
     allowLegacyWalletRoutes,
@@ -1880,6 +1974,9 @@ server.on('upgrade', (request, socket) => {
       persistRuntimeState,
       emitTableSnapshot,
       idempotencyStore: tableStreamCommandIdempotencyStore,
+      rateLimitWindowMs: tableWsCommandRateLimitWindowMs,
+      rateLimitMax: tableWsCommandRateLimitMax,
+      maxInFlight: tableWsCommandMaxInFlight,
     },
   });
 });
@@ -1933,6 +2030,9 @@ if (process.env.POKER_SERVER_NO_LISTEN !== '1') {
     console.info(`Auth demo users: ${authAllowDemoUsers ? 'enabled' : 'disabled'}`);
     console.info(`Legacy wallet routes: ${allowLegacyWalletRoutes ? 'enabled' : 'disabled'}`);
     console.info(`Table WS command channel: ${tableWsCommandChannelEnabled ? 'enabled' : 'disabled'}`);
+    console.info(
+      `Table WS command guardrails: windowMs=${tableWsCommandRateLimitWindowMs} maxPerWindow=${tableWsCommandRateLimitMax} maxInFlight=${tableWsCommandMaxInFlight}`,
+    );
     console.info(
       `External auth: ${externalAuthEnabled ? `enabled (${externalAuthMode}, issuer: ${externalAuthIssuer})` : 'disabled'}`,
     );

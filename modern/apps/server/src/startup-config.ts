@@ -5,6 +5,9 @@ import type { AuthUserSeedRecord } from './auth-wallet-service.ts';
 const DEFAULT_HOST = '127.0.0.1';
 const DEFAULT_PORT = 8787;
 const DEFAULT_TABLE_ID = 'table-1';
+const DEFAULT_TABLE_WS_COMMAND_RATE_LIMIT_WINDOW_MS = 1_000;
+const DEFAULT_TABLE_WS_COMMAND_RATE_LIMIT_MAX = 30;
+const DEFAULT_TABLE_WS_COMMAND_MAX_IN_FLIGHT = 4;
 const DEFAULT_EXTERNAL_AUTH_ISSUER = 'external-idp';
 const DEFAULT_EXTERNAL_AUTH_MODE = 'signed_assertion';
 const DEFAULT_FIREBASE_CERTS_URL =
@@ -56,6 +59,19 @@ function parseSessionTtlMs(rawValue: string | undefined): number | undefined {
   const parsed = Number.parseInt(rawValue, 10);
   if (!Number.isInteger(parsed) || parsed <= 0) {
     throw new Error(`Invalid POKER_SESSION_TTL_MS value: ${rawValue}`);
+  }
+
+  return parsed;
+}
+
+function parsePositiveIntegerEnvWithDefault(rawValue: string | undefined, fallback: number, label: string): number {
+  if (rawValue === undefined) {
+    return fallback;
+  }
+
+  const parsed = Number.parseInt(rawValue, 10);
+  if (!Number.isInteger(parsed) || parsed <= 0) {
+    throw new Error(`Invalid ${label} value: ${rawValue}`);
   }
 
   return parsed;
@@ -213,6 +229,9 @@ export interface StartupConfig {
   authBootstrapUsers: AuthUserSeedRecord[] | undefined;
   allowLegacyWalletRoutes: boolean;
   tableWsCommandChannelEnabled: boolean;
+  tableWsCommandRateLimitWindowMs: number;
+  tableWsCommandRateLimitMax: number;
+  tableWsCommandMaxInFlight: number;
   externalAuthEnabled: boolean;
   externalAuthMode: ExternalAuthMode;
   externalAuthIssuer: string;
@@ -322,6 +341,21 @@ export function loadStartupConfig(env: Record<string, string | undefined>): Star
     tableWsCommandChannelEnabled: env.POKER_ENABLE_TABLE_WS_COMMANDS === undefined
       ? false
       : parseBooleanEnv(env.POKER_ENABLE_TABLE_WS_COMMANDS, 'POKER_ENABLE_TABLE_WS_COMMANDS'),
+    tableWsCommandRateLimitWindowMs: parsePositiveIntegerEnvWithDefault(
+      env.POKER_TABLE_WS_COMMAND_RATE_LIMIT_WINDOW_MS,
+      DEFAULT_TABLE_WS_COMMAND_RATE_LIMIT_WINDOW_MS,
+      'POKER_TABLE_WS_COMMAND_RATE_LIMIT_WINDOW_MS',
+    ),
+    tableWsCommandRateLimitMax: parsePositiveIntegerEnvWithDefault(
+      env.POKER_TABLE_WS_COMMAND_RATE_LIMIT_MAX,
+      DEFAULT_TABLE_WS_COMMAND_RATE_LIMIT_MAX,
+      'POKER_TABLE_WS_COMMAND_RATE_LIMIT_MAX',
+    ),
+    tableWsCommandMaxInFlight: parsePositiveIntegerEnvWithDefault(
+      env.POKER_TABLE_WS_COMMAND_MAX_IN_FLIGHT,
+      DEFAULT_TABLE_WS_COMMAND_MAX_IN_FLIGHT,
+      'POKER_TABLE_WS_COMMAND_MAX_IN_FLIGHT',
+    ),
     externalAuthEnabled,
     externalAuthMode,
     externalAuthIssuer,
